@@ -1,0 +1,19 @@
+{
+  "name": "e2e-test-reviewer",
+  "display_name": "E2E Test Reviewer",
+  "provider": "ReviewBench",
+  "image": "ghcr.io/review-bench/rb-agent-pragent@sha256:c0b69555bffa48e0000000000000000000000000000000000000000000000000",
+  "secrets": {
+    "env": [
+      "EXAMPLE_API_KEY"
+    ]
+  },
+  "egress": [
+    "api.example.com"
+  ],
+  "contact": "abadawii591@gmail.com",
+  "notes": "Onboarding flow test from the API. Safe to close.",
+  "contacts": [
+    "abadawi591"
+  ]
+}
