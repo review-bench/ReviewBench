@@ -1,0 +1,15 @@
+{
+  "name": "acme-reviewer",
+  "display_name": "Acme Reviewer",
+  "provider": "Acme Inc.",
+  "image": "ghcr.io/example/reviewer@sha256:0000000000000000000000000000000000000000000000000000000000000001",
+  "contact": "reviews@acme.com",
+  "pr_timeout_seconds": 900,
+  "egress": [
+    "api.openai.com"
+  ],
+  "contacts": [
+    "alice-acme",
+    "abadawi591"
+  ]
+}
