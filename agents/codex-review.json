@@ -1,0 +1,27 @@
+{
+  "name": "codex-review",
+  "display_name": "Codex Review",
+  "provider": "OpenAI Codex CLI",
+  "image": "ghcr.io/review-bench/rb-agent-codex-review@sha256:74e71d8a92ff8bedf5e37f65b1d5129e52ea3cf460970f0d09013869a730da60",
+  "configuration": [
+    {
+      "key": "model",
+      "value": "gpt-5.5",
+      "display_value": "GPT-5.5"
+    }
+  ],
+  "secrets": {
+    "env": [
+      "CAPI_DEV_KEY"
+    ]
+  },
+  "egress": [
+    "api.githubcopilot.com"
+  ],
+  "pr_timeout_seconds": 900,
+  "contact": "@abadawi591",
+  "contacts": [
+    "abadawi591"
+  ],
+  "notes": "Reference vendor maintained by ReviewBench: OpenAI Codex CLI's review command, reaching the model through CAPI. Exercises the self-serve flow end to end."
+}
