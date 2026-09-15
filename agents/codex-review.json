@@ -2,7 +2,7 @@
   "name": "codex-review",
   "display_name": "Codex Review",
   "provider": "OpenAI Codex CLI",
-  "image": "ghcr.io/review-bench/rb-agent-codex-review@sha256:74e71d8a92ff8bedf5e37f65b1d5129e52ea3cf460970f0d09013869a730da60",
+  "image": "ghcr.io/review-bench/rb-agent-codex-review@sha256:71b7332f277512ca61acfea5eb490bde89aeaec6878b4e83192d512d0a617444",
   "configuration": [
     {
       "key": "model",
