@@ -2,12 +2,17 @@
   "name": "codex-review",
   "display_name": "Codex Review",
   "provider": "OpenAI Codex CLI",
-  "image": "ghcr.io/review-bench/rb-agent-codex-review@sha256:71b7332f277512ca61acfea5eb490bde89aeaec6878b4e83192d512d0a617444",
+  "image": "ghcr.io/abadawi591/codex-review@sha256:71b7332f277512ca61acfea5eb490bde89aeaec6878b4e83192d512d0a617444",
   "configuration": [
     {
       "key": "model",
-      "value": "gpt-5.5",
-      "display_value": "GPT-5.5"
+      "value": "gpt-5.6-sol",
+      "display_value": "GPT-5.6 Sol"
+    },
+    {
+      "key": "effort",
+      "value": "medium",
+      "display_value": "Medium"
     }
   ],
   "secrets": {
