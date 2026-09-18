@@ -1,0 +1,20 @@
+{
+  "name": "codex-review",
+  "display_name": "Codex Review",
+  "provider": "OpenAI",
+  "image": "ghcr.io/abadawi591/codex-review@sha256:71b7332f277512ca61acfea5eb490bde89aeaec6878b4e83192d512d0a617444",
+  "contact": "abadawii591@gmail.com",
+  "configuration": [
+    {
+      "key": "model",
+      "value": "gpt-5.6-sol"
+    },
+    {
+      "key": "effort",
+      "value": "medium"
+    }
+  ],
+  "contacts": [
+    "abadawi591"
+  ]
+}
