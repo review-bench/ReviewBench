@@ -1,0 +1,24 @@
+{
+  "name": "codex",
+  "display_name": "Codex",
+  "provider": "OpenAI Codex CLI",
+  "image": "ghcr.io/abadawi591/codex-review@sha256:71b7332f277512ca61acfea5eb490bde89aeaec6878b4e83192d512d0a617444",
+  "image_visibility": "public",
+  "contact": "abadawii591@gmail.com",
+  "configuration": [
+    {
+      "key": "model",
+      "value": "gpt-5.6-sol"
+    },
+    {
+      "key": "reasoning",
+      "value": "high"
+    }
+  ],
+  "egress": [
+    "api.openai.com"
+  ],
+  "contacts": [
+    "abadawi591"
+  ]
+}
