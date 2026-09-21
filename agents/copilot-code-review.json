@@ -2,26 +2,17 @@
   "name": "copilot-code-review",
   "display_name": "Copilot · Code Review",
   "provider": "GitHub",
-  "image": "ghcr.io/review-bench/rb-agent-ccr-review@sha256:4cd2f9770164e75f7d08df430abfe26d57ab82fae23054763c86322cf80e4e0d",
+  "image": "ghcr.io/review-bench/rb-agent-ccr-review@sha256:0ec46cb26c00d67c6a4758d495b9f82830cc382e78ca9f90ffa4916212b3343f",
   "image_visibility": "private",
   "contact": "abadawii591@gmail.com",
   "configuration": [
     {
       "key": "effort",
       "value": "medium"
-    },
-    {
-      "key": "model",
-      "value": "gpt-5.6-sol"
-    },
-    {
-      "key": "reasoning",
-      "value": "high"
     }
   ],
   "secrets": {
     "env": [
-      "CAPI_DEV_KEY",
       "GHCR_PULL_TOKEN"
     ]
   },
