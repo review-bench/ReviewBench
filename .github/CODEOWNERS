@@ -1,0 +1,5 @@
+# The onboarding manifests and their schema decide who may run on the benchmark.
+/agents/  @review-bench/reviewbench-maintainers
+/schema/  @review-bench/reviewbench-maintainers
+/AGENT_CONTRACT.md  @review-bench/reviewbench-maintainers
+/.github/workflows/  @review-bench/reviewbench-maintainers
