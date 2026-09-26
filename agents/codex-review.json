@@ -1,0 +1,30 @@
+{
+  "name": "codex-review",
+  "display_name": "Codex Review",
+  "provider": "OpenAI Codex CLI",
+  "image": "ghcr.io/abadawi591/rb-agent-codex-review@sha256:e9fb722ba91e44fd7cbc394835c559750f7b6d8a58e802228f59549bc7a655fc",
+  "image_visibility": "private",
+  "contact": "abadawii591@gmail.com",
+  "configuration": [
+    {
+      "key": "model",
+      "value": "gpt-5.6-sol"
+    },
+    {
+      "key": "effort",
+      "value": "medium"
+    }
+  ],
+  "secrets": {
+    "env": [
+      "GHCR_PULL_TOKEN",
+      "CAPI_DEV_KEY"
+    ]
+  },
+  "egress": [
+    "api.githubcopilot.com"
+  ],
+  "contacts": [
+    "abadawi591"
+  ]
+}
