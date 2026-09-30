@@ -7,33 +7,33 @@ For each pull request, the benchmark provides a human-reviewed golden set of cod
 
 ## What is in the Repository?
 
-- **[The test set: 25 tasks](corpus/test/).** The selected pull
-  requests come from 25 repositories and span a broad range of languages,
-  repository sizes, change sizes, finding categories, and severities.
-- **[The full set: 219 tasks](corpus/manifest.json).** Every pull request the
-  leaderboard runs on, with its corresponding findings in [`golden/`](golden/).
-- **[Benchmark documentation](docs/METHODOLOGY.md).** How the corpus was
-  built, how findings are labeled, and how agents are judged and scored.
+- **[The public full corpus of 219 tasks](corpus/manifest.json).** The pull
+  requests come from 187 repositories and span a broad range of languages,
+  repository sizes, change sizes, finding categories, and severities. The
+  [25-task test corpus](corpus/test/test.json) is a representative
+  subset of the full corpus intended for small and test runs.
+- **[Benchmark documentation](docs/METHODOLOGY.md).** This includes the
+  [methodology](docs/METHODOLOGY.md), [corpus extraction process](docs/EXTRACTION.md),
+  [evaluation harness](docs/HARNESS.md), and [security operations](docs/SECURITY-OPERATIONS.md).
+- **[The Claude Sonnet 5 classifier prompt](scripts/classifier/prompts.ts).**
+  It assigns TP/FP, severity, category, and the other auxiliary labels. The
+  [canonical renderer](scripts/eval/prompt-format.ts) completes the system prompt
+  and formats finding text. The matcher implementation is not included in this migration.
 - **[Everything a reviewer vendor needs](#run-your-code-review-agent-on-reviewbench).**
-  The [agent contract](AGENT_CONTRACT.md), the [Codex CLI example](examples/codex-cli/), a
-  [local test script](scripts/try-agent.sh) and the
-  [onboarding guide](docs/ONBOARDING.md).
-- **[The classifier prompt and supporting script](scripts/classifier/prompts.ts).**
-  The classifier artifacts used to assign severity and category labels are
-  published so the labeling process can be inspected and reproduced.
+  The [agent contract](AGENT_CONTRACT.md), [Codex CLI example](examples/codex-cli/),
+  [local test script](scripts/try-agent.sh), and [onboarding guide](docs/ONBOARDING.md).
 
-The full corpus manifest and all golden findings are public.
+The full corpus manifest and all golden findings in [`golden/`](golden/) are public.
 
-### Test Set Distribution
+### Corpus Distribution
 
-The 25 test set tasks were selected as a representative sample of the full
-set. They preserve its mix of major languages, change sizes, and
-repository diversity while also covering every finding category and severity
-level.
+All 219 full-corpus PRs are public. The 25-PR test corpus is included within
+the full corpus and preserves a representative mix of major languages, change
+sizes, finding categories, and severity levels for small and test runs.
 
 #### Languages
 
-| Language | Test set PRs | Test set share | Full set PRs | Full set share |
+| Language | Test-corpus tasks | Test-corpus share | Full-corpus PRs | Full-corpus share |
 |---|---:|---:|---:|---:|
 | TypeScript | 5 | 20.0% | 68 | 31.1% |
 | Python | 4 | 16.0% | 41 | 18.7% |
@@ -43,12 +43,12 @@ level.
 | Other languages | 9 | 36.0% | 51 | 23.3% |
 | **Total** | **25** | **100%** | **219** | **100%** |
 
-The test set's other languages are Rust, Java, Jupyter Notebook, Kotlin,
+The test corpus's other languages are Rust, Java, Jupyter Notebook, Kotlin,
 PHP, Ruby, Shell, and Swift.
 
 #### PR Change Size
 
-| Added and removed lines | Test set PRs | Test set share | Full set PRs | Full set share |
+| Added and removed lines | Test-corpus tasks | Test-corpus share | Full-corpus PRs | Full-corpus share |
 |---|---:|---:|---:|---:|
 | 50 or fewer | 3 | 12.0% | 17 | 7.8% |
 | 51-200 | 5 | 20.0% | 40 | 18.3% |
@@ -57,7 +57,7 @@ PHP, Ruby, Shell, and Swift.
 | More than 1,000 | 7 | 28.0% | 78 | 35.6% |
 | **Total** | **25** | **100%** | **219** | **100%** |
 
-#### Finding Severities
+#### Test-Corpus Finding Severities
 
 | Severity | Findings | Share |
 |---|---:|---:|
@@ -66,7 +66,7 @@ PHP, Ruby, Shell, and Swift.
 | Low | 188 | 52.2% |
 | **Total** | **360** | **100%** |
 
-#### Finding Categories
+#### Test-Corpus Finding Categories
 
 | Category | Findings | Category | Findings |
 |---|---:|---|---:|
@@ -76,9 +76,9 @@ PHP, Ruby, Shell, and Swift.
 | Performance | 13 | API architecture | 12 |
 | Accessibility | 10 |  |  |
 
-### Full Set Distribution
+### Full Corpus Distribution
 
-The full set contains 219 PRs from 187 distinct repositories. No single
+The full corpus contains 219 PRs from 187 distinct repositories. No single
 repository dominates the benchmark. The most represented repository contributes
 10 PRs, or only 4.6% of the corpus. The corpus covers both common and
 long-tail languages as well as changes ranging from small patches to
@@ -177,9 +177,10 @@ tuning happens on your side:
 1. **Test run.** Your image runs on the test set (25 pull requests). You
    get a result for each pull request, so you can see exactly what your
    adapter produced and fix it.
-2. **Tuning on the full set** happens on your side. The full set, the judge
-   prompts and the judge models are public, so you can score all 219 pull
-   requests yourself, as often as you like, with your own compute.
+2. **Tuning on the full set** happens on your side. The full set, the Claude
+   Sonnet 5 classifier prompt, and the matching methodology are public.
+   The complete evaluation runtime, including the matcher implementation,
+   is not included in this migration.
 3. **Final.** Three rounds on the full set (219 pull requests) with the
    configuration you pick. A maintainer reviews the result; once approved,
    your leaderboard row is published.
@@ -194,7 +195,7 @@ row shows how many configurations you tested.
   your container. We never see them, and the model you use is part of what
   the benchmark measures, so we cannot supply it.
 - **The judge's cost is coverd by us for test and final runs.** Every reviewer's result are evaluated
-  with the same judge panel models, at our cost. Tuning on the full set on your
+  with the same Claude Sonnet 5 classifier, at our cost. Tuning on the full set on your
   side uses your own judge calls.
 
 ### Credentials

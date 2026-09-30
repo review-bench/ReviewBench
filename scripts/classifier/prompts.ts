@@ -6,8 +6,13 @@
  * group's taste and is the component most likely to need periodic
  * recalibration (Section 5.3).
  *
- * Version: 2.0.0 — session-based architecture with tool use
+ * Model: Claude Sonnet 5
+ * Version: 3.0.0 — session-based architecture with tool use
  */
+
+import {
+  renderClassifierFinding,
+} from "../eval/prompt-format.js";
 
 export const CLASSIFIER_VERSION = "3.0.0";
 
@@ -218,7 +223,7 @@ export function buildClassifierUserMessage(args: {
 ${locationInfo}${hunkSection}
 
 **Finding:**
-> ${args.message}
+${renderClassifierFinding(args.message)}
 
 ---
 

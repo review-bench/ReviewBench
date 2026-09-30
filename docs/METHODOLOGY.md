@@ -5,16 +5,14 @@
 We describe an offline benchmark methodology for evaluating AI code review
 systems against pull requests (PRs) drawn from a curated set of source
 repositories. The methodology produces per-PR sets of *findings* — atomic
-review observations attached to specific lines or hunks of changed code — and
-labels each finding as a true positive (TP) or false positive (FP) using a
-combination of human-authored guidelines and a three-judge LLM panel. Each
-judge's vote is retained, and the final label is the unanimous consensus or,
-when the judges disagree, the majority vote. A separate classifier based on
-Claude Sonnet 5 assigns severity and category labels, so aggregate metrics
-can be sliced along both axes. Once a labeled corpus is established, any
+review observations attached to specific lines or hunks of code at the review-time snapshot — and
+labels each finding as a true positive (TP) or false positive (FP) using
+human-authored guidelines and a Claude Sonnet 5 classifier. The same
+classifier assigns severity, category, and the other auxiliary labels, so
+aggregate metrics can be sliced along those axes. Once a labeled corpus is established, any
 candidate review agent can be evaluated by generating its own findings on
 the same PRs, matching them against the labeled corpus, and classifying any
-unmatched findings with the same judge panel. From these operations we derive
+unmatched findings with the same classifier. From these operations we derive
 four primary metrics —
 *grounded precision*, *grounded recall*, *augmented precision*, and
 *augmented recall* — each of which can also be reported stratified by
@@ -41,11 +39,11 @@ The methodology in this document is designed to:
    author actions, deterministic tools, and LLM-based reviewers — so that
    the labeled corpus is not biased toward any single producer.
 3. Provide a reproducible, auditable definition of TP versus FP grounded in
-   senior-engineer judgment, and a three-judge panel that operationalizes
-   that definition at scale while retaining each judge's decision.
+   senior-engineer judgment, and a Claude Sonnet 5 classifier that
+   operationalizes that definition at scale.
 4. Yield precision and recall metrics that distinguish between findings
    verified against a fixed "golden set" and findings whose labels rely on
-   the judge panel alone.
+   the classifier alone.
 
 ## 2. Definitions
 
@@ -56,20 +54,23 @@ identified by its URL. A PR carries a diff, a title, a body, and a set of
 reviewer comments and subsequent commits.
 
 **Finding.** An atomic review observation attached to a specific location in
-the changed code. A finding has, at minimum: (i) a file path, (ii) a line
+the code at the review-time snapshot. A finding has, at minimum: (i) a file path, (ii) a line
 range, (iii) a natural-language message, and (iv) a producer identifier
 indicating where the finding came from. Findings are the unit of
 classification, matching, and scoring.
 
-**True positive (TP).** A finding that a competent senior reviewer would
-expect a PR author to address before merge. TPs are correct, verifiable
-against the changed code, in scope for the PR, and actionable.
+**True positive (TP).** A finding that is factually correct and verifiable
+against the code at the given SHA, identifies a real concern a competent
+engineer would want to address, and is non-trivial and specific enough to
+be actionable. It need not be merge-blocking; low-severity useful findings
+can be TPs. Scope is recorded separately and is not a TP/FP factor.
 
 **False positive (FP).** A finding that a competent senior reviewer would
 not consider worth addressing. FPs include factually incorrect statements,
-unverifiable claims, observations out of scope for the PR, duplicates,
-trivial style nits below the project's review bar, and findings whose
-suggested action would not improve the change.
+unverifiable claims, generic boilerplate, cosmetic suggestions with negligible
+impact and no pattern of inconsistency, and harmful advice. Findings are
+assessed independently; duplicates are not FPs merely because they repeat
+another finding. Deduplication is handled separately.
 
 **Golden set.** The per-PR set of findings whose TP/FP labels were
 assigned during corpus construction and serve as the reference baseline
@@ -85,7 +86,7 @@ finding indicating that the two refer to the same underlying issue, even
 if their messages and exact line ranges differ.
 
 **Grounded** vs. **augmented** metrics. Grounded metrics are computed using
-only golden-set labels. Augmented metrics additionally use the judge panel
+only golden-set labels. Augmented metrics additionally use the classifier
 to label candidate findings that did not match any golden finding. Both
 families are reported.
 
@@ -114,6 +115,13 @@ represent the change-type distribution of interest. We do not require PRs
 to be merged, but we do require that each PR has reached a state at which
 review feedback has plausibly stabilized (for example, merged, closed, or
 inactive for a sustained period).
+
+The full corpus contains 219 PRs, all public in
+[`corpus/manifest.json`](../corpus/manifest.json). The test corpus contains
+25 of those 219 PRs and is published in
+[`corpus/test/test.json`](../corpus/test/test.json). It is a
+representative subset intended for small and test runs, not a separate
+public/private partition.
 
 For each PR we record:
 
@@ -168,10 +176,10 @@ preserving the agent's original line anchors and messages.
 Before labeling, all findings — regardless of producer — are normalized to
 a common schema. This includes: collapsing multi-line messages into
 single-message findings where appropriate, canonicalizing file paths
-relative to the repository root, and clamping line ranges to the changed
-hunks of the PR. Findings that fall entirely outside the diff are
-discarded; findings that partially overlap the diff are retained with the
-overlap recorded.
+relative to the repository root, and preserving line ranges at the review-time
+snapshot. Diff overlap is recorded rather than used to discard findings.
+Findings outside the diff or in untouched files are retained and classified
+on their substance; their relationship to the PR is recorded by the Scope axis.
 
 ## 5. Labeling
 
@@ -183,20 +191,20 @@ appreciate and act on this finding?* The TP/FP boundary, the severity
 rubric, and the category taxonomy are all proxies for that question. They
 exist because we cannot observe human reactions for every finding in the
 corpus; we therefore codify the reactions we expect from a competent
-senior reviewer and apply them at scale via a judge panel. This framing has
+senior reviewer and apply them at scale via a classifier. This framing has
 two consequences that are made explicit throughout the rest of this
 section:
 
-1. The boundary between TP and FP is not fully objective. Findings that
-   are factually correct but out of scope for a PR, or that target
-   pre-existing code, or that fall below a project's review bar, may be
-   judged either way depending on review culture. We address this by
-   factoring the subjective dimensions out of the TP/FP decision and
-   into auxiliary axes (severity, category, scope) that consumers of the
+1. The boundary between TP and FP is not fully objective: relevance and
+   non-triviality require judgment. The current classifier does not reject
+   findings merely because they target pre-existing or out-of-diff code.
+   We address differences in review preferences by recording impact, concern
+   type, and relationship to the PR separately
+   as auxiliary axes (severity, category, scope) that consumers of the
    benchmark can re-weight.
 2. Offline metrics are an approximation of online behavior. Whether
    offline and online benchmarks converge depends on how faithfully the
-   judge panel reproduces the reactions of real humans on real PRs. This
+   classifier reproduces the reactions of real humans on real PRs. This
    is a measurable property and is discussed in Section 8.
 
 ### 5.2 Human Guidelines
@@ -210,108 +218,76 @@ auxiliary attribute, so that aggregate metrics can be stratified along
 these axes in Section 7.
 
 - **TP/FP** — the primary label. A finding is a TP if it is *true*
-  (factually correct and verifiable against the changed code),
-  *relevant* (a real concern that would improve the PR if addressed),
-  and *within scope of the review* (the kind of observation that
-  belongs in a code review on this PR at all). A finding is an FP
-  otherwise. Note that "within scope of the review" is broader than
-  the **Scope** axis below: a pre-existing issue can still be within
-  scope of the review depending on review culture.
+  (factually correct and verifiable against the code at the given SHA),
+  *relevant* (a real concern a competent engineer would want to address),
+  and *non-trivial* (concrete and specific enough to be actionable).
+  Scope and duplication are not factors in this decision. Each finding
+  is evaluated independently. Security findings require a concrete,
+  exploitable vulnerability, not a generic warning about a class of risk.
 - **Severity** — the impact of the finding if left unaddressed, on a
   fixed ordinal scale of *high*, *medium*, or *low*. Severity is
   recorded for every finding, including FPs, so that aggregate metrics
   can be sliced by severity.
 - **Category** — the kind of concern the finding raises, drawn from a
   fixed taxonomy. The taxonomy is intentionally coarse to keep the
-  axes interpretable. The final taxonomy is still being finalized; as
-  an illustrative example, candidate buckets include *correctness*
-  (logic errors, bugs), *security*, *performance*, *reliability*
-  (error handling, concurrency), *api / interface design*,
-  *maintainability* (readability, naming, structure),
-  *test quality / coverage*, *documentation*, *style / formatting*,
-  and *dependency / build*. Each finding is assigned exactly one
-  primary category; multi-category findings are split.
+  axes interpretable. The current categories are *correctness*, *security*,
+  *reliability*, *maintainability*, *testing*, *documentation*, *performance*,
+  *api-architecture*, *accessibility*, and *other*. Naming, style, and
+  formatting fall under maintainability; dependency, build, and CI/CD
+  concerns fall under reliability. Each finding is assigned exactly one
+  primary category; *other* is reserved for concerns that do not fit any
+  of the preceding categories.
 - **Scope** — is the issue introduced or materially affected by this
   PR, or is it pre-existing or unrelated? Recorded as one of
   *introduced-by-pr*, *exacerbated-by-pr*, *pre-existing*, or
   *unrelated*. Scope is informational: a finding can be a TP even if
-  pre-existing, depending on review culture, and the scope label lets
-  consumers of the benchmark filter accordingly.
+  pre-existing or unrelated, and the scope label lets
+  consumers of the benchmark filter accordingly. Scope does not affect TP/FP.
 - **Difficulty** — would a competent author reasonably be expected to
   notice and address the issue without external prompting?
 - **Context required** — can the finding be verified from the PR diff
   alone, from the PR plus immediately related files, or only with
   broader project context?
-- **Actionability** — is there a concrete change the author could make
-  in response, and would making that change improve the PR?
+
+Actionability is part of the non-triviality criterion, not a separate output
+field. The classifier returns TP/FP, severity, category, scope, difficulty,
+and context required, with justifications for TP/FP, severity, and category.
 
 The guidelines also enumerate common FP failure modes: incorrect claims,
-unverifiable claims, off-scope observations whose scope is judged out of
-bounds for the PR, duplicates, sub-threshold style nits, and advice that
-would degrade the change.
+unverifiable claims, generic boilerplate, sub-threshold cosmetic suggestions,
+and advice that would degrade the code. Concrete local convention violations
+and useful documentation fixes can be TPs even when low severity.
 
 ### 5.3 Labeling Models
 
-#### TP/FP Judge Panel
-
-The guidelines are operationalized by three independent LLM judges:
-
-- **GPT-5.6 Sol**
-- **Claude Sonnet 5**
-- **Gemini 3.8 Flash**
-
-The panel deliberately spans three model families. Using multiple model
-families reduces the risk that the benchmark inherits the systematic
-preferences, blind spots, or labeling bias of any single model family.
-The majority rule makes the final result less sensitive to one judge's
-model-specific behavior while preserving every vote for auditability.
-
-Each judge ingests the same finding and PR context (diff, surrounding code,
-title, and body) and independently produces a TP or FP decision. The result
-is persisted per finding and per judge; individual votes are never discarded
-after aggregation.
-
-The final TP/FP label for a finding is deterministic:
-
-- If all three judges agree, their unanimous decision is the consensus.
-- If the judges disagree, the label selected by at least two judges is the
-  majority result and becomes the final label.
-
-Because the panel contains three judges, every complete panel produces a
-final TP/FP label without a tie. An incomplete panel is an evaluation error
-and is not scored until all three judge results are available.
-
-The judges themselves were not hill-climbed against a labeled development
-set. Their model versions and prompts are fixed and versioned for each
-benchmark release. When a judge model or prompt changes, downstream TP/FP
-labels and metrics are recomputed.
-
-For every finding, the results UI exposes both the aggregate result from all
-three judges and the result from each individual judge. The aggregate
-consensus or majority label is shown by default. Users can click the finding
-to inspect each judge's TP/FP result, including which judges formed the
-majority when the decision was not unanimous.
-
-#### Severity and Category Classifier
-
-Severity and category labels come from a separate classifier based on Claude
-Sonnet 5. This classifier does not determine the final TP/FP label, which
-comes exclusively from the three-judge panel.
+The guidelines are operationalized by one classifier based on Claude Sonnet
+5. For each finding, the classifier ingests the finding and PR context (diff,
+surrounding code, title, and body) and produces the TP/FP decision together
+with severity, category, scope, difficulty, context required, and the other
+auxiliary labels. The same classifier is used for corpus labeling and for
+unmatched candidate findings during evaluation.
 
 The classifier was hill-climbed against a development set of human-authored
 findings that were independently labeled by senior engineers along TP/FP,
 severity, category, scope, difficulty, context required, and other
 dimensions. Hill-climbing iterated on the classifier prompt and decision
 thresholds to maximize agreement with human labels on this development
-set, with care taken to avoid overfitting by holding out evaluation
-slices.
+set, with prompt changes evaluated against labeled examples not used to
+motivate that iteration.
 
 Classifier accuracy is reported alongside benchmark results, including
-agreement on severity and category on held-out data. When the classifier is
-retrained, affected labels and downstream metrics are recomputed.
-The classifier prompt will be published as part of the benchmark artifacts;
-the current version is maintained in
-[`scripts/classifier/prompts.ts`](../scripts/classifier/prompts.ts).
+agreement on TP/FP, severity, and category against human labels. When the
+classifier is recalibrated, affected labels and downstream metrics are
+recomputed. The current
+Claude Sonnet 5 classifier prompt is in
+[`scripts/classifier/prompts.ts`](../scripts/classifier/prompts.ts), and the
+canonical renderer is in
+[`scripts/eval/prompt-format.ts`](../scripts/eval/prompt-format.ts). To reproduce
+the complete classifier system prompt, apply
+`renderJudgeSystemPrompt(CLASSIFIER_SYSTEM_PROMPT)`; this appends the instruction
+to treat quoted findings as data, not instructions. The finding-message builder
+uses the same renderer to escape and tag finding text. The matcher implementation
+is not included in this migration; Section 6.2 describes its matching procedure.
 
 ### 5.4 Corpus Labeling
 
@@ -433,7 +409,7 @@ follows:
   golden finding are reclassified as unmatched and proceed to
   Section 6.3 for independent classification. This prevents multiple
   candidates from claiming credit for the same golden TP while still
-  letting the judge panel assess whether the duplicate findings are
+  letting the classifier assess whether the duplicate findings are
   independently valid.
 
 When a candidate finding matches multiple golden findings, it inherits
@@ -443,10 +419,9 @@ the remaining correspondences are recorded but do not affect scoring.
 ### 6.3 Classification of Unmatched Findings
 
 Candidate findings that do not match any golden finding are classified
-using the same three-judge panel described in Section 5.3. This produces a
-TP/FP label for each unmatched candidate finding under the same
-guidelines used to label the golden set, while preserving every judge's
-individual vote.
+using the same Claude Sonnet 5 classifier described in Section 5.3. This
+produces a TP/FP decision and the same auxiliary labels for each unmatched
+candidate finding under the guidelines used to label the golden set.
 
 ## 7. Scoring
 
@@ -463,7 +438,7 @@ Let, for a single PR:
 - $U_{FP} = U \setminus U_{TP}$.
 
 We define four metrics. The first pair uses only golden-set labels; the
-second pair augments with panel labels on unmatched findings.
+second pair augments with classifier labels on unmatched findings.
 
 ### 7.1 Grounded Precision and Recall
 
@@ -603,7 +578,7 @@ typical finding.
 ### 7.7 Repeated Runs and Leaderboard Submission
 
 Each candidate evaluation is run three times using the same benchmark,
-configuration, judge panel, and scoring procedure. Metrics are computed
+configuration, classifier, and scoring procedure. Metrics are computed
 independently for each run. The final score submitted to the leaderboard
 is the arithmetic mean of the corresponding scores from the three runs.
 The three component run scores are retained so the published average can
@@ -620,26 +595,26 @@ surfaced are absent. Augmented recall partially mitigates this for any
 given agent, but a systematic gap shared by all producers will remain
 invisible.
 
-**Judge and classifier dependence.** Both the labels in the golden
-set and the labels on unmatched candidate findings depend on a fixed
-three-judge panel. Correlated judge errors propagate into both grounded and augmented
+**Classifier dependence.** Both the labels in the golden set and the labels
+on unmatched candidate findings depend on a fixed Claude Sonnet 5 classifier.
+Classifier errors propagate into both grounded and augmented
 metrics. More fundamentally, the TP/FP boundary is partly subjective:
-findings that are factually correct but out of scope, or that target
-pre-existing code, or that fall below a project's review bar, can be
-labeled either way depending on review culture. The judge prompts encode
+relevance and non-triviality can be judged differently across review cultures.
+In the current classifier, scope is not a TP/FP factor, and useful low-severity
+findings need not be merge-blocking. The classifier prompt encodes
 *our* working group's taste; another team running this methodology could
-configure the panel differently and reach different scores for the same agents.
+configure the classifier differently and reach different scores for the same agents.
 We mitigate this by (i) recording severity, category, and scope alongside
-TP/FP so that consumers can re-stratify, (ii) versioning the judge and
-classifier configurations, and (iii) reporting the classifier's
-agreement with held-out human labels on severity and category.
+TP/FP so that consumers can re-stratify, (ii) versioning the classifier
+configuration, and (iii) reporting the classifier's agreement with human
+labels across TP/FP, severity, and category.
 
 **Offline / online convergence.** What the methodology ultimately wants
 to measure is whether a finding would be appreciated and acted on by a
-real human on a real PR. Offline metrics use the judge panel as a
+real human on a real PR. Offline metrics use the classifier as a
 surrogate for that human reaction. Whether offline and online benchmarks
 converge is therefore an empirical question about how faithfully the
-panel reproduces human behavior, not a property of the methodology
+classifier reproduces human behavior, not a property of the methodology
 itself. Where online signal is available (for example, comment reactions,
 resolution rates, or follow-up-commit rates on agent-authored review
 comments), it should be compared against offline TP/FP labels on a
@@ -671,17 +646,18 @@ and recorded:
 1. The list of PRs, including base and head commits.
 2. The set of producers used to assemble the golden set, together with
    their versions and configurations.
-3. The three judge model versions and prompts.
-4. The classifier version, prompt, and any thresholds.
-5. The matcher version and prompt.
-6. The candidate agent version and configuration.
-7. The severity label and provenance for each finding.
-8. The aggregation choice (macro, micro, or both).
-9. The three independent run results used to compute the leaderboard
+3. The Claude Sonnet 5 classifier version, published prompt, and any
+   thresholds.
+4. The matcher version and prompt used for the run (the implementation is not
+   included in this migration).
+5. The candidate agent version and configuration.
+6. The severity label and provenance for each finding.
+7. The aggregation choice (macro, micro, or both).
+8. The three independent run results used to compute the leaderboard
    submission.
 
 A benchmark run is fully described by these artifacts together with the
-resulting per-PR finding sets, per-judge labels, final labels, matches, and
+resulting per-PR finding sets, classifier labels, matches, and
 metrics.
 
 ## 10. Extensions
@@ -711,10 +687,9 @@ into the guidelines and classifier calibration.
 
 The intended loop is:
 
-1. **Surface labels for inspection.** A subset of the golden set —
-   enough to exercise the full label space — is published alongside the
-   benchmark, with each finding's TP/FP label, severity, category, and
-   the relevant PR context.
+1. **Surface labels for inspection.** The public corpus is published
+   alongside the benchmark with each finding's TP/FP label, severity,
+   category, and the relevant PR context.
 2. **Accept dispute submissions.** Reviewers can submit a dispute against
    any published finding: which axis they disagree with (TP/FP, severity,
    category, scope), what they believe the correct label is, and a short
@@ -728,7 +703,7 @@ The intended loop is:
    themselves published so that the basis for the labeling decisions is
    auditable.
 4. **Feed back into the labeling process.** Upheld TP/FP disputes inform
-   the human-authored guidelines and evaluation of the judge panel.
+   the human-authored guidelines and classifier evaluation.
    Upheld severity, category, and other auxiliary-label disputes are added
    to the classifier's calibration set. When the classifier is
    retrained, its version is bumped and affected labels and metrics are
@@ -737,7 +712,7 @@ The intended loop is:
    labeling-system version as a proxy for how well the process reflects the
    guidelines. A falling rate indicates the working group's taste is being
    reproduced reliably; a flat or rising rate is a signal to revisit
-   the guidelines, panel configuration, or classifier prompt.
+   the guidelines, classifier configuration, or classifier prompt.
 
 The same loop applies to the matcher: disputes about whether a candidate
 finding should have matched a particular golden finding are accepted
