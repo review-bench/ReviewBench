@@ -185,8 +185,8 @@ row shows how many configurations you tested.
 - **Your agent's inference is yours.** It runs with your credentials, inside
   your container. We never see them, and the model you use is part of what
   the benchmark measures, so we cannot supply it.
-- **The judge's cost is coverd by us for test and final runs.** Every reviewer's result are evaluated
-  with the same judge panel models, at our cost. Tuning on the full set on your
+- **The judge's cost is covered by us for test and final runs.** Every reviewer's results are evaluated
+  with the same hardened Claude Sonnet 5 judge, at our cost. Tuning on the full set on your
   side uses your own judge calls.
 
 ### Credentials

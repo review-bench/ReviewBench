@@ -18,7 +18,7 @@ It needs docker, git and jq, and fetches each pull request from GitHub. Findings
 
 ## In the portal, with scoring
 
-A **test run** on the website runs the same 25 pull requests with the benchmark's judge and shows, for each pull request, what matched the expert findings, what your agent missed, and how each judge voted. Register your reviewer first; see the [onboarding guide](ONBOARDING.md).
+A **test run** on the website runs the same 25 pull requests with the benchmark's judge and shows, for each pull request, what matched the expert findings, what your agent missed, and the judge's decision. Register your reviewer first; see the [onboarding guide](ONBOARDING.md).
 
 ## What the benchmark does that the script does not
 

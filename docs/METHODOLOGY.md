@@ -7,14 +7,13 @@ systems against pull requests (PRs) drawn from a curated set of source
 repositories. The methodology produces per-PR sets of *findings* — atomic
 review observations attached to specific lines or hunks of changed code — and
 labels each finding as a true positive (TP) or false positive (FP) using a
-combination of human-authored guidelines and a three-judge LLM panel. Each
-judge's vote is retained, and the final label is the unanimous consensus or,
-when the judges disagree, the majority vote. A separate classifier based on
-Claude Sonnet 5 assigns severity and category labels, so aggregate metrics
-can be sliced along both axes. Once a labeled corpus is established, any
+combination of human-authored guidelines and a hardened Claude Sonnet 5
+judge. A separately versioned Claude Sonnet 5 classifier assigns severity and
+category labels, so aggregate metrics can be sliced along both axes. Once a
+labeled corpus is established, any
 candidate review agent can be evaluated by generating its own findings on
 the same PRs, matching them against the labeled corpus, and classifying any
-unmatched findings with the same judge panel. From these operations we derive
+unmatched findings with the same judge. From these operations we derive
 four primary metrics —
 *grounded precision*, *grounded recall*, *augmented precision*, and
 *augmented recall* — each of which can also be reported stratified by
@@ -41,11 +40,11 @@ The methodology in this document is designed to:
    author actions, deterministic tools, and LLM-based reviewers — so that
    the labeled corpus is not biased toward any single producer.
 3. Provide a reproducible, auditable definition of TP versus FP grounded in
-   senior-engineer judgment, and a three-judge panel that operationalizes
-   that definition at scale while retaining each judge's decision.
+   senior-engineer judgment, and a fixed Claude Sonnet 5 judge that
+   operationalizes that definition at scale.
 4. Yield precision and recall metrics that distinguish between findings
    verified against a fixed "golden set" and findings whose labels rely on
-   the judge panel alone.
+   the judge alone.
 
 ## 2. Definitions
 
@@ -85,7 +84,7 @@ finding indicating that the two refer to the same underlying issue, even
 if their messages and exact line ranges differ.
 
 **Grounded** vs. **augmented** metrics. Grounded metrics are computed using
-only golden-set labels. Augmented metrics additionally use the judge panel
+only golden-set labels. Augmented metrics additionally use the judge
 to label candidate findings that did not match any golden finding. Both
 families are reported.
 
@@ -183,7 +182,7 @@ appreciate and act on this finding?* The TP/FP boundary, the severity
 rubric, and the category taxonomy are all proxies for that question. They
 exist because we cannot observe human reactions for every finding in the
 corpus; we therefore codify the reactions we expect from a competent
-senior reviewer and apply them at scale via a judge panel. This framing has
+senior reviewer and apply them at scale via a fixed judge. This framing has
 two consequences that are made explicit throughout the rest of this
 section:
 
@@ -196,7 +195,7 @@ section:
    benchmark can re-weight.
 2. Offline metrics are an approximation of online behavior. Whether
    offline and online benchmarks converge depends on how faithfully the
-   judge panel reproduces the reactions of real humans on real PRs. This
+   judge reproduces the reactions of real humans on real PRs. This
    is a measurable property and is discussed in Section 8.
 
 ### 5.2 Human Guidelines
@@ -252,51 +251,27 @@ would degrade the change.
 
 ### 5.3 Labeling Models
 
-#### TP/FP Judge Panel
+#### TP/FP Judge
 
-The guidelines are operationalized by three independent LLM judges:
+The guidelines are operationalized by **Claude Sonnet 5**. The judge ingests
+the finding and PR context (diff, surrounding code, title, and body) and
+produces a TP or FP decision.
 
-- **GPT-5.6 Sol**
-- **Claude Sonnet 5**
-- **Gemini 3.8 Flash**
+Reviewer-produced finding text is untrusted. The hardened judge prompt wraps
+candidate and golden findings in explicit data delimiters, escapes delimiter
+characters inside the text, and instructs the model to treat the delimited
+content only as data to evaluate, never as instructions.
 
-The panel deliberately spans three model families. Using multiple model
-families reduces the risk that the benchmark inherits the systematic
-preferences, blind spots, or labeling bias of any single model family.
-The majority rule makes the final result less sensitive to one judge's
-model-specific behavior while preserving every vote for auditability.
-
-Each judge ingests the same finding and PR context (diff, surrounding code,
-title, and body) and independently produces a TP or FP decision. The result
-is persisted per finding and per judge; individual votes are never discarded
-after aggregation.
-
-The final TP/FP label for a finding is deterministic:
-
-- If all three judges agree, their unanimous decision is the consensus.
-- If the judges disagree, the label selected by at least two judges is the
-  majority result and becomes the final label.
-
-Because the panel contains three judges, every complete panel produces a
-final TP/FP label without a tie. An incomplete panel is an evaluation error
-and is not scored until all three judge results are available.
-
-The judges themselves were not hill-climbed against a labeled development
-set. Their model versions and prompts are fixed and versioned for each
-benchmark release. When a judge model or prompt changes, downstream TP/FP
-labels and metrics are recomputed.
-
-For every finding, the results UI exposes both the aggregate result from all
-three judges and the result from each individual judge. The aggregate
-consensus or majority label is shown by default. Users can click the finding
-to inspect each judge's TP/FP result, including which judges formed the
-majority when the decision was not unanimous.
+The judge was not hill-climbed against a labeled development set. Its model
+version and prompts are fixed and versioned for each benchmark release. When
+the judge model or prompt changes, downstream TP/FP labels and metrics are
+recomputed.
 
 #### Severity and Category Classifier
 
-Severity and category labels come from a separate classifier based on Claude
-Sonnet 5. This classifier does not determine the final TP/FP label, which
-comes exclusively from the three-judge panel.
+Severity and category labels come from a separately versioned classifier
+prompt run with Claude Sonnet 5. This classifier does not determine the final
+TP/FP label, which comes from the TP/FP judge.
 
 The classifier was hill-climbed against a development set of human-authored
 findings that were independently labeled by senior engineers along TP/FP,
@@ -433,7 +408,7 @@ follows:
   golden finding are reclassified as unmatched and proceed to
   Section 6.3 for independent classification. This prevents multiple
   candidates from claiming credit for the same golden TP while still
-  letting the judge panel assess whether the duplicate findings are
+  letting the judge assess whether the duplicate findings are
   independently valid.
 
 When a candidate finding matches multiple golden findings, it inherits
@@ -443,10 +418,9 @@ the remaining correspondences are recorded but do not affect scoring.
 ### 6.3 Classification of Unmatched Findings
 
 Candidate findings that do not match any golden finding are classified
-using the same three-judge panel described in Section 5.3. This produces a
-TP/FP label for each unmatched candidate finding under the same
-guidelines used to label the golden set, while preserving every judge's
-individual vote.
+using the same Claude Sonnet 5 judge described in Section 5.3. This produces
+a TP/FP label for each unmatched candidate finding under the same guidelines
+used to label the golden set.
 
 ## 7. Scoring
 
@@ -463,7 +437,7 @@ Let, for a single PR:
 - $U_{FP} = U \setminus U_{TP}$.
 
 We define four metrics. The first pair uses only golden-set labels; the
-second pair augments with panel labels on unmatched findings.
+second pair augments with judge labels on unmatched findings.
 
 ### 7.1 Grounded Precision and Recall
 
@@ -603,7 +577,7 @@ typical finding.
 ### 7.7 Repeated Runs and Leaderboard Submission
 
 Each candidate evaluation is run three times using the same benchmark,
-configuration, judge panel, and scoring procedure. Metrics are computed
+configuration, judge profile, and scoring procedure. Metrics are computed
 independently for each run. The final score submitted to the leaderboard
 is the arithmetic mean of the corresponding scores from the three runs.
 The three component run scores are retained so the published average can
@@ -621,14 +595,14 @@ given agent, but a systematic gap shared by all producers will remain
 invisible.
 
 **Judge and classifier dependence.** Both the labels in the golden
-set and the labels on unmatched candidate findings depend on a fixed
-three-judge panel. Correlated judge errors propagate into both grounded and augmented
+set and the labels on unmatched candidate findings depend on a fixed Claude
+Sonnet 5 judge. Judge errors propagate into both grounded and augmented
 metrics. More fundamentally, the TP/FP boundary is partly subjective:
 findings that are factually correct but out of scope, or that target
 pre-existing code, or that fall below a project's review bar, can be
 labeled either way depending on review culture. The judge prompts encode
 *our* working group's taste; another team running this methodology could
-configure the panel differently and reach different scores for the same agents.
+configure the judge differently and reach different scores for the same agents.
 We mitigate this by (i) recording severity, category, and scope alongside
 TP/FP so that consumers can re-stratify, (ii) versioning the judge and
 classifier configurations, and (iii) reporting the classifier's
@@ -636,10 +610,10 @@ agreement with held-out human labels on severity and category.
 
 **Offline / online convergence.** What the methodology ultimately wants
 to measure is whether a finding would be appreciated and acted on by a
-real human on a real PR. Offline metrics use the judge panel as a
+real human on a real PR. Offline metrics use the judge as a
 surrogate for that human reaction. Whether offline and online benchmarks
 converge is therefore an empirical question about how faithfully the
-panel reproduces human behavior, not a property of the methodology
+judge reproduces human behavior, not a property of the methodology
 itself. Where online signal is available (for example, comment reactions,
 resolution rates, or follow-up-commit rates on agent-authored review
 comments), it should be compared against offline TP/FP labels on a
@@ -728,7 +702,7 @@ The intended loop is:
    themselves published so that the basis for the labeling decisions is
    auditable.
 4. **Feed back into the labeling process.** Upheld TP/FP disputes inform
-   the human-authored guidelines and evaluation of the judge panel.
+   the human-authored guidelines and evaluation of the judge.
    Upheld severity, category, and other auxiliary-label disputes are added
    to the classifier's calibration set. When the classifier is
    retrained, its version is bumped and affected labels and metrics are
@@ -737,7 +711,7 @@ The intended loop is:
    labeling-system version as a proxy for how well the process reflects the
    guidelines. A falling rate indicates the working group's taste is being
    reproduced reliably; a flat or rising rate is a signal to revisit
-   the guidelines, panel configuration, or classifier prompt.
+   the guidelines, judge configuration, or classifier prompt.
 
 The same loop applies to the matcher: disputes about whether a candidate
 finding should have matched a particular golden finding are accepted
