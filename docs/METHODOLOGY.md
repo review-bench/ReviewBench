@@ -547,11 +547,25 @@ does not filter or reweight a previously aggregated leaderboard result.
 
 ### 7.5 Review Duration
 
-Duration is reported as an evaluated metric for each review run. It is the
-elapsed wall-clock time from creation of the PR presented to the candidate
-agent until the agent's review comments have been posted. When the review
-contains multiple comments, the end time is the timestamp of the final
-comment posted as part of that completed review.
+Review latency is measured and reported as duration alongside the quality
+metrics. For container-based evaluations, each PR's latency is the elapsed
+wall-clock time around the agent's container invocation on the attempt that
+succeeded, recorded in milliseconds as `review_ms`. It excludes earlier
+failed attempts, retry overhead, repository preparation, and subsequent
+matching, classification, and scoring.
+
+For each round, duration is the arithmetic mean of the valid latency
+measurements for successful PRs. The leaderboard reports the arithmetic
+mean of those round means and their sample standard deviation across the
+three rounds. Each round is weighted equally rather than pooling all PR
+measurements across rounds.
+
+For older runs without a valid `review_ms`, the reporting pipeline falls
+back to `duration_seconds` converted to milliseconds; that legacy value
+has whole-second precision and includes retries. Missing measurements
+are excluded, not treated as zero. A round with no measurements has no
+duration value, and the standard deviation is unavailable when fewer than
+two round means are available.
 
 Duration is reported alongside the quality metrics rather than incorporated
 into the precision, recall, or \(F_\beta\) calculations.
