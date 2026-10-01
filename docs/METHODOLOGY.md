@@ -275,10 +275,9 @@ motivate that iteration.
 Classifier accuracy is reported alongside benchmark results, including
 agreement on TP/FP, severity, and category against human labels. When the
 classifier is recalibrated, affected labels and downstream metrics are
-recomputed. All classifier and matcher prompts are published. The current
+recomputed. All classifier prompts are published. The current
 Claude Sonnet 5 classifier prompt is in
-[`scripts/classifier/prompts.ts`](../scripts/classifier/prompts.ts), and the
-matcher prompt is in [`scripts/eval/matcher.ts`](../scripts/eval/matcher.ts).
+[`scripts/classifier/prompts.ts`](../scripts/classifier/prompts.ts).
 
 ### 5.4 Corpus Labeling
 
