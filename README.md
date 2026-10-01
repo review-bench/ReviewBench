@@ -14,16 +14,10 @@ For each pull request, the benchmark provides a human-reviewed golden set of cod
   subset of the full corpus intended for small and test runs.
 - **[Benchmark documentation](docs/METHODOLOGY.md).** This includes the
   [methodology](docs/METHODOLOGY.md), [corpus extraction process](docs/EXTRACTION.md),
-  [evaluation harness](docs/HARNESS.md), and [security operations](docs/SECURITY-OPERATIONS.md).
+  and [evaluation harness](docs/HARNESS.md).
 - **[The Claude Sonnet 5 classifier prompt](scripts/classifier/prompts.ts).**
   It assigns TP/FP, severity, category, and the other auxiliary labels. The
-  [canonical renderer](scripts/eval/prompt-format.ts) completes the system prompt
-  and formats finding text. The matcher implementation is not included in this migration.
-- **[Everything a reviewer vendor needs](#run-your-code-review-agent-on-reviewbench).**
-  The [agent contract](AGENT_CONTRACT.md), [Codex CLI example](examples/codex-cli/),
-  [local test script](scripts/try-agent.sh), and [onboarding guide](docs/ONBOARDING.md).
-
-The full corpus manifest and all golden findings in [`golden/`](golden/) are public.
+  [matcher prompt](scripts/eval/matcher.ts) is also public.
 
 ### Corpus Distribution
 
@@ -79,10 +73,10 @@ PHP, Ruby, Shell, and Swift.
 ### Full Corpus Distribution
 
 The full corpus contains 219 PRs from 187 distinct repositories. No single
-repository dominates the benchmark. The most represented repository contributes
+repository dominates the benchmark. The most represented repository contributes 
 10 PRs, or only 4.6% of the corpus. The corpus covers both common and
 long-tail languages as well as changes ranging from small patches to
-large-scale updates.
+large-scale updates. 
 
 #### Primary PR Types
 
@@ -177,10 +171,9 @@ tuning happens on your side:
 1. **Test run.** Your image runs on the test set (25 pull requests). You
    get a result for each pull request, so you can see exactly what your
    adapter produced and fix it.
-2. **Tuning on the full set** happens on your side. The full set, the Claude
-   Sonnet 5 classifier prompt, and the matching methodology are public.
-   The complete evaluation runtime, including the matcher implementation,
-   is not included in this migration.
+2. **Tuning on the full set** happens on your side. The full set, the judge
+   prompts and the judge models are public, so you can score all 219 pull
+   requests yourself, as often as you like, with your own compute.
 3. **Final.** Three rounds on the full set (219 pull requests) with the
    configuration you pick. A maintainer reviews the result; once approved,
    your leaderboard row is published.
@@ -195,7 +188,7 @@ row shows how many configurations you tested.
   your container. We never see them, and the model you use is part of what
   the benchmark measures, so we cannot supply it.
 - **The judge's cost is coverd by us for test and final runs.** Every reviewer's result are evaluated
-  with the same Claude Sonnet 5 classifier, at our cost. Tuning on the full set on your
+  with the same judge panel models, at our cost. Tuning on the full set on your
   side uses your own judge calls.
 
 ### Credentials
@@ -233,6 +226,7 @@ The benchmark corpus is not currently accepting new pull-request submissions. In
 ReviewBench follows a consensus-based governance model:
 - [Governance policy](GOVERNANCE.md) — project roles, decisions, appeals, and amendments
 - [Maintainers](MAINTAINERS.md) — current project maintainers
+- [Project document license](LICENSE) — license accompanying the imported project documents
 
 ## License
 The repository is licensed under the [MIT License](LICENSE). The project documents copied from the MVG proposal retain the notices included in those files.

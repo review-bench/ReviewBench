@@ -242,9 +242,8 @@ defined in METHODOLOGY.md §4.3 before being written to disk. This
 includes:
 
 - Canonicalizing file paths relative to the repository root.
-- Preserving line ranges at the review-time snapshot and recording diff
-  overlap. Findings outside the diff are retained but flagged as out-of-diff;
-  scope is auxiliary and does not determine TP/FP.
+- Clamping line ranges to the changed hunks of the PR. Findings
+  outside the diff are retained but flagged as out-of-diff.
 - Collapsing multi-part comments (e.g., a GitHub review comment
   thread) into a single finding where they describe one issue.
 - Attaching the agent name as the producer identifier.

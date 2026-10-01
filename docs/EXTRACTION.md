@@ -12,11 +12,6 @@ deterministic tools supplement them with broader coverage.
 The output of extraction is a set of raw findings per PR, ready for
 classification (METHODOLOGY.md §5) and deduplication (§5.4).
 
-Producer-specific filters below limit what is extracted or generated; they
-are not TP/FP criteria. The classifier evaluates every retained finding
-independently at the review-time SHA, including findings outside the diff,
-with scope recorded separately.
-
 ## 1. Input
 
 Extraction operates on the PR manifest described in HARNESS.md §2. For
@@ -307,9 +302,8 @@ of findings per PR. This is managed by:
   underlying issue are collapsed.
 - **Classification** — one Claude Sonnet 5 classifier labels every finding
   TP/FP and assigns severity, category, and the other auxiliary labels.
-  Low-quality findings are identified by the labels; redundant findings
-  are handled separately by deduplication, not treated as FPs merely
-  for repeating another finding.
+  Low-quality or redundant findings are filtered by the labels, not by
+  restricting producer output.
 - **Per-producer ablation** (METHODOLOGY.md §10) — contribution
   of each (model, prompt) combination can be measured and passes
   that add little incremental value can be dropped.

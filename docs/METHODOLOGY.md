@@ -5,7 +5,7 @@
 We describe an offline benchmark methodology for evaluating AI code review
 systems against pull requests (PRs) drawn from a curated set of source
 repositories. The methodology produces per-PR sets of *findings* — atomic
-review observations attached to specific lines or hunks of code at the review-time snapshot — and
+review observations attached to specific lines or hunks of changed code — and
 labels each finding as a true positive (TP) or false positive (FP) using
 human-authored guidelines and a Claude Sonnet 5 classifier. The same
 classifier assigns severity, category, and the other auxiliary labels, so
@@ -54,23 +54,20 @@ identified by its URL. A PR carries a diff, a title, a body, and a set of
 reviewer comments and subsequent commits.
 
 **Finding.** An atomic review observation attached to a specific location in
-the code at the review-time snapshot. A finding has, at minimum: (i) a file path, (ii) a line
+the changed code. A finding has, at minimum: (i) a file path, (ii) a line
 range, (iii) a natural-language message, and (iv) a producer identifier
 indicating where the finding came from. Findings are the unit of
 classification, matching, and scoring.
 
-**True positive (TP).** A finding that is factually correct and verifiable
-against the code at the given SHA, identifies a real concern a competent
-engineer would want to address, and is non-trivial and specific enough to
-be actionable. It need not be merge-blocking; low-severity useful findings
-can be TPs. Scope is recorded separately and is not a TP/FP factor.
+**True positive (TP).** A finding that a competent senior reviewer would
+expect a PR author to address before merge. TPs are correct, verifiable
+against the changed code, in scope for the PR, and actionable.
 
 **False positive (FP).** A finding that a competent senior reviewer would
 not consider worth addressing. FPs include factually incorrect statements,
-unverifiable claims, generic boilerplate, cosmetic suggestions with negligible
-impact and no pattern of inconsistency, and harmful advice. Findings are
-assessed independently; duplicates are not FPs merely because they repeat
-another finding. Deduplication is handled separately.
+unverifiable claims, observations out of scope for the PR, duplicates,
+trivial style nits below the project's review bar, and findings whose
+suggested action would not improve the change.
 
 **Golden set.** The per-PR set of findings whose TP/FP labels were
 assigned during corpus construction and serve as the reference baseline
@@ -119,7 +116,7 @@ inactive for a sustained period).
 The full corpus contains 219 PRs, all public in
 [`corpus/manifest.json`](../corpus/manifest.json). The test corpus contains
 25 of those 219 PRs and is published in
-[`corpus/test/test.json`](../corpus/test/test.json). It is a
+[`corpus/showcase/manifest.json`](../corpus/test/test.json). It is a
 representative subset intended for small and test runs, not a separate
 public/private partition.
 
@@ -176,10 +173,10 @@ preserving the agent's original line anchors and messages.
 Before labeling, all findings — regardless of producer — are normalized to
 a common schema. This includes: collapsing multi-line messages into
 single-message findings where appropriate, canonicalizing file paths
-relative to the repository root, and preserving line ranges at the review-time
-snapshot. Diff overlap is recorded rather than used to discard findings.
-Findings outside the diff or in untouched files are retained and classified
-on their substance; their relationship to the PR is recorded by the Scope axis.
+relative to the repository root, and clamping line ranges to the changed
+hunks of the PR. Findings that fall entirely outside the diff are
+discarded; findings that partially overlap the diff are retained with the
+overlap recorded.
 
 ## 5. Labeling
 
@@ -195,12 +192,12 @@ senior reviewer and apply them at scale via a classifier. This framing has
 two consequences that are made explicit throughout the rest of this
 section:
 
-1. The boundary between TP and FP is not fully objective: relevance and
-   non-triviality require judgment. The current classifier does not reject
-   findings merely because they target pre-existing or out-of-diff code.
-   We address differences in review preferences by recording impact, concern
-   type, and relationship to the PR separately
-   as auxiliary axes (severity, category, scope) that consumers of the
+1. The boundary between TP and FP is not fully objective. Findings that
+   are factually correct but out of scope for a PR, or that target
+   pre-existing code, or that fall below a project's review bar, may be
+   judged either way depending on review culture. We address this by
+   factoring the subjective dimensions out of the TP/FP decision and
+   into auxiliary axes (severity, category, scope) that consumers of the
    benchmark can re-weight.
 2. Offline metrics are an approximation of online behavior. Whether
    offline and online benchmarks converge depends on how faithfully the
@@ -218,45 +215,45 @@ auxiliary attribute, so that aggregate metrics can be stratified along
 these axes in Section 7.
 
 - **TP/FP** — the primary label. A finding is a TP if it is *true*
-  (factually correct and verifiable against the code at the given SHA),
-  *relevant* (a real concern a competent engineer would want to address),
-  and *non-trivial* (concrete and specific enough to be actionable).
-  Scope and duplication are not factors in this decision. Each finding
-  is evaluated independently. Security findings require a concrete,
-  exploitable vulnerability, not a generic warning about a class of risk.
+  (factually correct and verifiable against the changed code),
+  *relevant* (a real concern that would improve the PR if addressed),
+  and *within scope of the review* (the kind of observation that
+  belongs in a code review on this PR at all). A finding is an FP
+  otherwise. Note that "within scope of the review" is broader than
+  the **Scope** axis below: a pre-existing issue can still be within
+  scope of the review depending on review culture.
 - **Severity** — the impact of the finding if left unaddressed, on a
   fixed ordinal scale of *high*, *medium*, or *low*. Severity is
   recorded for every finding, including FPs, so that aggregate metrics
   can be sliced by severity.
 - **Category** — the kind of concern the finding raises, drawn from a
   fixed taxonomy. The taxonomy is intentionally coarse to keep the
-  axes interpretable. The current categories are *correctness*, *security*,
-  *reliability*, *maintainability*, *testing*, *documentation*, *performance*,
-  *api-architecture*, *accessibility*, and *other*. Naming, style, and
-  formatting fall under maintainability; dependency, build, and CI/CD
-  concerns fall under reliability. Each finding is assigned exactly one
-  primary category; *other* is reserved for concerns that do not fit any
-  of the preceding categories.
+  axes interpretable. The final taxonomy is still being finalized; as
+  an illustrative example, candidate buckets include *correctness*
+  (logic errors, bugs), *security*, *performance*, *reliability*
+  (error handling, concurrency), *api / interface design*,
+  *maintainability* (readability, naming, structure),
+  *test quality / coverage*, *documentation*, *style / formatting*,
+  and *dependency / build*. Each finding is assigned exactly one
+  primary category; multi-category findings are split.
 - **Scope** — is the issue introduced or materially affected by this
   PR, or is it pre-existing or unrelated? Recorded as one of
   *introduced-by-pr*, *exacerbated-by-pr*, *pre-existing*, or
   *unrelated*. Scope is informational: a finding can be a TP even if
-  pre-existing or unrelated, and the scope label lets
-  consumers of the benchmark filter accordingly. Scope does not affect TP/FP.
+  pre-existing, depending on review culture, and the scope label lets
+  consumers of the benchmark filter accordingly.
 - **Difficulty** — would a competent author reasonably be expected to
   notice and address the issue without external prompting?
 - **Context required** — can the finding be verified from the PR diff
   alone, from the PR plus immediately related files, or only with
   broader project context?
-
-Actionability is part of the non-triviality criterion, not a separate output
-field. The classifier returns TP/FP, severity, category, scope, difficulty,
-and context required, with justifications for TP/FP, severity, and category.
+- **Actionability** — is there a concrete change the author could make
+  in response, and would making that change improve the PR?
 
 The guidelines also enumerate common FP failure modes: incorrect claims,
-unverifiable claims, generic boilerplate, sub-threshold cosmetic suggestions,
-and advice that would degrade the code. Concrete local convention violations
-and useful documentation fixes can be TPs even when low severity.
+unverifiable claims, off-scope observations whose scope is judged out of
+bounds for the PR, duplicates, sub-threshold style nits, and advice that
+would degrade the change.
 
 ### 5.3 Labeling Models
 
@@ -278,16 +275,10 @@ motivate that iteration.
 Classifier accuracy is reported alongside benchmark results, including
 agreement on TP/FP, severity, and category against human labels. When the
 classifier is recalibrated, affected labels and downstream metrics are
-recomputed. The current
+recomputed. All classifier and matcher prompts are published. The current
 Claude Sonnet 5 classifier prompt is in
 [`scripts/classifier/prompts.ts`](../scripts/classifier/prompts.ts), and the
-canonical renderer is in
-[`scripts/eval/prompt-format.ts`](../scripts/eval/prompt-format.ts). To reproduce
-the complete classifier system prompt, apply
-`renderJudgeSystemPrompt(CLASSIFIER_SYSTEM_PROMPT)`; this appends the instruction
-to treat quoted findings as data, not instructions. The finding-message builder
-uses the same renderer to escape and tag finding text. The matcher implementation
-is not included in this migration; Section 6.2 describes its matching procedure.
+matcher prompt is in [`scripts/eval/matcher.ts`](../scripts/eval/matcher.ts).
 
 ### 5.4 Corpus Labeling
 
@@ -599,9 +590,9 @@ invisible.
 on unmatched candidate findings depend on a fixed Claude Sonnet 5 classifier.
 Classifier errors propagate into both grounded and augmented
 metrics. More fundamentally, the TP/FP boundary is partly subjective:
-relevance and non-triviality can be judged differently across review cultures.
-In the current classifier, scope is not a TP/FP factor, and useful low-severity
-findings need not be merge-blocking. The classifier prompt encodes
+findings that are factually correct but out of scope, or that target
+pre-existing code, or that fall below a project's review bar, can be
+labeled either way depending on review culture. The classifier prompt encodes
 *our* working group's taste; another team running this methodology could
 configure the classifier differently and reach different scores for the same agents.
 We mitigate this by (i) recording severity, category, and scope alongside
@@ -648,8 +639,7 @@ and recorded:
    their versions and configurations.
 3. The Claude Sonnet 5 classifier version, published prompt, and any
    thresholds.
-4. The matcher version and prompt used for the run (the implementation is not
-   included in this migration).
+4. The matcher version and published prompt.
 5. The candidate agent version and configuration.
 6. The severity label and provenance for each finding.
 7. The aggregation choice (macro, micro, or both).

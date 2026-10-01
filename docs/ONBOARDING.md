@@ -91,7 +91,7 @@ As soon as you have registered, the portal shows a credentials form for your rev
 ## 4. Run
 
 - **Test run**: the test set of 25 pull requests, with per-PR detail, misses and judge votes. Use it to iterate; it is not on the leaderboard.
-- **Tuning on the full set**: on your side. Use the full set of 219 pull requests, the published Claude Sonnet 5 classifier prompt, and the [matching methodology](METHODOLOGY.md#62-matching). The complete evaluation runtime, including the matcher implementation, is not included in this migration.
+- **Tuning on the full set**: on your side. Evaluate your agent with the full set of 219 pull requests and the published judge prompts and models, as often as you like.
 - **Final run**: three fresh rounds over all 219; the mean becomes your row after a maintainer merges the publication.
 
 Every run pulls your image by digest with your token, runs it with your secrets and your host allowlist, and judges the findings with the same judge as every other row.

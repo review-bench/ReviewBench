@@ -6,8 +6,7 @@
  * group's taste and is the component most likely to need periodic
  * recalibration (Section 5.3).
  *
- * Model: Claude Sonnet 5
- * Version: 3.0.0 — session-based architecture with tool use
+ * Version: 2.0.0 — session-based architecture with tool use
  */
 
 import {
