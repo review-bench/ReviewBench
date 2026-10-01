@@ -7,27 +7,33 @@ For each pull request, the benchmark provides a human-reviewed golden set of cod
 
 ## What is in the Repository?
 
-- **[The public full corpus of 219 tasks](corpus/manifest.json).** The pull
-  requests come from 187 repositories and span a broad range of languages,
-  repository sizes, change sizes, finding categories, and severities. The
-  [25-task test corpus](corpus/test/test.json) is a representative
-  subset of the full corpus intended for small and test runs.
-- **[Benchmark documentation](docs/METHODOLOGY.md).** This includes the
-  [methodology](docs/METHODOLOGY.md), [corpus extraction process](docs/EXTRACTION.md),
-  and [evaluation harness](docs/HARNESS.md).
-- **[The Claude Sonnet 5 classifier prompt](scripts/classifier/prompts.ts).**
-  It assigns TP/FP, severity, category, and the other auxiliary labels. The
-  [matcher prompt](scripts/eval/matcher.ts) is also public.
+- **[The test set: 25 tasks](corpus/test/).** The selected pull
+  requests come from 25 repositories and span a broad range of languages,
+  repository sizes, change sizes, finding categories, and severities.
+- **[The full set: 219 tasks](corpus/manifest.json).** Every pull request the
+  leaderboard runs on, with its corresponding findings in [`golden/`](golden/).
+- **[Benchmark documentation](docs/METHODOLOGY.md).** How the corpus was
+  built, how findings are labeled, and how agents are judged and scored.
+- **[Everything a reviewer vendor needs](#run-your-code-review-agent-on-reviewbench).**
+  The [agent contract](AGENT_CONTRACT.md), the [Codex CLI example](examples/codex-cli/), a
+  [local test script](scripts/try-agent.sh) and the
+  [onboarding guide](docs/ONBOARDING.md).
+- **[The classifier prompt and supporting script](scripts/classifier/prompts.ts).**
+  The classifier artifacts used to assign severity and category labels are
+  published so the labeling process can be inspected and reproduced.
 
-### Corpus Distribution
+The full corpus manifest and all golden findings are public.
 
-All 219 full-corpus PRs are public. The 25-PR test corpus is included within
-the full corpus and preserves a representative mix of major languages, change
-sizes, finding categories, and severity levels for small and test runs.
+### Test Set Distribution
+
+The 25 test set tasks were selected as a representative sample of the full
+set. They preserve its mix of major languages, change sizes, and
+repository diversity while also covering every finding category and severity
+level.
 
 #### Languages
 
-| Language | Test-corpus tasks | Test-corpus share | Full-corpus PRs | Full-corpus share |
+| Language | Test set PRs | Test set share | Full set PRs | Full set share |
 |---|---:|---:|---:|---:|
 | TypeScript | 5 | 20.0% | 68 | 31.1% |
 | Python | 4 | 16.0% | 41 | 18.7% |
@@ -37,12 +43,12 @@ sizes, finding categories, and severity levels for small and test runs.
 | Other languages | 9 | 36.0% | 51 | 23.3% |
 | **Total** | **25** | **100%** | **219** | **100%** |
 
-The test corpus's other languages are Rust, Java, Jupyter Notebook, Kotlin,
+The test set's other languages are Rust, Java, Jupyter Notebook, Kotlin,
 PHP, Ruby, Shell, and Swift.
 
 #### PR Change Size
 
-| Added and removed lines | Test-corpus tasks | Test-corpus share | Full-corpus PRs | Full-corpus share |
+| Added and removed lines | Test set PRs | Test set share | Full set PRs | Full set share |
 |---|---:|---:|---:|---:|
 | 50 or fewer | 3 | 12.0% | 17 | 7.8% |
 | 51-200 | 5 | 20.0% | 40 | 18.3% |
@@ -51,7 +57,7 @@ PHP, Ruby, Shell, and Swift.
 | More than 1,000 | 7 | 28.0% | 78 | 35.6% |
 | **Total** | **25** | **100%** | **219** | **100%** |
 
-#### Test-Corpus Finding Severities
+#### Finding Severities
 
 | Severity | Findings | Share |
 |---|---:|---:|
@@ -60,7 +66,7 @@ PHP, Ruby, Shell, and Swift.
 | Low | 188 | 52.2% |
 | **Total** | **360** | **100%** |
 
-#### Test-Corpus Finding Categories
+#### Finding Categories
 
 | Category | Findings | Category | Findings |
 |---|---:|---|---:|
@@ -70,13 +76,13 @@ PHP, Ruby, Shell, and Swift.
 | Performance | 13 | API architecture | 12 |
 | Accessibility | 10 |  |  |
 
-### Full Corpus Distribution
+### Full Set Distribution
 
-The full corpus contains 219 PRs from 187 distinct repositories. No single
-repository dominates the benchmark. The most represented repository contributes 
+The full set contains 219 PRs from 187 distinct repositories. No single
+repository dominates the benchmark. The most represented repository contributes
 10 PRs, or only 4.6% of the corpus. The corpus covers both common and
 long-tail languages as well as changes ranging from small patches to
-large-scale updates. 
+large-scale updates.
 
 #### Primary PR Types
 
@@ -226,7 +232,6 @@ The benchmark corpus is not currently accepting new pull-request submissions. In
 ReviewBench follows a consensus-based governance model:
 - [Governance policy](GOVERNANCE.md) — project roles, decisions, appeals, and amendments
 - [Maintainers](MAINTAINERS.md) — current project maintainers
-- [Project document license](LICENSE) — license accompanying the imported project documents
 
 ## License
 The repository is licensed under the [MIT License](LICENSE). The project documents copied from the MVG proposal retain the notices included in those files.
