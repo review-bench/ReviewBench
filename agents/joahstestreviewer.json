@@ -1,0 +1,20 @@
+{
+  "name": "joahstestreviewer",
+  "display_name": "joahstestreviewer",
+  "image": "ghcr.io/block/reviewer@sha256:942188639d012c74e5fa83eef8fed3bf4354a0a74e14b8afa98c413e1ebbd04f",
+  "image_visibility": "private",
+  "secrets": {
+    "env": [
+      "asfd",
+      "GHCR_PULL_TOKEN"
+    ]
+  },
+  "model_api_url": "https://api.openai.com/v1",
+  "contacts": [
+    "joahg"
+  ],
+  "provider": "joahstestreviewer",
+  "egress": [
+    "api.openai.com"
+  ]
+}
