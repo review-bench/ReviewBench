@@ -1,7 +1,7 @@
 # ReviewBench
 [![License: MIT](https://img.shields.io/badge/License-MIT-000000?style=for-the-badge)](LICENSE)
 
-ReviewBench is an open, reproducible benchmark for evaluating AI code review systems on real-world pull requests.
+ReviewBench is an open, reproducible benchmark for evaluating AI code review systems on real-world pull requests developed by GitHub Inc.
 
 For each pull request, the benchmark provides a human-reviewed golden set of code review findings that serves as the ground truth. ReviewBench compares an agent's findings with this reference set to measure how reliably it identifies useful issues while avoiding false positives. Results can also be explored by dimensions such as severity and category.
 
