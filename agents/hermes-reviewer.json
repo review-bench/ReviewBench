@@ -1,0 +1,30 @@
+{
+  "name": "hermes-reviewer",
+  "display_name": "Hermes Reviewer",
+  "image": "ghcr.io/gromykoss/reviewbench-reviewer@sha256:d9aacbd63cc129c1eb5c7d8f6e55d7800c2a72b3a3cc945fb9e413aae0a640d9",
+  "image_visibility": "private",
+  "configuration": [
+    {
+      "key": "model",
+      "value": "z-ai/glm-4.6"
+    },
+    {
+      "key": "max-minutes",
+      "value": "14"
+    }
+  ],
+  "secrets": {
+    "env": [
+      "OPENROUTER_API_KEY",
+      "GHCR_PULL_TOKEN"
+    ]
+  },
+  "model_api_url": "https://openrouter.ai/api/v1",
+  "contacts": [
+    "gromykoss"
+  ],
+  "provider": "Hermes Reviewer",
+  "egress": [
+    "openrouter.ai"
+  ]
+}
