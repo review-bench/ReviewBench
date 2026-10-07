@@ -3,7 +3,6 @@
   "display_name": "Codex",
   "image": "ghcr.io/review-bench/rb-agent-codex-review@sha256:6295bdca634b87d1267c9c69bd64211fd350bae54db94ae8739a8c696584061f",
   "image_visibility": "private",
-  "contact": "abadawii591@gmail.com",
   "configuration": [
     {
       "key": "model",

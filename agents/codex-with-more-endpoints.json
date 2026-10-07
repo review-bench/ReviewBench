@@ -4,7 +4,6 @@
   "provider": "OpenAI",
   "image": "ghcr.io/simonaliao/review-bench-self-serve@sha256:33c7b1ba4cdd8e198289f4b2a602726134e3c831100187d798015b0e552484c1",
   "image_visibility": "public",
-  "contact": "zhehuiliao@microsoft.com",
   "configuration": [
     {
       "key": "model",
