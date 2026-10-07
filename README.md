@@ -196,7 +196,9 @@ choose "private package" and the website adds `GHCR_PULL_TOKEN` to the secret
 names for you; see [private images](docs/ONBOARDING.md#public-or-private).
 
 The website opens an onboarding pull request in this repository for you. It
-adds a manifest under [`agents/`](agents/) that follows
+stores your contact email privately; it is not written to the pull request.
+The pull request adds a manifest under
+[`agents/`](agents/) that follows
 [the schema](schema/agent-manifest.schema.json); CI validates it with
 [`schema/validate-manifest.mjs`](schema/validate-manifest.mjs). A maintainer
 merges it. You do not write the manifest or open the pull request yourself.
