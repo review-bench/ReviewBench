@@ -11,6 +11,29 @@ Vendor reviewer containers are not automatically Harbor agents. Start with a
 built-in agent; hosted custom reviewers need Harbor's
 [ACP integration](https://docs.harborframework.com/hosted-harbor/custom-agents).
 
+## Vendor execution path
+
+The primary path is **Harbor CLI execution, followed by result upload**.
+Vendors can run the CLI on an approved Linux Docker runner, or use an approved
+cloud sandbox through `--env` / `environment.type`. Direct cloud execution needs
+that provider's credentials and optional Harbor dependencies; it does **not**
+require Harbor Hosted Alpha access or Docker on the vendor's workstation.
+The chosen provider must support this task's separate verifier and exact-host
+network policies. Unsupported policies must fail rather than be disabled.
+
+These are different operations:
+
+| Operation | Purpose | Hosted Alpha needed? |
+| --- | --- | --- |
+| `harbor run -c job.yaml` | CLI orchestrates execution on the configured runner or sandbox | No |
+| `harbor upload <job-directory> --private` | Store and share existing job results on Hub | No hosted execution |
+| `harbor run --launch -c job.yaml` | Ask Harbor's hosted service to execute the job | May require access approval |
+
+Use the CLI path for private tuning and integration testing. Uploading a job
+does not automatically add a ReviewBench leaderboard row or make vendor-supplied
+scores authoritative; the complete run and scoring provenance must be checked
+before a submission is accepted.
+
 ## Export
 
 Requirements: Node 22+, `npm ci`, and a Debian-based Node container image pinned
@@ -122,9 +145,9 @@ Harbor's public setup baseline, so this is not a claim of parity with the
 official runner's proxy/port restrictions. Unsupported policies must fail,
 not be silently weakened.
 
-## Local smoke run
+## CLI smoke run
 
-Run the one-task export with a built-in reviewer:
+On an approved Linux Docker runner, run the one-task export with a built-in reviewer:
 
 ```powershell
 harbor run -p .\.harbor\smoke -a codex -m "openai/<reviewer-model-id>" -k 1 -n 1
@@ -209,7 +232,27 @@ aggregates. Multiple attempts, task filters, and partial regrades intentionally
 do not yield a complete score for the original dataset. A smoke subset must be
 exported as its own dataset.
 
-## Harbor Hub pilot and publication
+## Private result upload
+
+After `check-job.py` succeeds, sign in and upload the job directory, not the
+dataset export:
+
+```powershell
+harbor auth login
+harbor upload .\.harbor\jobs\<job-name> --private
+```
+
+Use `--org <owned-hub-org>` to select the owner of a new upload. Keep trial
+outputs, trajectories, and scoring provenance with the results, but never
+upload credentials or private integration source. For a remote runner, inspect
+and download its sanitized job artifacts, then upload from an authenticated
+client; no Hub credential needs to be provisioned to the runner.
+
+Result upload and dataset publication are separate actions. This adapter does
+not automatically publish results, create leaderboard rows, or replace
+ReviewBench's official submission process.
+
+## Optional hosted execution and dataset publication
 
 ### Model endpoints and credentials
 
@@ -268,9 +311,11 @@ for the verifier. Never solve a routing failure by baking keys into images or
 publishing literal secrets. The export alone is not an authenticated hosted
 execution test.
 
-Before public release: exercise image builds, a real reviewer/judge trial,
-network enforcement, hosted secret isolation, artifact transfer, timeout/error
-handling, and score parity; archive the resulting image digests. For repeatable
+Before public CLI release: exercise image builds, a real reviewer/judge trial,
+network enforcement, phase-specific secret isolation, artifact transfer,
+timeout/error handling, and score parity; archive the resulting image digests.
+Hosted secret routing is an additional requirement only when offering the
+optional hosted execution path. For repeatable
 published runs, prebuild both images and pin their digests in `[environment]`
 and `[verifier.environment]`, then run `harbor dataset sync` in the export
 directory to refresh task digests. The base image and npm lock are pinned, but
@@ -285,4 +330,6 @@ References: [task format](https://docs.harborframework.com/tasks/overview),
 [separate verifier](https://docs.harborframework.com/tasks/separate-verifier),
 [metrics](https://docs.harborframework.com/datasets/metrics),
 [network policies](https://docs.harborframework.com/tasks/network-policies),
+[cloud sandboxes](https://docs.harborframework.com/sandboxes/pre-integrated-sandboxes),
+[result upload](https://docs.harborframework.com/harbor-hub/upload),
 [publishing](https://docs.harborframework.com/harbor-hub/publish).
