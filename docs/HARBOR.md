@@ -211,6 +211,39 @@ exported as its own dataset.
 
 ## Harbor Hub pilot and publication
 
+### Model endpoints and credentials
+
+Harbor does not host the review or judge model. Use an approved inference
+provider's endpoint and its exact model identifier. The reviewer uses its
+Harbor agent's provider/model configuration; the verifier uses the exported
+`--judge-provider` and `--judge-model`. These are independent configurations.
+
+The judge's locked SDK must recognize that exact provider/model pair.
+An empty-review smoke test makes no model calls and therefore cannot prove
+model availability or authentication. Do not guess a Sonnet 5 identifier or
+treat a successful empty-review test as proof that an unregistered model works.
+
+Harbor uses GitHub OAuth for sign-in but has separate organization memberships.
+Confirm the owning namespace with `harbor auth org list`. In the Hub, select
+that organization, open its Settings, and use **Add secret** for an approved
+provider credential. Job `env` fields are plaintext configuration, not a place
+for keys. Provider endpoint URLs and model IDs are nonsensitive configuration;
+keys belong only in the secret manager.
+
+For a local Anthropic judge, provision a dedicated `RB_HARBOR_JUDGE_KEY` through
+your secret manager and export with
+`--judge-env ANTHROPIC_API_KEY=RB_HARBOR_JUDGE_KEY` and
+`--judge-host api.anthropic.com`. Give the reviewer a different credential.
+No key values belong in exported files or images.
+
+For hosted runs, normal agent secret selection grants those credentials to
+the reviewer. **Do not select the judge key for the reviewer**, even under a
+dedicated `RB_HARBOR_*` name. Confirm a verifier-only delivery route with the
+deployed Hub before any authenticated judge trial. A literal, non-secret marker
+in `[verifier.env]` can test phase isolation, but does not establish how stored
+credentials are delivered. Hosted rollouts may require separate alpha-access
+approval even when package publishing and organization ownership already work.
+
 After local review, authenticate and publish a **private** smoke package:
 
 ```powershell

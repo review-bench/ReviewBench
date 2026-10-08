@@ -87,6 +87,14 @@ jobs:
             --base-image node:22-bookworm-slim@sha256:efd0ab5780c2d9ab1f0f869571a00d5edb17793bff4cce4a2792e3eb0ffc7562 \
             --agent-host api.githubcopilot.com --judge-host api.githubcopilot.com \
             --judge-env COPILOT_GITHUB_TOKEN=RB_HARBOR_JUDGE_TOKEN
+          python - <<'PY'
+          from pathlib import Path
+          script = next(Path(".harbor/smoke").glob("*/tests/test.sh"))
+          script.write_text(script.read_text().replace(
+              "set -euo pipefail\n",
+              'set -euo pipefail\ntest "${COPILOT_GITHUB_TOKEN:-}" = "reviewbench-isolation-sentinel"\n',
+          ), encoding="utf-8")
+          PY
           harbor run -p .harbor/smoke -a scripts.harbor.smoke_agent:EmptyReviewAgent \
             -e docker -k 1 -n 1 --job-name empty-smoke --jobs-dir .harbor/jobs --yes
           python scripts/harbor/check-job.py .harbor/jobs/empty-smoke \
