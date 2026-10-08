@@ -1,0 +1,29 @@
+{
+  "name": "mesrai",
+  "display_name": "mesrai",
+  "image": "ghcr.io/mesraiofficial/mesrai-reviewbench@sha256:b4246deb7c5b7fc6c99749f4438ab0d74cba57581d070453ee1b5a7a8906f08e",
+  "image_visibility": "public",
+  "configuration": [
+    {
+      "key": "engine",
+      "value": "mesrai-cli"
+    },
+    {
+      "key": "cli_version",
+      "value": "0.4.23"
+    }
+  ],
+  "secrets": {
+    "env": [
+      "MESRAI_TEAM_KEY"
+    ]
+  },
+  "model_api_url": "https://api.mesrai.com",
+  "contacts": [
+    "mesraiofficial"
+  ],
+  "provider": "mesrai",
+  "egress": [
+    "api.mesrai.com"
+  ]
+}
