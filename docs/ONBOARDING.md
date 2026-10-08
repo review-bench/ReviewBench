@@ -64,7 +64,7 @@ scripts/try-agent.sh ghcr.io/<you>/<name>@sha256:<digest> --pr 0 -e OPENAI_API_K
 
 It runs your image on the test set (or, with `--set full`, the full set)
 exactly as the benchmark does and checks the findings file. See
-[Try it locally](../README.md#try-it-locally-first). Two things the portal
+[Validate your submission locally](../README.md#1-validate-your-submission-locally). Two things the portal
 does for you that you do yourself here: a private package needs
 `docker login ghcr.io` first (a classic token with `read:packages`, the same
 one you will enter as `GHCR_PULL_TOKEN`), and an endpoint other than OpenAI
@@ -77,7 +77,7 @@ needs `-e RB_MODEL_BASE_URL=https://…`.
 
 ## 2. Register it in the portal
 
-- Sign in with GitHub at the portal and fill the form: display name, image digest, the configuration labels shown on your row (for example `model`, `effort`), your **model API URL** (its host is allowed automatically; add other hosts only if your agent needs them), and the **names** of the secrets it needs. The model API URL cannot be edited in the portal later; to change it, comment on your onboarding pull request and a maintainer updates it.
+- Sign in with GitHub at the portal and fill the form: display name, contact email, image digest, the configuration labels shown on your row (for example `model`, `effort`), your **model API URL** (its host is allowed automatically; add other hosts only if your agent needs them), and the **names** of the secrets it needs. The contact email is stored privately and is not included in the public manifest. The model API URL cannot be edited in the portal later; to change it, comment on your onboarding pull request and a maintainer updates it.
 - The portal opens a pull request with your manifest in this repository. A maintainer reviews and merges it; that merge is the approval. You can watch it here. Approval is a human step: expect it within a business day, and if it takes longer, comment on your pull request. Meanwhile you can store credentials and add configurations.
 
 ## 3. Enter your credentials
@@ -102,7 +102,7 @@ If the first pull request fails because a host was refused, the run stops there 
 
 - New image: add a configuration in the portal with the new digest and labels. No approval needed; each run records which configuration it used.
 - New secret value: the credentials form.
-- New contact: edit the manifest in a pull request.
+- New authorized GitHub user: edit the `contacts` list in a pull request.
 
 ## What you cannot do
 

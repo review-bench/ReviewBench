@@ -2,8 +2,6 @@
 
 This Project welcomes contributions, suggestions, and feedback. All contributions, suggestions, and feedback you submitted are accepted under the [Project's license](./LICENSE). You represent that if you do not own copyright in the code that you have the authority to submit it under the [Project's license](./LICENSE). All feedback, suggestions, or contributions are not confidential.
 
-The Project abides by the Organization's [code of conduct](https://github.com/review-bench/MVG/blob/main/org-docs/CODE-OF-CONDUCT.md) and [trademark policy](https://github.com/review-bench/MVG/blob/main/org-docs/TRADEMARKS.md).
-
 ## Label Disputes
 
 If you believe a finding in the golden set is mislabeled (wrong TP/FP decision, severity, or category), open an issue with:
@@ -28,7 +26,3 @@ Maintainer status is granted by existing maintainers to contributors who have de
 - A track record of constructive engagement in discussions.
 
 There is no fixed threshold. Existing maintainers will invite contributors when the time is right.
-
----
-Part of MVG-0.1-beta.
-Made with love by GitHub. Licensed under the [CC-BY 4.0 License](https://creativecommons.org/licenses/by/4.0/).

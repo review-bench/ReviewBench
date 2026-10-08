@@ -275,28 +275,6 @@
     },
     {
       "file": "tests/performance/performance.test.js",
-      "start_line": 92,
-      "end_line": 92,
-      "message": "[javascript.lang.security.audit.path-traversal.path-join-resolve-traversal.path-join-resolve-traversal] Detected possible user input going into a `path.join` or `path.resolve` function. This could possibly lead to a path traversal vulnerability,  where the attacker can access arbitrary files stored in the file system. Instead, be sure to sanitize or validate user input first.",
-      "tp_fp": "fp",
-      "severity": "low",
-      "category": "security",
-      "scope": "introduced-by-pr",
-      "difficulty": "easy",
-      "context_required": "diff-only",
-      "tp_fp_justification": "Duplicate of Finding 13 — same file, same line, same claim. The `item` variable comes from `fs.readdirSync(dir)` (OS-provided directory entries), not user-controlled input. This is a local performance test script with no external inputs or attack surface.",
-      "severity_justification": "Developer test script with no external input; no exploitable path traversal exists.",
-      "category_justification": "The finding is framed as a path traversal vulnerability.",
-      "producer": "deterministic_tool:semgrep",
-      "source": {
-        "type": "tool",
-        "alignment": "generated",
-        "tool": "semgrep",
-        "rule_id": "javascript.lang.security.audit.path-traversal.path-join-resolve-traversal.path-join-resolve-traversal"
-      }
-    },
-    {
-      "file": "tests/performance/performance.test.js",
       "start_line": 212,
       "end_line": 212,
       "message": "[javascript.lang.security.audit.unsafe-formatstring.unsafe-formatstring] Detected string concatenation with a non-literal variable in a util.format / console.log function. If an attacker injects a format specifier in the string, it will forge the log message. Try to use constant values for the format string.",

@@ -7,6 +7,9 @@
   "scripts": {
     "judge": "tsx scripts/eval/eval.ts",
     "harbor:export": "tsx scripts/harbor/export.ts",
+    "sync:test-set": "tsx scripts/sync-test-set.ts",
+    "check:test-set": "tsx scripts/sync-test-set.ts --check",
+    "check:golden": "tsx scripts/validate-golden.ts",
     "typecheck": "tsc --noEmit",
     "test:judge": "node --import tsx --test tests/**/*.test.ts",
     "test": "npm run typecheck && npm run test:judge"

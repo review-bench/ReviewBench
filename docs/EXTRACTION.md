@@ -407,15 +407,14 @@ only if coverage gaps appear during golden set construction.
 4. Filter to findings that target lines within the review-time
    diff. Findings on unchanged lines are discarded.
 
-### 5.3 Severity Filtering
+### 5.3 Label Retention
 
-After labeling (METHODOLOGY.md §5), deterministic tool findings labeled
-low severity are excluded from the golden set.
-This is a pragmatic choice: low-severity linter findings are
-the category most likely to flood the golden set with noise and
-least likely to represent issues a human reviewer would flag.
-Medium and high severity findings from deterministic tools are
-retained.
+After labeling (METHODOLOGY.md §5), deterministic tool findings are
+retained in the golden set at every severity, with both TP and FP labels.
+Keeping the labeled tool output makes the corpus auditable and preserves
+known negative examples rather than silently dropping them based on
+severity. Consumers that only need a severity-filtered view can derive it
+from the published labels.
 
 ### 5.4 Output
 

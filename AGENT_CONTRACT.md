@@ -35,7 +35,7 @@ docker run --rm \
 | `RB_BASE`, `RB_HEAD` | Full 40-character commit SHAs |
 | `RB_AGENT` | The name you registered. Use it as `agent` and `producer` in your output. |
 | `RB_OUT` | Where to write your findings |
-| `RB_CONFIG_<KEY>` | One variable per entry in your manifest's `configuration`. The key is upper-cased and every character that is not a letter or digit becomes an underscore (`model` becomes `RB_CONFIG_MODEL`, `max-tokens` becomes `RB_CONFIG_MAX_TOKENS`). Read these to select model, effort or any other setting, so a configuration can be tried without rebuilding the image. |
+| `RB_CONFIG_<KEY>` | One variable per entry in your manifest's `configuration`. The key is upper-cased and every character that is not a letter or digit becomes an underscore (`model` becomes `RB_CONFIG_MODEL`, `max-tokens` becomes `RB_CONFIG_MAX_TOKENS`). Read these to select model, effort or any other setting, so a configuration can be tried without rebuilding the image. Print the settings your agent applies (for example `model=gpt-5.5 effort=high`): the run names any label whose value never appears in your agent's output, since a label your image does not read has no effect. |
 | `RB_MODEL_BASE_URL` | The model API URL you registered, if any (for example `https://api.openai.com/v1`). Read it instead of hardcoding your endpoint, so the endpoint and the allowlist come from one place. |
 | `RB_ATTEMPT` | Attempt number, starting at 1, if we are retrying |
 

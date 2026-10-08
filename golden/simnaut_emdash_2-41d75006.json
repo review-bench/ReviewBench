@@ -256,50 +256,6 @@
       }
     },
     {
-      "file": "packages/core/src/database/repositories/options.ts",
-      "start_line": 6,
-      "end_line": 6,
-      "message": "[javascript.lang.correctness.no-replaceall.no-replaceall] The string method replaceAll is not supported in all versions of javascript, and is not supported by older browser versions. Consider using replace() with a regex as the first argument instead like mystring.replace(/bad/g, \"good\") instead of mystring.replaceAll(\"bad\", \"good\") (https://discourse.threejs.org/t/replaceall-is-not-a-function/14585)",
-      "tp_fp": "fp",
-      "severity": "low",
-      "category": "correctness",
-      "scope": "pre-existing",
-      "difficulty": "easy",
-      "context_required": "diff-plus-related-files",
-      "tp_fp_justification": "Exact duplicate of Finding 12 — identical rule ID, identical file (packages/core/src/database/repositories/options.ts), identical line (6), identical inapplicability to server-side Node.js 22 code.",
-      "severity_justification": "No actual compatibility issue in this server-side Node.js 22 context.",
-      "category_justification": "The tool incorrectly claims a compatibility issue that doesn't exist for this runtime.",
-      "producer": "deterministic_tool:semgrep",
-      "source": {
-        "type": "tool",
-        "alignment": "generated",
-        "tool": "semgrep",
-        "rule_id": "javascript.lang.correctness.no-replaceall.no-replaceall"
-      }
-    },
-    {
-      "file": "packages/core/src/database/repositories/options.ts",
-      "start_line": 6,
-      "end_line": 6,
-      "message": "[javascript.lang.correctness.no-replaceall.no-replaceall] The string method replaceAll is not supported in all versions of javascript, and is not supported by older browser versions. Consider using replace() with a regex as the first argument instead like mystring.replace(/bad/g, \"good\") instead of mystring.replaceAll(\"bad\", \"good\") (https://discourse.threejs.org/t/replaceall-is-not-a-function/14585)",
-      "tp_fp": "fp",
-      "severity": "low",
-      "category": "correctness",
-      "scope": "pre-existing",
-      "difficulty": "easy",
-      "context_required": "diff-plus-related-files",
-      "tp_fp_justification": "Exact duplicate of Findings 12 and 13 — identical rule ID, identical file (packages/core/src/database/repositories/options.ts), identical line (6). Same inapplicability to server-side Node.js 22 code.",
-      "severity_justification": "No actual compatibility issue in this server-side Node.js 22 context.",
-      "category_justification": "The tool incorrectly claims a compatibility issue that doesn't exist for this runtime.",
-      "producer": "deterministic_tool:semgrep",
-      "source": {
-        "type": "tool",
-        "alignment": "generated",
-        "tool": "semgrep",
-        "rule_id": "javascript.lang.correctness.no-replaceall.no-replaceall"
-      }
-    },
-    {
       "file": "packages/core/src/emdash-runtime.ts",
       "start_line": 2046,
       "end_line": 2046,

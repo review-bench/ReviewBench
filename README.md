@@ -1,7 +1,7 @@
 # ReviewBench
 [![License: MIT](https://img.shields.io/badge/License-MIT-000000?style=for-the-badge)](LICENSE)
 
-ReviewBench is an open, reproducible benchmark for evaluating AI code review systems on real-world pull requests.
+ReviewBench is an open, reproducible benchmark for evaluating AI code review systems on real-world pull requests developed by GitHub Inc.
 
 For each pull request, the benchmark provides a human-reviewed golden set of code review findings that serves as the ground truth. ReviewBench compares an agent's findings with this reference set to measure how reliably it identifies useful issues while avoiding false positives. Results can also be explored by dimensions such as severity and category.
 
@@ -16,7 +16,6 @@ For each pull request, the benchmark provides a human-reviewed golden set of cod
   - [Costs](#costs)
   - [Credentials](#credentials)
 - [Contribution](#contribution)
-- [Governance](#governance)
 - [License](#license)
 
 ## What is in the Repository?
@@ -26,6 +25,13 @@ For each pull request, the benchmark provides a human-reviewed golden set of cod
   repository sizes, change sizes, finding categories, and severities.
 - **[The full set: 219 tasks](corpus/manifest.json).** Every pull request the
   leaderboard runs on, with its corresponding findings in [`golden/`](golden/).
+- **[Repository mirrors](https://github.com/review-bench).** Each source
+  repository in the corpus has a mirror in the review-bench organization,
+  named `review-bench/<owner>_<repo>`, holding every task's base and head
+  commits. If an original repository link is unavailable, use its corresponding
+  mirror. The judge and the local test script check out pull requests from these
+  mirrors, so the benchmark still runs if an upstream repository is deleted or
+  rewritten.
 - **[Benchmark documentation](docs/METHODOLOGY.md).** How the corpus was
   built, how findings are labeled, and how agents are judged and scored.
 - **[Everything a reviewer vendor needs](#submit-your-reviewer-to-the-reviewbench-leaderboard).**
@@ -81,19 +87,19 @@ PHP, Ruby, Shell, and Swift.
 
 | Severity | Findings | Share |
 |---|---:|---:|
-| High | 37 | 10.3% |
-| Medium | 135 | 37.5% |
-| Low | 188 | 52.2% |
-| **Total** | **360** | **100%** |
+| High | 36 | 10.2% |
+| Medium | 134 | 38.1% |
+| Low | 182 | 51.7% |
+| **Total** | **352** | **100%** |
 
 #### Finding Categories
 
 | Category | Findings | Category | Findings |
 |---|---:|---|---:|
-| Correctness | 138 | Reliability | 59 |
-| Maintainability | 45 | Testing | 35 |
+| Correctness | 133 | Reliability | 58 |
+| Maintainability | 44 | Testing | 35 |
 | Security | 27 | Documentation | 21 |
-| Performance | 13 | API architecture | 12 |
+| Performance | 12 | API architecture | 12 |
 | Accessibility | 10 |  |  |
 
 ### Full Set Distribution
@@ -151,7 +157,10 @@ Four steps; the [onboarding guide](docs/ONBOARDING.md) walks through each one.
 set the way the benchmark does: one fresh container per pull request, the
 same mounts and variables, and the same checks on the findings file. With
 `--set full` it runs the full set instead. It needs docker, git and jq, and
-fetches each pull request from GitHub.
+fetches each pull request's commits from its mirror in the
+[review-bench organization](https://github.com/review-bench)
+(`review-bench/<owner>_<repo>`), the same copy the judge uses. It falls back
+to the upstream repository only if the mirror lacks a commit.
 
 This checks that the same container you plan to submit can complete the
 benchmark PRs and produce valid findings. It does not score the findings or
@@ -190,7 +199,9 @@ choose "private package" and the website adds `GHCR_PULL_TOKEN` to the secret
 names for you; see [private images](docs/ONBOARDING.md#public-or-private).
 
 The website opens an onboarding pull request in this repository for you. It
-adds a manifest under [`agents/`](agents/) that follows
+stores your contact email privately; it is not written to the pull request.
+The pull request adds a manifest under
+[`agents/`](agents/) that follows
 [the schema](schema/agent-manifest.schema.json); CI validates it with
 [`schema/validate-manifest.mjs`](schema/validate-manifest.mjs). A maintainer
 merges it. You do not write the manifest or open the pull request yourself.
@@ -292,10 +303,5 @@ not the onboarding path; the website is. For how the benchmark works, see the
 ReviewBench welcomes contributions, suggestions, and feedback. See [CONTRIBUTING.md](CONTRIBUTING.md) for contribution requirements, the process for disputing golden-set labels, and information about becoming a maintainer.
 The benchmark corpus is not currently accepting new pull-request submissions. Instructions will be published in the contribution guide when submissions open.
 
-## Governance
-ReviewBench follows a consensus-based governance model:
-- [Governance policy](GOVERNANCE.md) — project roles, decisions, appeals, and amendments
-- [Maintainers](MAINTAINERS.md) — current project maintainers
-
 ## License
-The repository is licensed under the [MIT License](LICENSE). The project documents copied from the MVG proposal retain the notices included in those files.
+The repository is licensed under the [MIT License](LICENSE).

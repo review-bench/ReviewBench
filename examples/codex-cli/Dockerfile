@@ -13,7 +13,7 @@ FROM node:22-slim
 RUN apt-get update \
     && apt-get install -y --no-install-recommends git ca-certificates \
     && rm -rf /var/lib/apt/lists/* \
-    && npm install -g --no-audit --no-fund @openai/codex@0.154.0 \
+    && npm install -g --no-audit --no-fund @openai/codex@0.159.3 \
     && npm cache clean --force
 
 WORKDIR /agent

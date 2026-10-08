@@ -9,7 +9,6 @@
     "name",
     "display_name",
     "image",
-    "contact",
     "contacts"
   ],
   "anyOf": [
@@ -113,12 +112,6 @@
       "minimum": 60,
       "maximum": 3600,
       "default": 900
-    },
-    "contact": {
-      "type": "string",
-      "description": "Where we send your report and any questions.",
-      "minLength": 3,
-      "maxLength": 128
     },
     "contacts": {
       "type": "array",

@@ -27,7 +27,6 @@
     "api.example.com"
   ],
   "pr_timeout_seconds": 900,
-  "contact": "reviews@example.com",
   "contacts": [
     "example-maintainer"
   ],

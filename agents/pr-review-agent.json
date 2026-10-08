@@ -1,0 +1,29 @@
+{
+  "name": "pr-review-agent",
+  "display_name": "pr-review-agent",
+  "image": "ghcr.io/barsurfer/pr-review-agent@sha256:0363815bce2fe2b3262887c382c8f17c2381c62d7f9c36fec1008cae4042be5f",
+  "image_visibility": "public",
+  "configuration": [
+    {
+      "key": "RB_CONFIG_MODEL",
+      "value": "claude-haiku-5-5"
+    },
+    {
+      "key": "RB_CONFIG_JUDGE_MODEL",
+      "value": "claude-sonnet-5"
+    }
+  ],
+  "secrets": {
+    "env": [
+      "ANTHROPIC_API_KEY"
+    ]
+  },
+  "model_api_url": "https://api.anthropic.com",
+  "contacts": [
+    "barsurfer"
+  ],
+  "provider": "pr-review-agent",
+  "egress": [
+    "api.anthropic.com"
+  ]
+}

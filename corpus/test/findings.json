@@ -50,7 +50,7 @@
       "end_line": 278,
       "severity": "low",
       "category": "correctness",
-      "message": "When `pattern.flags` contains disallowed characters, `validatePattern` pushes a flags-error and then continues to compile the regex using normalized (stripped) flags. This means a pattern that is syntactically invalid only when combined with its declared flags (rare but possible with flag-specific syntax like `\\p{}` requiring `u`) will be compiled with `u` stripped and may not surface an 'Invalid regex pattern' error. The two validation concerns \u2014 flags and pattern \u2014 are tested independently rather than together, so the reported validity does not reflect the actual behavior at execution time when both flags and pattern interact.",
+      "message": "When `pattern.flags` contains disallowed characters, `validatePattern` pushes a flags-error and then continues to compile the regex using normalized (stripped) flags. This means a pattern that is syntactically invalid only when combined with its declared flags (rare but possible with flag-specific syntax like `\\p{}` requiring `u`) will be compiled with `u` stripped and may not surface an 'Invalid regex pattern' error. The two validation concerns — flags and pattern — are tested independently rather than together, so the reported validity does not reflect the actual behavior at execution time when both flags and pattern interact.",
       "scope": "introduced-by-pr",
       "difficulty": "hard",
       "context_required": "diff-plus-related-files"
@@ -61,7 +61,7 @@
       "end_line": 448,
       "severity": "low",
       "category": "security",
-      "message": "The two new error messages `File not found: ${path}` and `Could not read file stats for: ${path}` embed the raw `path` value, which is typically an absolute filesystem path, in the MCP error response. The project's AGENTS.md security section states 'Use getRelativePath() in error messages returned to clients \u2014 never leak absolute filesystem paths' (Issue #129). These are new error paths introduced by this PR that do not follow that convention.",
+      "message": "The two new error messages `File not found: ${path}` and `Could not read file stats for: ${path}` embed the raw `path` value, which is typically an absolute filesystem path, in the MCP error response. The project's AGENTS.md security section states 'Use getRelativePath() in error messages returned to clients — never leak absolute filesystem paths' (Issue #129). These are new error paths introduced by this PR that do not follow that convention.",
       "scope": "introduced-by-pr",
       "difficulty": "easy",
       "context_required": "diff-plus-related-files"
@@ -175,7 +175,7 @@
       "end_line": 240,
       "severity": "high",
       "category": "correctness",
-      "message": "layer('disable') and layer('enable') are not valid reatom v2 API calls. LayerAtom is AtomSelfBinded<LogicalLayerState, LogicalLayerActions>; actions must be dispatched via store.dispatch([layer.disable()]) and store.dispatch([layer.enable()]), as demonstrated in applyNewLayerSource.ts. Calling the atom as a plain function with a string argument invokes the reducer directly with an invalid argument \u2014 not the action handler \u2014 so the remounting logic is a no-op. store is not imported in GenericRenderer.ts, so this cannot be fixed without adding that import.",
+      "message": "layer('disable') and layer('enable') are not valid reatom v2 API calls. LayerAtom is AtomSelfBinded<LogicalLayerState, LogicalLayerActions>; actions must be dispatched via store.dispatch([layer.disable()]) and store.dispatch([layer.enable()]), as demonstrated in applyNewLayerSource.ts. Calling the atom as a plain function with a string argument invokes the reducer directly with an invalid argument — not the action handler — so the remounting logic is a no-op. store is not imported in GenericRenderer.ts, so this cannot be fixed without adding that import.",
       "scope": "introduced-by-pr",
       "difficulty": "hard",
       "context_required": "diff-plus-related-files"
@@ -353,7 +353,7 @@
       "end_line": 51,
       "severity": "high",
       "category": "correctness",
-      "message": "`syncConfig.lastSynced` is never written by `writeSyncConfig` in storageDriver.ts, and the `SyncConfig` objects constructed in WorkspaceManagerModal never include a `lastSynced` field. As a result `localTs` is always `null`, the condition `remoteTs && localTs && remoteTs > localTs` is always false, and conflict detection is completely disabled \u2014 every pull silently overwrites local changes without warning.",
+      "message": "`syncConfig.lastSynced` is never written by `writeSyncConfig` in storageDriver.ts, and the `SyncConfig` objects constructed in WorkspaceManagerModal never include a `lastSynced` field. As a result `localTs` is always `null`, the condition `remoteTs && localTs && remoteTs > localTs` is always false, and conflict detection is completely disabled — every pull silently overwrites local changes without warning.",
       "scope": "introduced-by-pr",
       "difficulty": "medium",
       "context_required": "diff-plus-related-files"
@@ -463,7 +463,7 @@
       "end_line": 39,
       "severity": "high",
       "category": "correctness",
-      "message": "`s3Adapter` calls `(window as any).electronAPI.getPresignedUrl(...)`, but no `getPresignedUrl` is exposed in `electron/preload.js` and no `get-presigned-url` IPC handler is registered in `electron/main.js`. As a result, every push/pull/timestamp call for the S3 provider will throw `S3 presigned URL generation requires Electron (not available in browser mode)` even when running inside Electron. The S3 provider is documented as a supported, Electron-only option (see `WORKSPACES.md` \u00a77 and `README.md`), but it is non-functional in this PR. Either implement the `get-presigned-url` IPC channel (and add `getPresignedUrl` to preload) or remove S3 from the provider list and documentation until it lands.",
+      "message": "`s3Adapter` calls `(window as any).electronAPI.getPresignedUrl(...)`, but no `getPresignedUrl` is exposed in `electron/preload.js` and no `get-presigned-url` IPC handler is registered in `electron/main.js`. As a result, every push/pull/timestamp call for the S3 provider will throw `S3 presigned URL generation requires Electron (not available in browser mode)` even when running inside Electron. The S3 provider is documented as a supported, Electron-only option (see `WORKSPACES.md` §7 and `README.md`), but it is non-functional in this PR. Either implement the `get-presigned-url` IPC channel (and add `getPresignedUrl` to preload) or remove S3 from the provider list and documentation until it lands.",
       "scope": "introduced-by-pr",
       "difficulty": "medium",
       "context_required": "diff-plus-related-files"
@@ -496,7 +496,7 @@
       "end_line": 670,
       "severity": "low",
       "category": "documentation",
-      "message": "The feature comparison table marks Git as **not requiring Electron** (`\u2717`), but `gitAdapter.ts` calls `getDataDir()` from `storageDriver`, which returns `null` in browser mode, and then sends `dataDir: null` to the server. The server route at `/api/sync/git/push` (and pull/timestamp) explicitly requires `dataDir`: `if (!workspaceId || !data || !config?.remote || !dataDir) return res.status(400)...`. So in practice, Git sync also requires Electron unless `APILIX_DATA_DIR` is set in the server's environment. Either clarify this row (e.g. \"Requires Electron or `APILIX_DATA_DIR` on server\") or update the adapter/server to be browser-friendly.",
+      "message": "The feature comparison table marks Git as **not requiring Electron** (`✗`), but `gitAdapter.ts` calls `getDataDir()` from `storageDriver`, which returns `null` in browser mode, and then sends `dataDir: null` to the server. The server route at `/api/sync/git/push` (and pull/timestamp) explicitly requires `dataDir`: `if (!workspaceId || !data || !config?.remote || !dataDir) return res.status(400)...`. So in practice, Git sync also requires Electron unless `APILIX_DATA_DIR` is set in the server's environment. Either clarify this row (e.g. \"Requires Electron or `APILIX_DATA_DIR` on server\") or update the adapter/server to be browser-friendly.",
       "scope": "introduced-by-pr",
       "difficulty": "medium",
       "context_required": "diff-plus-related-files"
@@ -507,7 +507,7 @@
       "end_line": 99,
       "severity": "low",
       "category": "maintainability",
-      "message": "In `handleDelete`, `state.activeWorkspaceId` is read both before and after `dispatch({ type: 'DELETE_WORKSPACE', ... })`, but the closure's `state.activeWorkspaceId` does not update synchronously. The subsequent `await StorageDriver.writeManifest(...)` therefore persists `activeWorkspaceId: state.activeWorkspaceId === id ? fallback.id : state.activeWorkspaceId` using the *pre-dispatch* value \u2014 which still works for the current case, but the logic is fragile and easy to break. More importantly, the debounced save effect in `store.tsx` will fire a moment later and overwrite this manifest write with the new state anyway, so this explicit `writeManifest` call is redundant and the two writes can race on slow disks. Consider removing the explicit `writeManifest` here and relying on the debounced effect, or routing all manifest writes through a single helper.",
+      "message": "In `handleDelete`, `state.activeWorkspaceId` is read both before and after `dispatch({ type: 'DELETE_WORKSPACE', ... })`, but the closure's `state.activeWorkspaceId` does not update synchronously. The subsequent `await StorageDriver.writeManifest(...)` therefore persists `activeWorkspaceId: state.activeWorkspaceId === id ? fallback.id : state.activeWorkspaceId` using the *pre-dispatch* value — which still works for the current case, but the logic is fragile and easy to break. More importantly, the debounced save effect in `store.tsx` will fire a moment later and overwrite this manifest write with the new state anyway, so this explicit `writeManifest` call is redundant and the two writes can race on slow disks. Consider removing the explicit `writeManifest` here and relying on the debounced effect, or routing all manifest writes through a single helper.",
       "scope": "introduced-by-pr",
       "difficulty": "medium",
       "context_required": "diff-plus-related-files"
@@ -518,7 +518,7 @@
       "end_line": 476,
       "severity": "medium",
       "category": "correctness",
-      "message": "`TeamTab` imports `dispatch` from `useApp()` but never uses it; it also reads `activeWorkspace.teamServerUrl` and writes to local `serverUrl` state but never persists the entered Server URL or JWT token anywhere (no `StorageDriver.writeSyncConfig` call). After \"Test connection\" succeeds the credentials are simply discarded on tab change or modal close, contradicting `WORKSPACES.md` \u00a79 step 6 which says clicking \"Test connection in the Team tab\" is part of the connect-and-sync flow. Either remove the unused `dispatch`, wire up the team-server credential save, or document that this tab is informational only.",
+      "message": "`TeamTab` imports `dispatch` from `useApp()` but never uses it; it also reads `activeWorkspace.teamServerUrl` and writes to local `serverUrl` state but never persists the entered Server URL or JWT token anywhere (no `StorageDriver.writeSyncConfig` call). After \"Test connection\" succeeds the credentials are simply discarded on tab change or modal close, contradicting `WORKSPACES.md` §9 step 6 which says clicking \"Test connection in the Team tab\" is part of the connect-and-sync flow. Either remove the unused `dispatch`, wire up the team-server credential save, or document that this tab is informational only.",
       "scope": "introduced-by-pr",
       "difficulty": "easy",
       "context_required": "diff-plus-related-files"
@@ -606,7 +606,7 @@
       "end_line": 310,
       "severity": "low",
       "category": "correctness",
-      "message": "When the user resolves a conflict with `Keep Local`, `syncPull` returns `null`, but this branch reports \u201cRemote is empty \u2014 nothing to pull\u201d. That gives the wrong result message for a conflict resolution and may lead users to believe the remote has no data.",
+      "message": "When the user resolves a conflict with `Keep Local`, `syncPull` returns `null`, but this branch reports “Remote is empty — nothing to pull”. That gives the wrong result message for a conflict resolution and may lead users to believe the remote has no data.",
       "scope": "introduced-by-pr",
       "difficulty": "easy",
       "context_required": "diff-plus-related-files"
@@ -729,7 +729,7 @@
       "end_line": 40,
       "severity": "high",
       "category": "testing",
-      "message": "The test never calls `send_request_to_llm` \u2014 the actual function under test. It directly invokes the mocked `chat_interface.send_request_to_open_ai` and then asserts against the return value the mock was configured to produce. No real application logic is exercised, so the test does not validate the behaviour it claims to test.",
+      "message": "The test never calls `send_request_to_llm` — the actual function under test. It directly invokes the mocked `chat_interface.send_request_to_open_ai` and then asserts against the return value the mock was configured to produce. No real application logic is exercised, so the test does not validate the behaviour it claims to test.",
       "scope": "introduced-by-pr",
       "difficulty": "easy",
       "context_required": "diff-plus-related-files"
@@ -751,7 +751,7 @@
       "end_line": 37,
       "severity": "medium",
       "category": "testing",
-      "message": "`send_request_to_open_ai` is called with 10 positional arguments, but its real signature (aafactory/src/aafactory/fetcher/fetching.py) is `send_request_to_open_ai(messages: list[dict[str, str]])` \u2014 a single parameter. The arguments passed don't match the actual API, so the mock is being exercised with a completely wrong call shape; if patching ever failed, this would raise a TypeError immediately.",
+      "message": "`send_request_to_open_ai` is called with 10 positional arguments, but its real signature (aafactory/src/aafactory/fetcher/fetching.py) is `send_request_to_open_ai(messages: list[dict[str, str]])` — a single parameter. The arguments passed don't match the actual API, so the mock is being exercised with a completely wrong call shape; if patching ever failed, this would raise a TypeError immediately.",
       "scope": "introduced-by-pr",
       "difficulty": "easy",
       "context_required": "diff-plus-related-files"
@@ -830,7 +830,7 @@
       "end_line": 66,
       "severity": "low",
       "category": "reliability",
-      "message": "`_try_download_file` does not clean up a partially-downloaded file on failure. `urlretrieve` writes data as it arrives; if the connection drops after more than 100 bytes, `dest.stat().st_size > 100` returns True and the function returns True with a corrupt or truncated file. If the download delivers \u2264100 bytes before failing, the partial file remains on disk and `dest.exists()` is True. On any subsequent run the file is found in the cache and `missing` will not include it, so the corrupt file is silently used instead of being re-fetched.",
+      "message": "`_try_download_file` does not clean up a partially-downloaded file on failure. `urlretrieve` writes data as it arrives; if the connection drops after more than 100 bytes, `dest.stat().st_size > 100` returns True and the function returns True with a corrupt or truncated file. If the download delivers ≤100 bytes before failing, the partial file remains on disk and `dest.exists()` is True. On any subsequent run the file is found in the cache and `missing` will not include it, so the corrupt file is silently used instead of being re-fetched.",
       "scope": "introduced-by-pr",
       "difficulty": "medium",
       "context_required": "diff-plus-related-files"
@@ -957,17 +957,6 @@
       "context_required": "diff-plus-related-files"
     },
     {
-      "file": "fortran_to_rust/test_harness.py",
-      "start_line": 409,
-      "end_line": 419,
-      "severity": "low",
-      "category": "correctness",
-      "message": "The `_resolve_dim` method resolves fallback dimension sizes as static integers (e.g., 4). This heuristic might introduce mismatches between actual array dimensions and assumed sizes during numerical comparisons.",
-      "scope": "introduced-by-pr",
-      "difficulty": "medium",
-      "context_required": "broader-project-context"
-    },
-    {
       "file": ".devcontainer/Dockerfile",
       "start_line": 33,
       "end_line": 33,
@@ -995,7 +984,7 @@
       "end_line": 190,
       "severity": "medium",
       "category": "correctness",
-      "message": "The Rust benchmark template never actually calls the converted function \u2014 the call line is commented out and the body only runs `std::hint::black_box(&{first_array})`. As a result, the reported \"Rust ms/call\" and the \"Speedup\" column in the report measure overhead of a black-box on a vector reference, not the conversion's real performance. Any speedup numbers shown to users will be meaningless (and typically wildly favorable to Rust). Either enable the actual call (since `_generate_rust_example` in `test_harness.py` already demonstrates a working `unsafe { fn(...) }` invocation pattern that compiled successfully when accuracy passed), or skip producing a Rust time / speedup entirely when the function cannot be called.",
+      "message": "The Rust benchmark template never actually calls the converted function — the call line is commented out and the body only runs `std::hint::black_box(&{first_array})`. As a result, the reported \"Rust ms/call\" and the \"Speedup\" column in the report measure overhead of a black-box on a vector reference, not the conversion's real performance. Any speedup numbers shown to users will be meaningless (and typically wildly favorable to Rust). Either enable the actual call (since `_generate_rust_example` in `test_harness.py` already demonstrates a working `unsafe { fn(...) }` invocation pattern that compiled successfully when accuracy passed), or skip producing a Rust time / speedup entirely when the function cannot be called.",
       "scope": "introduced-by-pr",
       "difficulty": "easy",
       "context_required": "diff-only"
@@ -1184,7 +1173,7 @@
       "end_line": 29,
       "severity": "low",
       "category": "performance",
-      "message": "`shouldTrace` returns `channel.hasSubscribers !== false`. On Node 18, `TracingChannel.hasSubscribers` was not backported and evaluates to `undefined`, making `shouldTrace` always return `true`. As a result, on Node 18 every single `client.query()` and `client.connect()` call allocates a context object, creates multiple closures, and invokes `traceCallback` \u2014 regardless of whether any subscribers exist. The comment acknowledges this but frames it as intentional; for a potentially high-throughput pg client on Node 18 this is a constant, non-trivial allocation overhead that cannot be opted out of.",
+      "message": "`shouldTrace` returns `channel.hasSubscribers !== false`. On Node 18, `TracingChannel.hasSubscribers` was not backported and evaluates to `undefined`, making `shouldTrace` always return `true`. As a result, on Node 18 every single `client.query()` and `client.connect()` call allocates a context object, creates multiple closures, and invokes `traceCallback` — regardless of whether any subscribers exist. The comment acknowledges this but frames it as intentional; for a potentially high-throughput pg client on Node 18 this is a constant, non-trivial allocation overhead that cannot be opted out of.",
       "scope": "introduced-by-pr",
       "difficulty": "easy",
       "context_required": "diff-only"
@@ -1206,7 +1195,7 @@
       "end_line": 226,
       "severity": "medium",
       "category": "correctness",
-      "message": "The `fn` passed to `traceCallback` for `pg:pool:connect` does nothing except assign `response.callback = tracedCb`. The `TracingChannel` API contract requires `fn` to actually initiate the async operation so the `start`\u2192`end` synchronous span covers that work. Here the `end` event fires immediately after the assignment \u2014 before `newClient()`, before any queue push, before any pool logic runs. The real async initiation happens after `traceCallback` returns (lines 230-265). APM tools measuring the synchronous span will see a near-zero duration and no meaningful work. Compare with the `pg:query` and `pg:connection` channels where `fn` correctly calls `enqueue()` and `_connect()` respectively.",
+      "message": "The `fn` passed to `traceCallback` for `pg:pool:connect` does nothing except assign `response.callback = tracedCb`. The `TracingChannel` API contract requires `fn` to actually initiate the async operation so the `start`→`end` synchronous span covers that work. Here the `end` event fires immediately after the assignment — before `newClient()`, before any queue push, before any pool logic runs. The real async initiation happens after `traceCallback` returns (lines 230-265). APM tools measuring the synchronous span will see a near-zero duration and no meaningful work. Compare with the `pg:query` and `pg:connection` channels where `fn` correctly calls `enqueue()` and `_connect()` respectively.",
       "scope": "introduced-by-pr",
       "difficulty": "medium",
       "context_required": "diff-plus-related-files"
@@ -1302,17 +1291,6 @@
       "context_required": "diff-only"
     },
     {
-      "file": ".github/workflows/publish-figprint.yml",
-      "start_line": 253,
-      "end_line": 262,
-      "severity": "high",
-      "category": "correctness",
-      "message": "`PortableCommandAlias: figprint` was removed from both the x64 and arm64 `NestedInstallerFiles` entries. WinGet uses this field to register the `figprint` command alias on PATH for portable packages. Without it, users who install via `winget install ByteForge.FIGPrint` will not have `figprint` available as a command, breaking the documented install experience.",
-      "scope": "introduced-by-pr",
-      "difficulty": "medium",
-      "context_required": "diff-plus-related-files"
-    },
-    {
       "file": ".github/workflows/publish-figlet-nuget.yml",
       "start_line": 8,
       "end_line": 8,
@@ -1340,7 +1318,7 @@
       "end_line": 8,
       "severity": "medium",
       "category": "reliability",
-      "message": "Path filter was narrowed from `FIGPrint/**` to `FIGPrint/**/*.cs`. A version bump to `FIGPrint/FIGPrint.csproj` alone \u2014 the typical release commit \u2014 will not match this filter and the FIGPrint winget/GitHub release workflow will never fire automatically.",
+      "message": "Path filter was narrowed from `FIGPrint/**` to `FIGPrint/**/*.cs`. A version bump to `FIGPrint/FIGPrint.csproj` alone — the typical release commit — will not match this filter and the FIGPrint winget/GitHub release workflow will never fire automatically.",
       "scope": "introduced-by-pr",
       "difficulty": "easy",
       "context_required": "diff-plus-related-files"
@@ -1377,28 +1355,6 @@
       "scope": "introduced-by-pr",
       "difficulty": "easy",
       "context_required": "diff-plus-related-files"
-    },
-    {
-      "file": "FIGLet.VSCodeExtension/src/webview/SettingsApp.tsx",
-      "start_line": 269,
-      "end_line": 269,
-      "severity": "low",
-      "category": "correctness",
-      "message": "The `handleFontRowClick` function updates the `selectedFont` state, but this state is only used to highlight the row in the UI. It no longer updates the `defaultFont` to be saved. Since the concept of a 'default font' setting has been removed, this font selection click action in the settings panel has no persistent effect.",
-      "scope": "introduced-by-pr",
-      "difficulty": "medium",
-      "context_required": "diff-plus-related-files"
-    },
-    {
-      "file": "FIGLet.VSCodeExtension/src/LanguageCommentStyles.ts",
-      "start_line": 74,
-      "end_line": 74,
-      "severity": "low",
-      "category": "maintainability",
-      "message": "A new enum member `BATCHFile` was added, but TypeScript enum member names are typically PascalCase. The convention in this file and in TypeScript generally is `PascalCase` for enum members (e.g., `BlockComment`, `SingleLine`), but `BATCHFile` is an exception. It should be `BatchFile` for consistency.",
-      "scope": "introduced-by-pr",
-      "difficulty": "easy",
-      "context_required": "diff-only"
     },
     {
       "file": ".github/workflows/publish-figprint.yml",
@@ -1452,7 +1408,7 @@
       "end_line": 341,
       "severity": "medium",
       "category": "correctness",
-      "message": "When `QuerySummaries` fails (i.e., the pgx `Query` call returns an error), `query` returns `nil`. The handler converts `nil` to `[]types.AuditEntry{}` and responds HTTP 200 with `{\"entries\":[], \"total\": N, \"has_more\": true}` \u2014 an empty entry list paired with a positive total and `has_more: true`. The UI will show zero rows but keep the \"Load more\" button active, looping forever. The nil return from `query` signals a DB error and should be converted to a 500 response, the same way a `Count` error already is.",
+      "message": "When `QuerySummaries` fails (i.e., the pgx `Query` call returns an error), `query` returns `nil`. The handler converts `nil` to `[]types.AuditEntry{}` and responds HTTP 200 with `{\"entries\":[], \"total\": N, \"has_more\": true}` — an empty entry list paired with a positive total and `has_more: true`. The UI will show zero rows but keep the \"Load more\" button active, looping forever. The nil return from `query` signals a DB error and should be converted to a 500 response, the same way a `Count` error already is.",
       "scope": "introduced-by-pr",
       "difficulty": "easy",
       "context_required": "diff-plus-related-files"
@@ -1474,7 +1430,7 @@
       "end_line": 89,
       "severity": "low",
       "category": "correctness",
-      "message": "`loadMore` appends `data.entries` to the current `entries` array (which may include SSE-injected entries) but advances `offset` by `limit` based on the previous API offset, not the current list length. If N entries arrived via SSE since the last fetch, the next `loadMore` call fetches at `offset + limit` \u2014 covering the same DB positions as some of the SSE-injected entries \u2014 and `setEntries` appends them without deduplication. The audit table can show duplicate rows for any entry that arrived both via SSE push and via the paginated API response.",
+      "message": "`loadMore` appends `data.entries` to the current `entries` array (which may include SSE-injected entries) but advances `offset` by `limit` based on the previous API offset, not the current list length. If N entries arrived via SSE since the last fetch, the next `loadMore` call fetches at `offset + limit` — covering the same DB positions as some of the SSE-injected entries — and `setEntries` appends them without deduplication. The audit table can show duplicate rows for any entry that arrived both via SSE push and via the paginated API response.",
       "scope": "pre-existing",
       "difficulty": "medium",
       "context_required": "diff-plus-related-files"
@@ -1687,7 +1643,7 @@
       "end_line": 11,
       "severity": "high",
       "category": "correctness",
-      "message": "The `@filename` syntax (e.g. `@INSTRUCTIONS.md`, `@AGENT-PERSONA.md`) is a Claude Code-specific file-inclusion feature. OpenAI Codex CLI does not support this syntax \u2014 it will treat these lines as literal text rather than loading the referenced files. The shared laws, constraints, and workflow instructions will be silently absent from Codex's effective context, making the shared-instructions architecture non-functional for Codex.",
+      "message": "The `@filename` syntax (e.g. `@INSTRUCTIONS.md`, `@AGENT-PERSONA.md`) is a Claude Code-specific file-inclusion feature. OpenAI Codex CLI does not support this syntax — it will treat these lines as literal text rather than loading the referenced files. The shared laws, constraints, and workflow instructions will be silently absent from Codex's effective context, making the shared-instructions architecture non-functional for Codex.",
       "scope": "introduced-by-pr",
       "difficulty": "medium",
       "context_required": "broader-project-context"
@@ -1709,7 +1665,7 @@
       "end_line": 12,
       "severity": "high",
       "category": "correctness",
-      "message": "The old template used bare `@AGENT-PERSONA.md` / `@USER-PERSONA.md` directives which Claude Code expands directly at parse time. The new form wraps them in natural-language prose (`Read the contents of @INSTRUCTIONS.md \u2026`). Whether Claude Code still performs file inclusion when the `@` reference appears inside a sentence is unverified \u2014 the PR test plan explicitly marks this item as unchecked. If Claude Code requires the bare `@file` form for inclusion, the entire shared-instructions chain silently becomes a no-op.",
+      "message": "The old template used bare `@AGENT-PERSONA.md` / `@USER-PERSONA.md` directives which Claude Code expands directly at parse time. The new form wraps them in natural-language prose (`Read the contents of @INSTRUCTIONS.md …`). Whether Claude Code still performs file inclusion when the `@` reference appears inside a sentence is unverified — the PR test plan explicitly marks this item as unchecked. If Claude Code requires the bare `@file` form for inclusion, the entire shared-instructions chain silently becomes a no-op.",
       "scope": "introduced-by-pr",
       "difficulty": "medium",
       "context_required": "broader-project-context"
@@ -1753,7 +1709,7 @@
       "end_line": 427,
       "severity": "low",
       "category": "reliability",
-      "message": "The temp file created by `mktemp` in `sync_settings_file` is not protected by a `trap \u2026 EXIT` cleanup handler. If `printf \u2026 | jq . > \"$tmp\"` fails (disk full, jq error on unexpectedly malformed merged JSON) or `mv` fails, the temp file is left in `/tmp` indefinitely. With `set -euo pipefail` active, the script exits without any cleanup. Adding `trap 'rm -f \"$tmp\"' EXIT` immediately after `tmp=\"$(mktemp)\"` prevents the leak.",
+      "message": "The temp file created by `mktemp` in `sync_settings_file` is not protected by a `trap … EXIT` cleanup handler. If `printf … | jq . > \"$tmp\"` fails (disk full, jq error on unexpectedly malformed merged JSON) or `mv` fails, the temp file is left in `/tmp` indefinitely. With `set -euo pipefail` active, the script exits without any cleanup. Adding `trap 'rm -f \"$tmp\"' EXIT` immediately after `tmp=\"$(mktemp)\"` prevents the leak.",
       "scope": "introduced-by-pr",
       "difficulty": "easy",
       "context_required": "diff-only"
@@ -1808,7 +1764,7 @@
       "end_line": 3,
       "severity": "low",
       "category": "documentation",
-      "message": "Correct the typo in the role description: this should be \u201cprincipal software architect,\u201d not \u201cprinciple software architect.\u201d",
+      "message": "Correct the typo in the role description: this should be “principal software architect,” not “principle software architect.”",
       "scope": "pre-existing",
       "difficulty": "easy",
       "context_required": "diff-only"
@@ -1863,7 +1819,7 @@
       "end_line": 36,
       "severity": "medium",
       "category": "correctness",
-      "message": "If the pollution target already exists before a test runs, the script skips that test and continues, then can finish with \u201cNo polluter found\u201d even though no tests were actually evaluated. A pre-existing pollution target should fail fast or be cleaned explicitly; otherwise the script can produce a false clean result.",
+      "message": "If the pollution target already exists before a test runs, the script skips that test and continues, then can finish with “No polluter found” even though no tests were actually evaluated. A pre-existing pollution target should fail fast or be cleaned explicitly; otherwise the script can produce a false clean result.",
       "scope": "pre-existing",
       "difficulty": "medium",
       "context_required": "diff-only"
@@ -1874,7 +1830,7 @@
       "end_line": 60,
       "severity": "low",
       "category": "correctness",
-      "message": "Several items listed as \u201cES2024+ Features\u201d are still proposal-stage or not universally available JavaScript syntax (for example pipeline operator, pattern matching, and record/tuple). As a default shared agent, this can lead it to generate code that current runtimes and toolchains cannot parse unless a project has explicit transpiler support.",
+      "message": "Several items listed as “ES2024+ Features” are still proposal-stage or not universally available JavaScript syntax (for example pipeline operator, pattern matching, and record/tuple). As a default shared agent, this can lead it to generate code that current runtimes and toolchains cannot parse unless a project has explicit transpiler support.",
       "scope": "pre-existing",
       "difficulty": "medium",
       "context_required": "broader-project-context"
@@ -1986,7 +1942,7 @@
       "end_line": 550,
       "severity": "high",
       "category": "reliability",
-      "message": "`projectToLocalRepository` (and its callee `getProjectRenames`/`getProjectComments`) reads `context!!.args.codeData.renames` and `.comments` directly on the background thread. `localRepositoryToProject` (dispatched to the EDT via `uiRun`) writes those same fields via `setProjectRenames`/`setProjectComments`. Since multiple background threads can exist simultaneously (finding #1 \u2014 no serialization), concurrent reads on a background thread and writes on the EDT to these unsynchronized mutable fields constitute a data race.",
+      "message": "`projectToLocalRepository` (and its callee `getProjectRenames`/`getProjectComments`) reads `context!!.args.codeData.renames` and `.comments` directly on the background thread. `localRepositoryToProject` (dispatched to the EDT via `uiRun`) writes those same fields via `setProjectRenames`/`setProjectComments`. Since multiple background threads can exist simultaneously (finding #1 — no serialization), concurrent reads on a background thread and writes on the EDT to these unsynchronized mutable fields constitute a data race.",
       "scope": "introduced-by-pr",
       "difficulty": "medium",
       "context_required": "diff-plus-related-files"
@@ -1997,7 +1953,7 @@
       "end_line": 575,
       "severity": "high",
       "category": "correctness",
-      "message": "`uiRun` delegates to `SwingUtilities.invokeLater` (asynchronous). Scheduling `localRepositoryToProject` inside `uiRun` means `pull()` returns \u2014 and the background thread exits \u2014 before the project state has actually been updated. If a new pull is triggered immediately afterwards (which is possible because no serialization exists), `projectToLocalRepository` in the new pull reads stale project renames/comments from before the previous pull's EDT update ran. The same problem applies to the equivalent block at the end of `push()` (lines 645\u2013648).",
+      "message": "`uiRun` delegates to `SwingUtilities.invokeLater` (asynchronous). Scheduling `localRepositoryToProject` inside `uiRun` means `pull()` returns — and the background thread exits — before the project state has actually been updated. If a new pull is triggered immediately afterwards (which is possible because no serialization exists), `projectToLocalRepository` in the new pull reads stale project renames/comments from before the previous pull's EDT update ran. The same problem applies to the equivalent block at the end of `push()` (lines 645–648).",
       "scope": "introduced-by-pr",
       "difficulty": "medium",
       "context_required": "diff-plus-related-files"
@@ -2030,7 +1986,7 @@
       "end_line": 33,
       "severity": "low",
       "category": "testing",
-      "message": "`PluginMockery.pull` and `push` are still populated with the `{ kotlin.concurrent.thread { this.pull() } }` menu-action lambdas, but no test calls them any more \u2014 tests now invoke `plugin.pull()` / `plugin.push()` directly. Consequently, the tests never exercise the actual menu-triggered code path (which spawns a background thread), so any threading defect in that path, including the missing serialization, goes completely untested.",
+      "message": "`PluginMockery.pull` and `push` are still populated with the `{ kotlin.concurrent.thread { this.pull() } }` menu-action lambdas, but no test calls them any more — tests now invoke `plugin.pull()` / `plugin.push()` directly. Consequently, the tests never exercise the actual menu-triggered code path (which spawns a background thread), so any threading defect in that path, including the missing serialization, goes completely untested.",
       "scope": "introduced-by-pr",
       "difficulty": "easy",
       "context_required": "diff-only"
@@ -2221,7 +2177,7 @@
       "end_line": 158,
       "severity": "medium",
       "category": "correctness",
-      "message": "Lazy rotation CAS write-back succeeds but returns a credential with the old version number. After `inner.put(updated, CAS{expected_version: credential.version})` succeeds, the backing store version is incremented to N+1, but `credential.version` is still N. The returned `StoredCredential` is therefore stale. Any caller that uses this version for a subsequent CAS write (e.g., the resolver's refresh loop in resolver.rs:306) receives `VersionConflict { actual: N+1 }`. The resolver's 3-attempt retry loop absorbs this, but each lazy rotation consumes one retry slot \u2014 under concurrent modifications a legitimate refresh can exhaust the budget and fail. Code paths outside the resolver that do a single-shot CAS after `get()` will always fail when lazy rotation fires.",
+      "message": "Lazy rotation CAS write-back succeeds but returns a credential with the old version number. After `inner.put(updated, CAS{expected_version: credential.version})` succeeds, the backing store version is incremented to N+1, but `credential.version` is still N. The returned `StoredCredential` is therefore stale. Any caller that uses this version for a subsequent CAS write (e.g., the resolver's refresh loop in resolver.rs:306) receives `VersionConflict { actual: N+1 }`. The resolver's 3-attempt retry loop absorbs this, but each lazy rotation consumes one retry slot — under concurrent modifications a legitimate refresh can exhaust the budget and fail. Code paths outside the resolver that do a single-shot CAS after `get()` will always fail when lazy rotation fires.",
       "scope": "introduced-by-pr",
       "difficulty": "medium",
       "context_required": "diff-plus-related-files"
@@ -2232,7 +2188,7 @@
       "end_line": 102,
       "severity": "high",
       "category": "correctness",
-      "message": "`EncryptionLayer::with_keys()` does not register the empty-string key alias that `new()` registers (line 72: `keys.insert(String::new(), key)`). Any `EncryptedData` with `key_id = \"\"` (produced by the public `encrypt()` and `encrypt_with_aad()` functions, which both use `EncryptedData::new(\"\", \u2026)`) cannot be decrypted via a `with_keys()` layer \u2014 `key_for_id(\"\")` returns `Err(StoreError::Backend)`. An operator who starts with `new()` mode, has records written by the pre-PR code or by callers of the public `encrypt` API, and then switches to `with_keys()` for key rotation will find those records permanently unreadable.",
+      "message": "`EncryptionLayer::with_keys()` does not register the empty-string key alias that `new()` registers (line 72: `keys.insert(String::new(), key)`). Any `EncryptedData` with `key_id = \"\"` (produced by the public `encrypt()` and `encrypt_with_aad()` functions, which both use `EncryptedData::new(\"\", …)`) cannot be decrypted via a `with_keys()` layer — `key_for_id(\"\")` returns `Err(StoreError::Backend)`. An operator who starts with `new()` mode, has records written by the pre-PR code or by callers of the public `encrypt` API, and then switches to `with_keys()` for key rotation will find those records permanently unreadable.",
       "scope": "introduced-by-pr",
       "difficulty": "medium",
       "context_required": "diff-plus-related-files"
@@ -2254,7 +2210,7 @@
       "end_line": 218,
       "severity": "low",
       "category": "maintainability",
-      "message": "`CredentialContext::resolve_credential` now passes `format!(\"{:?}\", S::pattern())` \u2014 a non-unique category string like `\"SecretToken\"` \u2014 as the `expected_kind` argument to `CredentialResolverRef::resolve_scheme`. Previously this parameter carried `S::KIND`, a unique per-type string. Two different `AuthScheme` types that share the same `AuthPattern` (e.g., any two custom schemes both returning `AuthPattern::SecretToken`) will now receive the same string, silently breaking any resolver implementation that used the kind string for type-based dispatch. The `downcast::<S>()` call provides type safety, but if the resolver returns the wrong concrete type, the only error is `SchemeMismatch { actual: \"unknown\" }`, which gives no useful diagnostic.",
+      "message": "`CredentialContext::resolve_credential` now passes `format!(\"{:?}\", S::pattern())` — a non-unique category string like `\"SecretToken\"` — as the `expected_kind` argument to `CredentialResolverRef::resolve_scheme`. Previously this parameter carried `S::KIND`, a unique per-type string. Two different `AuthScheme` types that share the same `AuthPattern` (e.g., any two custom schemes both returning `AuthPattern::SecretToken`) will now receive the same string, silently breaking any resolver implementation that used the kind string for type-based dispatch. The `downcast::<S>()` call provides type safety, but if the resolver returns the wrong concrete type, the only error is `SchemeMismatch { actual: \"unknown\" }`, which gives no useful diagnostic.",
       "scope": "introduced-by-pr",
       "difficulty": "medium",
       "context_required": "diff-plus-related-files"
@@ -2388,7 +2344,7 @@
       "end_line": 97,
       "severity": "low",
       "category": "maintainability",
-      "message": "`'Ligand Context'` is included in `sele_cols` but excluded from `group_cols`. The `drop_duplicates()` on `source_subset_df` uses `Ligand Context` to distinguish rows, causing rows that differ only in context to be kept as separate pre-aggregation entries. However, the subsequent `groupby` silently collapses them anyway (the column is dropped from the result). This means rows with different `Ligand Context` values but identical SPO+qualifier tuples will have their PubMed IDs merged without any record of the context distinction \u2014 the inclusion of `Ligand Context` in `sele_cols` serves no purpose and can mislead future readers about which columns drive deduplication.",
+      "message": "`'Ligand Context'` is included in `sele_cols` but excluded from `group_cols`. The `drop_duplicates()` on `source_subset_df` uses `Ligand Context` to distinguish rows, causing rows that differ only in context to be kept as separate pre-aggregation entries. However, the subsequent `groupby` silently collapses them anyway (the column is dropped from the result). This means rows with different `Ligand Context` values but identical SPO+qualifier tuples will have their PubMed IDs merged without any record of the context distinction — the inclusion of `Ligand Context` in `sele_cols` serves no purpose and can mislead future readers about which columns drive deduplication.",
       "scope": "introduced-by-pr",
       "difficulty": "medium",
       "context_required": "diff-only"
@@ -2410,7 +2366,7 @@
       "end_line": 450,
       "severity": "high",
       "category": "correctness",
-      "message": "For `Type='Allosteric modulator'`, `Action='Neutral'` and `Action=None` are both included in `allosteric_modulator_list_with_separate_directly_physically_interacts_with_edge` (line 331), so both enter the outer `if` block. The inner `elif` at line 411 then hits `break`, which (per finding #1) terminates the entire loop. Because `None` is explicitly in the list, any record in the real data with `Type='Allosteric modulator'` and a null Action value will kill the transform mid-stream regardless of the `break`\u2192`continue` fix described separately.",
+      "message": "For `Type='Allosteric modulator'`, `Action='Neutral'` and `Action=None` are both included in `allosteric_modulator_list_with_separate_directly_physically_interacts_with_edge` (line 331), so both enter the outer `if` block. The inner `elif` at line 411 then hits `break`, which (per finding #1) terminates the entire loop. Because `None` is explicitly in the list, any record in the real data with `Type='Allosteric modulator'` and a null Action value will kill the transform mid-stream regardless of the `break`→`continue` fix described separately.",
       "scope": "introduced-by-pr",
       "difficulty": "medium",
       "context_required": "diff-only"
@@ -2454,7 +2410,7 @@
       "end_line": 167,
       "severity": "low",
       "category": "maintainability",
-      "message": "The variable names `*_list_with_separate_directly_physically_interacts_with_edge` are extremely long (60+ characters) and are re-declared inside the per-record loop on each iteration. Consider moving these constants to module scope with shorter, descriptive names (e.g., `ACTIVATOR_ACTIONS_WITH_DPI_EDGE`) \u2014 this would also help readers see at a glance what categories exist and avoid repeated allocation per record.",
+      "message": "The variable names `*_list_with_separate_directly_physically_interacts_with_edge` are extremely long (60+ characters) and are re-declared inside the per-record loop on each iteration. Consider moving these constants to module scope with shorter, descriptive names (e.g., `ACTIVATOR_ACTIONS_WITH_DPI_EDGE`) — this would also help readers see at a glance what categories exist and avoid repeated allocation per record.",
       "scope": "introduced-by-pr",
       "difficulty": "easy",
       "context_required": "diff-only"
@@ -2555,7 +2511,7 @@
       "end_line": 42,
       "severity": "low",
       "category": "maintainability",
-      "message": "After this refactor, the entire `files` module consists only of `#[cfg(test)]` helpers (`sanitize_id`, `date_parts`, `screenshot_path`, `audio_path`) and their tests. None of its functions are referenced from production code anymore, and the helpers reimplement the path/date logic that now lives in `media.rs` \u2014 so the tests verify a parallel implementation, not the real code path. Consider removing this module entirely (and the `pub(crate) mod files;` declaration in `lib.rs`) to avoid dead code drift, or convert these into tests of `MediaManager::allocate_path` that assert the expected `YYYY/MM/DD/<ts>_<id>.<ext>` layout against the actual production code.",
+      "message": "After this refactor, the entire `files` module consists only of `#[cfg(test)]` helpers (`sanitize_id`, `date_parts`, `screenshot_path`, `audio_path`) and their tests. None of its functions are referenced from production code anymore, and the helpers reimplement the path/date logic that now lives in `media.rs` — so the tests verify a parallel implementation, not the real code path. Consider removing this module entirely (and the `pub(crate) mod files;` declaration in `lib.rs`) to avoid dead code drift, or convert these into tests of `MediaManager::allocate_path` that assert the expected `YYYY/MM/DD/<ts>_<id>.<ext>` layout against the actual production code.",
       "scope": "introduced-by-pr",
       "difficulty": "easy",
       "context_required": "diff-plus-related-files"
@@ -2566,7 +2522,7 @@
       "end_line": 191,
       "severity": "low",
       "category": "testing",
-      "message": "`dummy_media_mgr()` uses a hard-coded shared path `/tmp/chronicle-test-dummy` that is created (but never cleaned up) and reused across every test that calls it. Because `cargo test` runs tests in parallel by default, several tests may concurrently share/own this directory, and on systems where `/tmp` is a symlink (e.g. macOS where `/tmp -> /private/tmp`) the canonicalization in `MediaManager::new` will resolve to a different path than the literal one passed in \u2014 which is fine here only because the dummy is never used for actual writes. Prefer creating a per-test `tempfile::tempdir()` (as `cleanup_handles_missing_files_gracefully` and the other tests already do) so each test gets an isolated, automatically-cleaned-up base directory.",
+      "message": "`dummy_media_mgr()` uses a hard-coded shared path `/tmp/chronicle-test-dummy` that is created (but never cleaned up) and reused across every test that calls it. Because `cargo test` runs tests in parallel by default, several tests may concurrently share/own this directory, and on systems where `/tmp` is a symlink (e.g. macOS where `/tmp -> /private/tmp`) the canonicalization in `MediaManager::new` will resolve to a different path than the literal one passed in — which is fine here only because the dummy is never used for actual writes. Prefer creating a per-test `tempfile::tempdir()` (as `cleanup_handles_missing_files_gracefully` and the other tests already do) so each test gets an isolated, automatically-cleaned-up base directory.",
       "scope": "introduced-by-pr",
       "difficulty": "medium",
       "context_required": "diff-plus-related-files"
@@ -2689,7 +2645,7 @@
       "end_line": 83,
       "severity": "low",
       "category": "performance",
-      "message": "ISO8601DateFormatter() is constructed inside the pairs.map closure, creating one formatter instance per ColorPair rather than once per export call. ISO8601DateFormatter is expensive to initialise. The PR description states the formatter was hoisted out of the closure, but the code contradicts this \u2014 it is still allocated per iteration.",
+      "message": "ISO8601DateFormatter() is constructed inside the pairs.map closure, creating one formatter instance per ColorPair rather than once per export call. ISO8601DateFormatter is expensive to initialise. The PR description states the formatter was hoisted out of the closure, but the code contradicts this — it is still allocated per iteration.",
       "scope": "introduced-by-pr",
       "difficulty": "easy",
       "context_required": "diff-only"
@@ -2722,7 +2678,7 @@
       "end_line": 152,
       "severity": "medium",
       "category": "reliability",
-      "message": "The export handler silently discards write errors with try?. If the file write fails (e.g., permissions, disk full), the user receives no feedback \u2014 the save panel closes and nothing happens. The PR description notes 'write errors s...' (truncated), suggesting this was identified but not fixed. At minimum the error should be surfaced via an alert.",
+      "message": "The export handler silently discards write errors with try?. If the file write fails (e.g., permissions, disk full), the user receives no feedback — the save panel closes and nothing happens. The PR description notes 'write errors s...' (truncated), suggesting this was identified but not fixed. At minimum the error should be surfaced via an alert.",
       "scope": "introduced-by-pr",
       "difficulty": "easy",
       "context_required": "diff-only"
@@ -2810,7 +2766,7 @@
       "end_line": 103,
       "severity": "medium",
       "category": "correctness",
-      "message": "This notification is only observed by `PaletteTabBar`, which exists only while `ColorHistoryDrawer` is mounted. If the drawer is hidden (the default), choosing \u201cNew palette\u201d from this menu posts to no active receiver, so nothing opens and no palette can be created from the menu.",
+      "message": "This notification is only observed by `PaletteTabBar`, which exists only while `ColorHistoryDrawer` is mounted. If the drawer is hidden (the default), choosing “New palette” from this menu posts to no active receiver, so nothing opens and no palette can be created from the menu.",
       "scope": "introduced-by-pr",
       "difficulty": "medium",
       "context_required": "diff-plus-related-files"
@@ -2944,7 +2900,7 @@
       "end_line": 93,
       "severity": "low",
       "category": "maintainability",
-      "message": "For `method == \"OHT\"`, the branch body is just a log message \u2014 it relies on `q` computed unconditionally at lines 44-45. But for `method == \"gs\"`, lines 92-93 redundantly recompute `perform_svd()` and `find_enc_dim_optht()` (already done at lines 44-45). Additionally, for an integer `method` (e.g. `\"5\"`), the OHT computation at lines 44-45 is wasted work since `q` is overwritten at line 164. Consider moving the unconditional `perform_svd()` / `find_enc_dim_optht()` into the branches that actually need it (OHT and the `gs`/`bs` initial estimate).",
+      "message": "For `method == \"OHT\"`, the branch body is just a log message — it relies on `q` computed unconditionally at lines 44-45. But for `method == \"gs\"`, lines 92-93 redundantly recompute `perform_svd()` and `find_enc_dim_optht()` (already done at lines 44-45). Additionally, for an integer `method` (e.g. `\"5\"`), the OHT computation at lines 44-45 is wasted work since `q` is overwritten at line 164. Consider moving the unconditional `perform_svd()` / `find_enc_dim_optht()` into the branches that actually need it (OHT and the `gs`/`bs` initial estimate).",
       "scope": "introduced-by-pr",
       "difficulty": "easy",
       "context_required": "diff-only"
@@ -3067,7 +3023,7 @@
       "end_line": 95,
       "severity": "low",
       "category": "maintainability",
-      "message": "The `volume` field in StalenessEntry is written each cycle but never read back in the staleness logic. The new code only reads `entry[\"price\"]`, `entry.get(\"open_interest\", 0)`, and `entry[\"count\"]` \u2014 `entry[\"volume\"]` is never consulted. Storing it is misleading: the TypedDict requires it and it's persisted to disk each scan, but it has no effect on any decision.",
+      "message": "The `volume` field in StalenessEntry is written each cycle but never read back in the staleness logic. The new code only reads `entry[\"price\"]`, `entry.get(\"open_interest\", 0)`, and `entry[\"count\"]` — `entry[\"volume\"]` is never consulted. Storing it is misleading: the TypedDict requires it and it's persisted to disk each scan, but it has no effect on any decision.",
       "scope": "introduced-by-pr",
       "difficulty": "easy",
       "context_required": "diff-only"
@@ -3089,18 +3045,7 @@
       "end_line": 80,
       "severity": "low",
       "category": "correctness",
-      "message": "`oi_changed = oi != entry.get(\"open_interest\", 0)` defaults the missing field to 0. On first load of an old `scan_staleness.json` (without `open_interest`), every market with nonzero OI \u2014 essentially all real markets \u2014 will have `oi_changed=True`, resetting their accumulated stale count to 0. This silently voids all previously-built-up staleness state on migration, making the filter ineffective for another full `staleness_cycles` rounds.",
-      "scope": "introduced-by-pr",
-      "difficulty": "medium",
-      "context_required": "diff-plus-related-files"
-    },
-    {
-      "file": "src/gimmes/strategy/staleness.py",
-      "start_line": 79,
-      "end_line": 79,
-      "severity": "low",
-      "category": "correctness",
-      "message": "`has_volume = volume >= volume_floor` checks current absolute volume against a fixed floor, not whether trading activity changed between cycles. A market with a consistently stagnant 10-15 contracts/day will never accumulate a stale count and will never be filtered, even though it is essentially dead. The old `volume_spike_ratio` checked for a relative increase in volume (i.e., actual new activity) \u2014 the replacement checks only for presence of volume above a minimum, conflating \"some volume exists\" with \"trading just happened\".",
+      "message": "`oi_changed = oi != entry.get(\"open_interest\", 0)` defaults the missing field to 0. On first load of an old `scan_staleness.json` (without `open_interest`), every market with nonzero OI — essentially all real markets — will have `oi_changed=True`, resetting their accumulated stale count to 0. This silently voids all previously-built-up staleness state on migration, making the filter ineffective for another full `staleness_cycles` rounds.",
       "scope": "introduced-by-pr",
       "difficulty": "medium",
       "context_required": "diff-plus-related-files"
@@ -3146,7 +3091,7 @@
       "end_line": 27,
       "severity": "medium",
       "category": "reliability",
-      "message": "Changing `cancel-in-progress` to `true` means a new push to `main` will cancel an in-flight GitHub Pages deployment job. The `deploy-pages` action may be interrupted mid-upload, leaving the Pages site in a broken or partially-updated state. The original `cancel-in-progress: false` was intentional for deployment workflows \u2014 it's safe to cancel a build but not a live deploy. The concurrency group should either remain `false` for cancel-in-progress, or the deploy job should use a separate concurrency group with `cancel-in-progress: false`.",
+      "message": "Changing `cancel-in-progress` to `true` means a new push to `main` will cancel an in-flight GitHub Pages deployment job. The `deploy-pages` action may be interrupted mid-upload, leaving the Pages site in a broken or partially-updated state. The original `cancel-in-progress: false` was intentional for deployment workflows — it's safe to cancel a build but not a live deploy. The concurrency group should either remain `false` for cancel-in-progress, or the deploy job should use a separate concurrency group with `cancel-in-progress: false`.",
       "scope": "introduced-by-pr",
       "difficulty": "medium",
       "context_required": "diff-plus-related-files"
@@ -3168,7 +3113,7 @@
       "end_line": 255,
       "severity": "low",
       "category": "maintainability",
-      "message": "`pre::before` is `position: absolute` inside a `position: relative` element that also has `overflow: auto`. This makes `pre` a scroll container, and absolutely-positioned children live in the scrollable content area \u2014 not pinned to the visual viewport of the element. When a code block has wide content and the user scrolls horizontally, the decorative amber stripe scrolls with the content and disappears from view. It should be rendered as a non-scrolling overlay, e.g. using a wrapper div with `overflow: hidden` for the stripe and `overflow: auto` on an inner element, or a sticky/fixed alternative.",
+      "message": "`pre::before` is `position: absolute` inside a `position: relative` element that also has `overflow: auto`. This makes `pre` a scroll container, and absolutely-positioned children live in the scrollable content area — not pinned to the visual viewport of the element. When a code block has wide content and the user scrolls horizontally, the decorative amber stripe scrolls with the content and disappears from view. It should be rendered as a non-scrolling overlay, e.g. using a wrapper div with `overflow: hidden` for the stripe and `overflow: auto` on an inner element, or a sticky/fixed alternative.",
       "scope": "introduced-by-pr",
       "difficulty": "hard",
       "context_required": "diff-only"
@@ -3392,7 +3337,7 @@
       "end_line": 213,
       "severity": "medium",
       "category": "security",
-      "message": "The /token endpoint performs no client_id validation. The comment claims GitHub validates client_id during code exchange, but that exchange happens at /callback, not at /token time. When /token is called, the internal code is already in the store and no outbound GitHub call is made. Combined with the missing PKCE enforcement, any party that obtains an internal code can present it to /token without supplying client_id and receive the GitHub access token. RFC 6749 \u00a73.2.1 requires public clients to be identified at the token endpoint.",
+      "message": "The /token endpoint performs no client_id validation. The comment claims GitHub validates client_id during code exchange, but that exchange happens at /callback, not at /token time. When /token is called, the internal code is already in the store and no outbound GitHub call is made. Combined with the missing PKCE enforcement, any party that obtains an internal code can present it to /token without supplying client_id and receive the GitHub access token. RFC 6749 §3.2.1 requires public clients to be identified at the token endpoint.",
       "scope": "introduced-by-pr",
       "difficulty": "medium",
       "context_required": "diff-plus-related-files"
@@ -3491,7 +3436,7 @@
       "end_line": 198,
       "severity": "low",
       "category": "security",
-      "message": "Forwarding `err.Error()` from `ExchangeCode` directly into the `error_description` field leaks internal state to the client. In particular, the \"session not found or expired for state %q\" error from `session.go` will echo the client-supplied state value back in the response and the \"redirect_uri mismatch\" message can also be informative to attackers. Per RFC 6749 \u00a75.2, `error_description` should be a human-readable explanation safe for the client, not an internal log message. Consider mapping internal errors to a generic message (e.g. \"authorization code is invalid or expired\") and keeping the detailed `err` only in the `slog.Warn` log line above.",
+      "message": "Forwarding `err.Error()` from `ExchangeCode` directly into the `error_description` field leaks internal state to the client. In particular, the \"session not found or expired for state %q\" error from `session.go` will echo the client-supplied state value back in the response and the \"redirect_uri mismatch\" message can also be informative to attackers. Per RFC 6749 §5.2, `error_description` should be a human-readable explanation safe for the client, not an internal log message. Consider mapping internal errors to a generic message (e.g. \"authorization code is invalid or expired\") and keeping the detailed `err` only in the `slog.Warn` log line above.",
       "scope": "introduced-by-pr",
       "difficulty": "medium",
       "context_required": "diff-plus-related-files"
@@ -3502,7 +3447,7 @@
       "end_line": 123,
       "severity": "medium",
       "category": "security",
-      "message": "When `ExchangeCode` fails due to `redirect_uri` mismatch or PKCE verification failure, the authorization code is left in `s.codes` and remains valid until TTL expiry. RFC 6749 \u00a710.5 and RFC 7636 \u00a74.6 require that an authorization code be invalidated as soon as it has been used (or attempted) so an attacker who obtains the code cannot brute-force the `code_verifier`. Recommend deleting the entry from `s.codes` (and the matching session) on any validation failure, not only on success.",
+      "message": "When `ExchangeCode` fails due to `redirect_uri` mismatch or PKCE verification failure, the authorization code is left in `s.codes` and remains valid until TTL expiry. RFC 6749 §10.5 and RFC 7636 §4.6 require that an authorization code be invalidated as soon as it has been used (or attempted) so an attacker who obtains the code cannot brute-force the `code_verifier`. Recommend deleting the entry from `s.codes` (and the matching session) on any validation failure, not only on success.",
       "scope": "introduced-by-pr",
       "difficulty": "easy",
       "context_required": "diff-only"
@@ -3524,7 +3469,7 @@
       "end_line": 96,
       "severity": "medium",
       "category": "security",
-      "message": "`Callback` calls `CompleteCallback`, which leaves the original `s.sessions[state]` entry in place (it is only removed later when `/token` consumes the code). This allows the same `state` to be replayed against `/callback` \u2014 for example, if the redirect from GitHub is repeated by the browser \u2014 and each replay will issue a fresh internal code while overwriting `sess.InternalCode`, leaving orphan entries in `s.codes` that still reference the same underlying session. Consider invalidating the state on first successful callback (i.e. delete `s.sessions[state]` once an internal code has been issued) so a callback can be processed at most once.",
+      "message": "`Callback` calls `CompleteCallback`, which leaves the original `s.sessions[state]` entry in place (it is only removed later when `/token` consumes the code). This allows the same `state` to be replayed against `/callback` — for example, if the redirect from GitHub is repeated by the browser — and each replay will issue a fresh internal code while overwriting `sess.InternalCode`, leaving orphan entries in `s.codes` that still reference the same underlying session. Consider invalidating the state on first successful callback (i.e. delete `s.sessions[state]` once an internal code has been issued) so a callback can be processed at most once.",
       "scope": "introduced-by-pr",
       "difficulty": "medium",
       "context_required": "diff-plus-related-files"
@@ -3535,7 +3480,7 @@
       "end_line": 56,
       "severity": "medium",
       "category": "testing",
-      "message": "No tests are included in `services/copilot-review-mcp/` for the OAuth fa\u00e7ade, although issue #28's DoD and \"\u30c6\u30b9\u30c8\u6226\u7565\" section explicitly require unit/E2E tests for Discovery, the OAuth flow, PKCE verifier mismatch, token validation, and session TTL. Given that PKCE handling, session lifecycle, and Bearer token validation have several subtle security-relevant branches (PKCE optionality, redirect_uri validation, upstream-error mapping to 503), at least table-driven unit tests for `verifyPKCE`, `ExchangeCode`, `isAllowedRedirectHost`, and an `httptest`-based test for `/.well-known/...`, `/authorize`, `/token`, and the auth middleware would be valuable before this phase 1 lands.",
+      "message": "No tests are included in `services/copilot-review-mcp/` for the OAuth façade, although issue #28's DoD and \"テスト戦略\" section explicitly require unit/E2E tests for Discovery, the OAuth flow, PKCE verifier mismatch, token validation, and session TTL. Given that PKCE handling, session lifecycle, and Bearer token validation have several subtle security-relevant branches (PKCE optionality, redirect_uri validation, upstream-error mapping to 503), at least table-driven unit tests for `verifyPKCE`, `ExchangeCode`, `isAllowedRedirectHost`, and an `httptest`-based test for `/.well-known/...`, `/authorize`, `/token`, and the auth middleware would be valuable before this phase 1 lands.",
       "scope": "introduced-by-pr",
       "difficulty": "easy",
       "context_required": "diff-only"
@@ -3568,7 +3513,7 @@
       "end_line": 94,
       "severity": "medium",
       "category": "security",
-      "message": "PKCE is advertised in discovery but remains optional here: if a client omits `code_challenge`, the session is saved without one and `ExchangeCode` skips verifier validation. For this public OAuth fa\u00e7ade, require `code_challenge` with S256 so intercepted internal authorization codes cannot be redeemed without a verifier.",
+      "message": "PKCE is advertised in discovery but remains optional here: if a client omits `code_challenge`, the session is saved without one and `ExchangeCode` skips verifier validation. For this public OAuth façade, require `code_challenge` with S256 so intercepted internal authorization codes cannot be redeemed without a verifier.",
       "scope": "introduced-by-pr",
       "difficulty": "easy",
       "context_required": "diff-plus-related-files"
@@ -3579,7 +3524,7 @@
       "end_line": 79,
       "severity": "low",
       "category": "security",
-      "message": "`client_id` is not read or checked on the authorization request, so any caller can create a session that will later be exchanged as this fa\u00e7ade's configured GitHub OAuth app. In a single-client fa\u00e7ade, validate the incoming `client_id` against the configured client and store it with the session for the `/token` check.",
+      "message": "`client_id` is not read or checked on the authorization request, so any caller can create a session that will later be exchanged as this façade's configured GitHub OAuth app. In a single-client façade, validate the incoming `client_id` against the configured client and store it with the session for the `/token` check.",
       "scope": "introduced-by-pr",
       "difficulty": "medium",
       "context_required": "diff-plus-related-files"
@@ -3642,28 +3587,6 @@
       "context_required": "diff-plus-related-files"
     },
     {
-      "file": "resources/views/livewire/chats/chats.blade.php",
-      "start_line": 84,
-      "end_line": 84,
-      "severity": "medium",
-      "category": "correctness",
-      "message": "wire:navigate:scroll is not a valid Livewire directive on a div. Livewire's scroll preservation modifier is only documented for anchor tags that use wire:navigate (e.g., <a wire:navigate.scroll href=\"...\">). The colon-separated form wire:navigate:scroll on an arbitrary scrollable container is not a recognized Livewire attribute and is silently ignored, meaning the intended scroll-restore behavior does not activate.",
-      "scope": "introduced-by-pr",
-      "difficulty": "medium",
-      "context_required": "broader-project-context"
-    },
-    {
-      "file": "resources/views/livewire/chat/partials/body.blade.php",
-      "start_line": 227,
-      "end_line": 234,
-      "severity": "low",
-      "category": "reliability",
-      "message": "The @scroll-bottom.window handler directly accesses el.style.overflowY without a null guard. el is initialized to null in x-data and set to $el in x-init. The widget's dispatchScrollBottom calls requestAnimationFrame inside $nextTick, which runs after Livewire re-renders the DOM. If the new chat body's Alpine x-init has not yet run when this event fires (possible during Livewire morph timing), el is still null and el.style.overflowY = 'hidden' throws a TypeError, breaking scroll-to-bottom and leaving overflowY unrestored.",
-      "scope": "introduced-by-pr",
-      "difficulty": "hard",
-      "context_required": "broader-project-context"
-    },
-    {
       "file": "src/Livewire/Chat/Chat.php",
       "start_line": 1031,
       "end_line": 1031,
@@ -3684,17 +3607,6 @@
       "scope": "introduced-by-pr",
       "difficulty": "medium",
       "context_required": "broader-project-context"
-    },
-    {
-      "file": "resources/views/livewire/chats/partials/list.blade.php",
-      "start_line": 50,
-      "end_line": 50,
-      "severity": "low",
-      "category": "performance",
-      "message": "The wire:key now includes $unreadIndicatorKey which equals the exact unread count for UnreadIndicatorType::Count. Every new message that changes the count produces a different key, causing Livewire to destroy and recreate the full <li> DOM node including its Alpine component. This means Alpine state is lost and all CSS transitions are interrupted on every incoming message. Using a boolean presence key (read/unread) instead of the exact count would be sufficient to trigger re-render when the badge should appear or disappear.",
-      "scope": "introduced-by-pr",
-      "difficulty": "medium",
-      "context_required": "diff-plus-related-files"
     },
     {
       "file": "tests/Feature/ChatTest.php",
@@ -3724,7 +3636,7 @@
       "end_line": 39,
       "severity": "low",
       "category": "maintainability",
-      "message": "The `requestAnimationFrame` wrapping was moved to enclose the entire function body (line 15), but the original `requestAnimationFrame(() => { ... })` block around the `scrollTo` call was deleted, leaving a stale `// Animate scroll` comment with an empty line and inconsistent indentation right before `container.scrollTo(...)`. The remaining `scrollTo` call is no longer wrapped in a dedicated rAF \u2014 it now executes synchronously within the outer rAF. The dangling comment and stray indentation are confusing; please remove the stale comment/empty block and reindent the `scrollTo` call to match its actual scope.",
+      "message": "The `requestAnimationFrame` wrapping was moved to enclose the entire function body (line 15), but the original `requestAnimationFrame(() => { ... })` block around the `scrollTo` call was deleted, leaving a stale `// Animate scroll` comment with an empty line and inconsistent indentation right before `container.scrollTo(...)`. The remaining `scrollTo` call is no longer wrapped in a dedicated rAF — it now executes synchronously within the outer rAF. The dangling comment and stray indentation are confusing; please remove the stale comment/empty block and reindent the `scrollTo` call to match its actual scope.",
       "scope": "introduced-by-pr",
       "difficulty": "easy",
       "context_required": "diff-only"
@@ -3746,7 +3658,7 @@
       "end_line": 513,
       "severity": "low",
       "category": "maintainability",
-      "message": "Typo in the new test name: \u201csuccesfully\u201d should be \u201csuccessfully\u201d.",
+      "message": "Typo in the new test name: “succesfully” should be “successfully”.",
       "scope": "introduced-by-pr",
       "difficulty": "easy",
       "context_required": "diff-only"
@@ -3836,7 +3748,7 @@
       "end_line": 26,
       "severity": "low",
       "category": "correctness",
-      "message": "The nil guard only covers the case where both x_ppm and y_ppm are zero (return nil if x_ppm == 0 && y_ppm == 0). If only one dimension is zero \u2014 or if either value is negative (the fields are signed 32-bit longs per the BMP spec; some encoders write -1 or other sentinel values) \u2014 the code returns a nonsensical resolution like [[0, 2834], :meters] or [[-2834, -2834], :meters]. The guard should be return nil if x_ppm <= 0 || y_ppm <= 0 to reject any non-positive PPM value.",
+      "message": "The nil guard only covers the case where both x_ppm and y_ppm are zero (return nil if x_ppm == 0 && y_ppm == 0). If only one dimension is zero — or if either value is negative (the fields are signed 32-bit longs per the BMP spec; some encoders write -1 or other sentinel values) — the code returns a nonsensical resolution like [[0, 2834], :meters] or [[-2834, -2834], :meters]. The guard should be return nil if x_ppm <= 0 || y_ppm <= 0 to reject any non-positive PPM value.",
       "scope": "introduced-by-pr",
       "difficulty": "easy",
       "context_required": "diff-only"
@@ -3847,7 +3759,7 @@
       "end_line": 62,
       "severity": "low",
       "category": "api-architecture",
-      "message": "The resolution method returns Integer values when parsed from a JFIF APP0 segment (via unpack('nn')) but Float values when parsed from EXIF APP1 (num.to_f / den). The same logical value \u2014 e.g. 72 DPI \u2014 is returned as [72, 72] from JFIF and [72.0, 72.0] from EXIF. This is observable in the test fixtures: test.jpg (JFIF) has [[72, 72], :inches] while test2.jpg (EXIF) has [[72.0, 72.0], :inches]. Callers that compare resolution values or use Integer-specific methods will behave differently depending on which segment is present, without any indication in the API. The return type should be consistent (prefer Float across all paths, or document the distinction and guarantee it).",
+      "message": "The resolution method returns Integer values when parsed from a JFIF APP0 segment (via unpack('nn')) but Float values when parsed from EXIF APP1 (num.to_f / den). The same logical value — e.g. 72 DPI — is returned as [72, 72] from JFIF and [72.0, 72.0] from EXIF. This is observable in the test fixtures: test.jpg (JFIF) has [[72, 72], :inches] while test2.jpg (EXIF) has [[72.0, 72.0], :inches]. Callers that compare resolution values or use Integer-specific methods will behave differently depending on which segment is present, without any indication in the API. The return type should be consistent (prefer Float across all paths, or document the distinction and guarantee it).",
       "scope": "introduced-by-pr",
       "difficulty": "easy",
       "context_required": "diff-only"
@@ -3970,7 +3882,7 @@
       "end_line": 242,
       "severity": "medium",
       "category": "security",
-      "message": "Same `language: string` \u2192 `as Locale` unsafe cast as in `downloadPublishedData`. The unsanitised user-supplied `download_language` query param flows through the GET handler into this method. The parameter type should be `Locale`, not `string`, to match the actual constraint.",
+      "message": "Same `language: string` → `as Locale` unsafe cast as in `downloadPublishedData`. The unsanitised user-supplied `download_language` query param flows through the GET handler into this method. The parameter type should be `Locale`, not `string`, to match the actual constraint.",
       "scope": "exacerbated-by-pr",
       "difficulty": "easy",
       "context_required": "diff-plus-related-files"
@@ -3981,7 +3893,7 @@
       "end_line": 933,
       "severity": "medium",
       "category": "security",
-      "message": "Same `language: string` \u2192 `as Locale` unsafe cast in `downloadDatasetPreview`. The GET handler in `publish.ts` reads `req.query.download_language?.toString()` without validation and passes it here. The parameter type should be `Locale` to close the gap between the validated POST path and the unvalidated GET path.",
+      "message": "Same `language: string` → `as Locale` unsafe cast in `downloadDatasetPreview`. The GET handler in `publish.ts` reads `req.query.download_language?.toString()` without validation and passes it here. The parameter type should be `Locale` to close the gap between the validated POST path and the unvalidated GET path.",
       "scope": "exacerbated-by-pr",
       "difficulty": "medium",
       "context_required": "diff-plus-related-files"

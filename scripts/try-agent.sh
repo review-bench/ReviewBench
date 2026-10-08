@@ -42,6 +42,15 @@ esac
 work="${TRY_AGENT_WORK:-$PWD/.try-agent}"
 out_dir="$PWD/findings"
 mkdir -p "$work/repos" "$out_dir"
+mirror_org="${MIRROR_ORG:-review-bench}"
+
+has_commits() {
+  local dir="$1"; shift
+  local sha
+  for sha in "$@"; do
+    GIT_NO_LAZY_FETCH=1 git -C "$dir" cat-file -e "$sha^{commit}" 2>/dev/null || return 1
+  done
+}
 
 count=$(jq length "$manifest")
 indices=$(if [ -n "$only" ]; then echo "$only"; else seq 0 $((count - 1)); fi)
@@ -56,12 +65,28 @@ for i in $indices; do
   echo "== [$i] $nwo#$pr ($key)" >&2
 
   # A checkout at head with base reachable, like the one the benchmark mounts.
+  # Fetch from the review-bench mirror (the snapshot the judge also uses), and
+  # only fall back to upstream if the mirror lacks a commit. Upstream repos can
+  # be deleted or force-pushed, so the mirror is the source of truth.
   if [ ! -d "$repo/.git" ]; then
     git init -q "$repo"
-    git -C "$repo" remote add origin "https://github.com/$nwo.git"
   fi
-  GIT_LFS_SKIP_SMUDGE=1 git -C "$repo" fetch -q --filter=blob:none origin "$base" "pull/$pr/head" \
-    || GIT_LFS_SKIP_SMUDGE=1 git -C "$repo" fetch -q --filter=blob:none origin "$base" "$head"
+  # origin is the mirror, as in the benchmark's checkout; reset it on caches made by older versions.
+  git -C "$repo" remote remove origin 2>/dev/null || true
+  git -C "$repo" remote remove upstream 2>/dev/null || true
+  git -C "$repo" remote add origin "https://github.com/$mirror_org/${nwo/\//_}.git"
+  git -C "$repo" remote add upstream "https://github.com/$nwo.git"
+  if ! has_commits "$repo" "$base" "$head"; then
+    GIT_LFS_SKIP_SMUDGE=1 git -C "$repo" fetch -q --filter=blob:none origin "$base" "$head" 2>/dev/null || true
+  fi
+  if ! has_commits "$repo" "$base" "$head"; then
+    echo "   mirror $mirror_org/${nwo/\//_} lacks $base or $head; trying upstream" >&2
+    GIT_LFS_SKIP_SMUDGE=1 git -C "$repo" fetch -q --filter=blob:none upstream "$base" "pull/$pr/head" 2>/dev/null \
+      || GIT_LFS_SKIP_SMUDGE=1 git -C "$repo" fetch -q --filter=blob:none upstream "$base" "$head" 2>/dev/null || true
+  fi
+  if ! has_commits "$repo" "$base" "$head"; then
+    echo "   FAIL: could not fetch base $base and head $head" >&2; failed=$((failed + 1)); continue
+  fi
   GIT_LFS_SKIP_SMUDGE=1 git -C "$repo" checkout -q --force --detach "$head"
   git -C "$repo" clean -qfdx
 

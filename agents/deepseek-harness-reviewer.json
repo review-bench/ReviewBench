@@ -1,0 +1,33 @@
+{
+  "name": "deepseek-harness-reviewer",
+  "display_name": "DeepSeek Harness Reviewer",
+  "image": "ghcr.io/fangkangmi/deepseek-reviewer@sha256:0ee7bb6ea3cbb6ae2b8f15a07e9f5081f2677ad23fd0bfea2ec118eb696ccc9e",
+  "image_visibility": "public",
+  "configuration": [
+    {
+      "key": "model",
+      "value": "deepseek-flash"
+    },
+    {
+      "key": "effort",
+      "value": "high"
+    },
+    {
+      "key": "timeout_seconds",
+      "value": "2400"
+    }
+  ],
+  "secrets": {
+    "env": [
+      "DEEPSEEK_API_KEY"
+    ]
+  },
+  "model_api_url": "https://api.deepseek.com",
+  "contacts": [
+    "fangkangmi"
+  ],
+  "provider": "DeepSeek Harness Reviewer",
+  "egress": [
+    "api.deepseek.com"
+  ]
+}

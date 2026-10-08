@@ -1,0 +1,47 @@
+name: Validate corpus
+
+on:
+  pull_request:
+    paths:
+      - corpus/test/**
+      - golden/**
+      - scripts/sync-test-set.ts
+      - scripts/validate-golden.ts
+      - .github/workflows/validate-test-set.yml
+      - docs/EXTRACTION.md
+      - README.md
+      - package.json
+      - package-lock.json
+  push:
+    branches: [main]
+    paths:
+      - corpus/test/**
+      - golden/**
+      - scripts/sync-test-set.ts
+      - scripts/validate-golden.ts
+      - .github/workflows/validate-test-set.yml
+      - docs/EXTRACTION.md
+      - README.md
+      - package.json
+      - package-lock.json
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: "22"
+          cache: npm
+
+      - run: npm ci
+      - run: npm run check:golden
+      - run: npm run check:test-set

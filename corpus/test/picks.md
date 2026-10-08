@@ -5,7 +5,7 @@ A diverse subset of the full set chosen to demonstrate the breadth of repos, lan
 ## Overall stats
 
 - **Total**: 25 PRs
-- **PRs with ≥1 high TP finding**: 15
+- **PRs with ≥1 high TP finding**: 14
 - **PRs with ≥1 security TP finding**: 8
 
 **Languages**: TypeScript (5), Python (4), C# (3), Go (3), Rust (2), JavaScript (1), Shell (1), Kotlin (1), Java (1), Jupyter Notebook (1), Swift (1), PHP (1), Ruby (1)
@@ -18,7 +18,7 @@ A diverse subset of the full set chosen to demonstrate the breadth of repos, lan
 
 ## Picks
 
-### Tier A — ≥1 high TP finding (15)
+### Tier A — ≥1 high TP finding (14)
 
 #### [PierreJanineh/TechDebtMCP#135](https://github.com/PierreJanineh/TechDebtMCP/pull/135)
 - **Lang/size**: TypeScript · xs (<50) · repo <1MB
@@ -58,7 +58,7 @@ A diverse subset of the full set chosen to demonstrate the breadth of repos, lan
 #### [DisciplinedSoftware/Codebase-Conversion#1](https://github.com/DisciplinedSoftware/Codebase-Conversion/pull/1)
 - **Lang/size**: Python · xl (>1500) · repo <1MB
 - **Title**: Fortran-to-Rust conversion pipeline with devcontainer
-- **TP findings**: 32 (high:2 med:15 low:15) — categories: correctness,documentation,maintainability,reliability,security
+- **TP findings**: 31 (high:2 med:15 low:14) — categories: correctness,documentation,maintainability,reliability,security
 - **Why included**: Fortran→Rust pipeline filters out lines starting with `/*` to remove f2c headers — but f2c also emits the function prototype as `/* Subroutine */ int dgemm_(...)`, which gets stripped, breaking every conversion. Reviewer actually understood the data.
 - **Golden file**: `golden/DisciplinedSoftware_Codebase-Conversion_1-4b46d68c.json`
 
@@ -68,13 +68,6 @@ A diverse subset of the full set chosen to demonstrate the breadth of repos, lan
 - **TP findings**: 11 (high:1 med:4 low:6) — categories: correctness,maintainability,performance,reliability,testing
 - **Why included**: New `diagnostics_channel` tracing imports `./diagnostics` from `pg-pool`, but `packages/pg-pool/package.json#files` still only ships `index.js` and `esm/`. Tests pass locally; the published tarball would crash on require. Classic publish-config regression.
 - **Golden file**: `golden/brianc_node-postgres_3650-b922f0dd.json`
-
-#### [PaulStSmith/figlet-comment-generator#32](https://github.com/PaulStSmith/figlet-comment-generator/pull/32)
-- **Lang/size**: C# · m (200-500) · repo 1-10MB
-- **Title**: BugFix: Link to Issues not working on VSCode
-- **TP findings**: 12 (high:1 med:7 low:4) — categories: correctness,documentation,maintainability,reliability
-- **Why included**: WinGet manifest drops `PortableCommandAlias: figprint` from both arch entries — users who install via `winget install` no longer get the `figprint` command on PATH. Plus a CI path-filter tightened to `**/*.cs` and `**/*.ts` only, so version bumps in `.csproj` / `package.json` will silently not trigger publish workflows. Two concrete release-pipeline regressions in a small PR.
-- **Golden file**: `golden/PaulStSmith_figlet-comment-generator_32-1d0b6642.json`
 
 #### [brexhq/CrabTrap#15](https://github.com/brexhq/CrabTrap/pull/15)
 - **Lang/size**: Go · m (200-500) · repo 1-10MB
@@ -125,7 +118,14 @@ A diverse subset of the full set chosen to demonstrate the breadth of repos, lan
 - **Why included**: `break` is used inside `for record in data:` to mean 'skip this record' — but `break` exits the whole loop, so the first 'not applicable' record terminates processing of all remaining records. Plus a `'Agnoist'` typo (vs `'Agonist'`) silently routing records to a default branch. Two very human bugs.
 - **Golden file**: `golden/NCATSTranslator_translator-ingests_336-efb31e9c.json`
 
-### Tier B — medium TP finding (no high) (10)
+### Tier B — medium TP finding (no high) (11)
+
+#### [PaulStSmith/figlet-comment-generator#32](https://github.com/PaulStSmith/figlet-comment-generator/pull/32)
+- **Lang/size**: C# · m (200-500) · repo 1-10MB
+- **Title**: BugFix: Link to Issues not working on VSCode
+- **TP findings**: 9 (high:0 med:7 low:2) — categories: correctness,documentation,maintainability,reliability
+- **Why included**: Several publish-workflow path filters were narrowed to source files only, so version bumps and release assets in `.csproj`, `package.json`, manifests, and resources can silently skip publishing. The extension also stopped replacing selected text when inserting a banner. Multiple concrete regressions in a small PR.
+- **Golden file**: `golden/PaulStSmith_figlet-comment-generator_32-1d0b6642.json`
 
 #### [mheuss/chronicle#14](https://github.com/mheuss/chronicle/pull/14)
 - **Lang/size**: Rust · xl (>1500) · repo <1MB
@@ -151,7 +151,7 @@ A diverse subset of the full set chosen to demonstrate the breadth of repos, lan
 #### [allan-mobley-jr/gimmes#468](https://github.com/allan-mobley-jr/gimmes/pull/468)
 - **Lang/size**: Python · s (50-200) · repo 1-10MB
 - **Title**: Fix staleness filter for NO variance strategy
-- **TP findings**: 7 (high:0 med:3 low:4) — categories: api-architecture,correctness,documentation,maintainability,testing
+- **TP findings**: 6 (high:0 med:3 low:3) — categories: api-architecture,correctness,documentation,maintainability,testing
 - **Why included**: `check_staleness` is called without the new `volume_floor` parameter so it silently uses the hardcoded default of 10. Plus a fallback that uses lifetime cumulative `volume` when `volume_24h` is zero — recently-low-volume tokens get judged on all-time numbers.
 - **Golden file**: `golden/allan-mobley-jr_gimmes_468-e1477f8b.json`
 
@@ -179,7 +179,7 @@ A diverse subset of the full set chosen to demonstrate the breadth of repos, lan
 #### [wirechat/wirechat#183](https://github.com/wirechat/wirechat/pull/183)
 - **Lang/size**: PHP · l (500-1500) · repo 10-100MB
 - **Title**: Harden chat/chats scroll state and pagination concurrency in Livewire UI
-- **TP findings**: 15 (high:0 med:5 low:10) — categories: api-architecture,correctness,maintainability,performance,reliability,testing
+- **TP findings**: 12 (high:0 med:4 low:8) — categories: api-architecture,correctness,maintainability,performance,reliability,testing
 - **Why included**: `loadOlderWithStableScroll` has no `finally` block, so if the await throws, `loadingOlder` and `pendingPrependRestore` stay true — chat lockout. Separately, `pushMessage` runs `syncCanLoadFlags` after every appended message, which itself runs two `EXISTS` queries — N+1 on hot path.
 - **Golden file**: `golden/wirechat_wirechat_183-6e3156e7.json`
 

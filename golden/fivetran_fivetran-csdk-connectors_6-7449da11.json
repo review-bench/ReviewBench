@@ -646,32 +646,6 @@
       }
     },
     {
-      "file": "couchbase_magma/README.md",
-      "start_line": 48,
-      "end_line": 48,
-      "message": "```suggestion\r\n    \"collection\": \"<YOUR_COUCHBASE_COLLECTION_NAME>\",\r\n```",
-      "tp_fp": "fp",
-      "severity": "low",
-      "category": "documentation",
-      "scope": "pre-existing",
-      "difficulty": "easy",
-      "context_required": "diff-only",
-      "tp_fp_justification": "Identical to Finding 29: same file (couchbase_magma/README.md), same line (48), same suggestion. The file already contains `    \"collection\": \"<YOUR_COUCHBASE_COLLECTION_NAME>\",` at the current SHA.",
-      "severity_justification": "No change needed; the suggested content is already present.",
-      "category_justification": "The finding references README configuration example content.",
-      "producer": "human_review",
-      "source": {
-        "type": "review_comment",
-        "author": "fivetran-JenasVimal",
-        "url": "https://github.com/fivetran/fivetran_csdk_connectors/pull/6#discussion_r3051246817",
-        "created_at": "2026-04-08T12:18:00Z",
-        "alignment": "code_changed",
-        "original_commit": "2c097eca1a22cef814ddc4e4823c4c0d6afb2678",
-        "original_start_line": 48,
-        "original_end_line": 48
-      }
-    },
-    {
       "file": "couchbase_capella/README.md",
       "start_line": 46,
       "end_line": 47,
