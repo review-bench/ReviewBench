@@ -1,0 +1,62 @@
+{
+  "name": "heydeer",
+  "display_name": "HeyDeer",
+  "image": "ghcr.io/adastralab-ai/heydeer-reviewbench@sha256:27f288fbd203d18661ac7cf27eb25539c05cbf6120798f2b77dafa934a388642",
+  "image_visibility": "private",
+  "configuration": [
+    {
+      "key": "depth",
+      "value": "deep"
+    },
+    {
+      "key": "filter",
+      "value": "detailed"
+    }
+  ],
+  "secrets": {
+    "env": [
+      "HEYDEER_RUNTIME_URL",
+      "HEYDEER_RUNTIME_KEY",
+      "GHCR_PULL_TOKEN"
+    ]
+  },
+  "model_api_url": "https://chatgpt.com/backend-api/codex",
+  "egress": [
+    "api.openai.com",
+    "auth.openai.com",
+    "api.anthropic.com",
+    "github.com",
+    "docs.github.com",
+    "raw.githubusercontent.com",
+    "codeload.github.com",
+    "objects.githubusercontent.com",
+    "registry.npmjs.org",
+    "unpkg.com",
+    "cdn.jsdelivr.net",
+    "nodejs.org",
+    "developer.mozilla.org",
+    "pypi.org",
+    "files.pythonhosted.org",
+    "docs.python.org",
+    "proxy.golang.org",
+    "storage.googleapis.com",
+    "pkg.go.dev",
+    "go.dev",
+    "repo.maven.apache.org",
+    "docs.oracle.com",
+    "crates.io",
+    "static.crates.io",
+    "docs.rs",
+    "doc.rust-lang.org",
+    "api.nuget.org",
+    "learn.microsoft.com",
+    "rubygems.org",
+    "rubydoc.info",
+    "heydeer-runtime.vercel.app",
+    "chatgpt.com"
+  ],
+  "contacts": [
+    "luin"
+  ],
+  "provider": "HeyDeer"
+}
