@@ -57,3 +57,46 @@ jobs:
               --judge-env OPENAI_API_KEY=RB_HARBOR_JUDGE_KEY
             python scripts/harbor/check-format.py ".harbor/$split"
           done
+  docker-smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      PYTHONPATH: ${{ github.workspace }}
+      RB_HARBOR_JUDGE_TOKEN: reviewbench-isolation-sentinel
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v7
+        with:
+          node-version: "22"
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+      - run: npm ci --no-audit --no-fund
+      - name: Install pinned Harbor runtime
+        run: |
+          python -m pip install uv
+          python -m pip install 'git+https://github.com/harbor-framework/harbor.git@b53b8134e1241686dca7759af188f987ecc48e8b'
+      - name: Run no-inference isolation and artifact-transfer trial
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm run harbor:export -- --output .harbor/smoke --split test --limit 1 \
+            --judge-provider github-copilot --judge-model isolation-fixture \
+            --base-image node:22-bookworm-slim@sha256:efd0ab5780c2d9ab1f0f869571a00d5edb17793bff4cce4a2792e3eb0ffc7562 \
+            --agent-host api.githubcopilot.com --judge-host api.githubcopilot.com \
+            --judge-env COPILOT_GITHUB_TOKEN=RB_HARBOR_JUDGE_TOKEN
+          harbor run -p .harbor/smoke -a scripts.harbor.smoke_agent:EmptyReviewAgent \
+            -e docker -k 1 -n 1 --job-name empty-smoke --jobs-dir .harbor/jobs --yes
+          python scripts/harbor/check-job.py .harbor/jobs/empty-smoke \
+            .harbor/smoke/metric.py --output .harbor/smoke-metrics.json
+      - name: Archive smoke evidence
+        if: always()
+        uses: actions/upload-artifact@v6
+        with:
+          name: harbor-docker-smoke
+          path: |
+            .harbor/jobs/
+            .harbor/smoke-metrics.json
+          if-no-files-found: warn

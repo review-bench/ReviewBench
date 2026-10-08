@@ -15,7 +15,10 @@ built-in agent; hosted custom reviewers need Harbor's
 
 Requirements: Node 22+, `npm ci`, and a Debian-based Node container image pinned
 by digest. Running tasks also requires Harbor, `uv` for its custom metric, and
-a Linux sandbox. Local Docker allowlists require the nftables features used by
+a Linux sandbox. The local Harbor Docker orchestrator must run on Linux;
+a Windows host with a Linux Docker daemon can build the images but Harbor
+v0.24.0 rejects Docker allowlists from Windows. Do not disable network
+enforcement to work around that rejection. Local Docker allowlists require the nftables features used by
 Harbor's egress sidecar. The test suite uses Python 3; `PYTHON` can override its
 executable.
 
@@ -124,7 +127,7 @@ not be silently weakened.
 Run the one-task export with a built-in reviewer:
 
 ```powershell
-harbor run -p .\.harbor\smoke\dataset.toml -a codex -m "openai/<reviewer-model-id>" -k 1 -n 1
+harbor run -p .\.harbor\smoke -a codex -m "openai/<reviewer-model-id>" -k 1 -n 1
 ```
 
 The reviewer uses its ordinary provider credential; the verifier uses the
@@ -132,7 +135,7 @@ dedicated variable mapping from `task.toml`. The oracle checks output plumbing
 with canonical TP findings:
 
 ```powershell
-harbor run -p .\.harbor\smoke\dataset.toml -a oracle -k 1 -n 1
+harbor run -p .\.harbor\smoke -a oracle -k 1 -n 1
 ```
 
 **The oracle still invokes the real LLM judge and costs money.** It is not a
@@ -146,9 +149,27 @@ including severity/category strata and task/evaluation identity markers.
 
 ## Aggregation
 
-Use the generated dataset manifest, not just a task directory, to load its
-custom `metric.py`. Harbor's default mean of reward fields is not a ReviewBench
-aggregate.
+Use the exported dataset directory for local `-p` runs, not `dataset.toml`.
+Harbor v0.24.0 does not automatically load a local directory's custom metric;
+configure it explicitly in a job config:
+
+```yaml
+datasets:
+  - path: .harbor/smoke
+agents:
+  - name: codex
+    model_name: openai/<reviewer-model-id>
+n_attempts: 1
+n_concurrent_trials: 1
+metrics:
+  - type: uv-script
+    kwargs:
+      script_path: .harbor/smoke/metric.py
+```
+
+Run that configuration with `harbor run -c smoke.yaml`. Published Hub datasets
+load their packaged `metric.py` automatically. Harbor's default mean of reward
+fields is not a ReviewBench aggregate.
 
 The metric reports `complete=0` with coverage/failure/duplicate counts during
 incomplete runs and withholds all aggregate scores. Once every expected task
@@ -167,6 +188,20 @@ python .\.harbor\smoke\metric.py -i rewards.jsonl -o metrics.json --require-comp
 Also require **zero agent/trial exceptions in Harbor's job result**: the custom
 metric receives rewards, not trial statuses, so it cannot detect an agent
 failure if Harbor subsequently produced a valid verifier reward.
+
+The release check validates both complete rewards and exception-free,
+separate-verifier trial results in a downloaded or local job directory:
+
+```powershell
+python scripts\harbor\check-job.py .\.harbor\jobs\<job-name> .\.harbor\smoke\metric.py --output verified-metrics.json
+```
+
+CI runs `scripts.harbor.smoke_agent:EmptyReviewAgent` on a Linux Docker host.
+It makes no inference calls, writes a valid empty review, checks that golden
+and oracle assets and judge credentials are absent from the reviewer, and
+requires blocked egress to a non-allowlisted hostname. The real judge then
+grades the transferred artifact in a fresh verifier. This validates plumbing,
+not real reviewer or authenticated judge performance.
 
 Use one attempt per task per job. For three-round reporting, run three complete
 jobs with identical versions, then report the mean/std of the three round

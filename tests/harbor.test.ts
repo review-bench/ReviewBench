@@ -150,6 +150,47 @@ test("Harbor metric rejects wrong versions, invalid counts, and incomplete rewar
   }
 });
 
+test("Harbor release gate requires complete rewards and exception-free separate trials", (t) => {
+  const dir = fixture(t);
+  const scores = [score([], true)];
+  metric(dir, scores);
+  const jobDir = join(dir, "job");
+  const output = join(dir, "verified.json");
+  const job = {
+    finished_at: "2026-10-08T00:00:00Z", n_total_trials: 1,
+    stats: { n_errored_trials: 0, n_running_trials: 0, n_pending_trials: 0, n_cancelled_trials: 0 },
+  };
+  const trial = {
+    trial_name: "smoke", finished_at: job.finished_at, exception_info: null,
+    verifier_environment_mode: "separate",
+    verifier_result: { rewards: toRewards(scores[0], { task_id: 0, evaluation_id: 42 }) },
+  };
+  write(join(jobDir, "result.json"), job);
+  write(join(jobDir, "smoke", "result.json"), trial);
+  const check = () => spawnSync(PYTHON, [
+    join(ROOT, "scripts", "harbor", "check-job.py"), jobDir, join(dir, "metric.py"), "--output", output,
+  ], { encoding: "utf8" });
+  const success = check();
+  assert.equal(success.status, 0, success.stderr);
+  assert.equal(JSON.parse(readFileSync(output, "utf8")).complete, 1);
+  for (const bad of [
+    { ...trial, exception_info: { exception_type: "AgentTimeoutError" } },
+    { ...trial, finished_at: null },
+    { ...trial, verifier_environment_mode: "shared" },
+    { ...trial, verifier_result: null },
+  ]) {
+    write(join(jobDir, "smoke", "result.json"), bad);
+    write(output, { complete: 1 });
+    assert.notEqual(check().status, 0);
+    assert.equal(existsSync(output), false, "failed checks must remove stale metrics");
+  }
+  write(join(jobDir, "smoke", "result.json"), trial);
+  write(join(jobDir, "result.json"), { ...job, stats: { ...job.stats, n_errored_trials: 1 } });
+  assert.notEqual(check().status, 0);
+  write(join(jobDir, "result.json"), { ...job, n_total_trials: 2 });
+  assert.notEqual(check().status, 0);
+});
+
 test("Harbor exports are deterministic and keep judge inputs out of the agent build context", (t) => {
   const dir = fixture(t);
   sourceFixture(dir);
