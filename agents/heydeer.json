@@ -58,5 +58,6 @@
   "contacts": [
     "luin"
   ],
-  "provider": "HeyDeer"
+  "provider": "HeyDeer",
+  "pr_timeout_seconds": 1800
 }
