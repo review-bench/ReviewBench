@@ -26,6 +26,9 @@
  *   --provider <name>    Exact LLM provider for matcher/classifier (required)
  *   --model <id>         Exact LLM model ID (required)
  *   --repo-dir <path>    Repo checkout directory (default: /tmp/review-repos)
+ *   --exclude-producer <prefix>
+ *                        Drop golden findings whose producer starts with <prefix>
+ *                        before matching and scoring (repeatable; see docs/JUDGING.md)
  */
 
 import { existsSync, mkdirSync, readdirSync, readFileSync, unlinkSync, writeFileSync } from "fs";
@@ -57,6 +60,7 @@ import { prKey } from "../lib/types.js";
 import { aggregateCandidateUsage } from "../lib/usage.js";
 import { checkpointFingerprint } from "./checkpoint-fingerprint.js";
 import { outputSidecarPath } from "./output-paths.js";
+import { excludeGoldenProducers, normalizeProducerPrefixes } from "./exclude-producers.js";
 
 // ---------------------------------------------------------------------------
 // Detailed per-finding output
@@ -108,6 +112,7 @@ interface CliArgs {
   provider: string;
   modelId: string;
   repoDir: string;
+  excludeProducers: string[];
 }
 
 function parseArgs(): CliArgs {
@@ -125,6 +130,7 @@ function parseArgs(): CliArgs {
     provider: "",
     modelId: "",
     repoDir: "/tmp/review-repos",
+    excludeProducers: [],
   };
 
   for (let i = 0; i < args.length; i++) {
@@ -168,6 +174,9 @@ function parseArgs(): CliArgs {
       case "--repo-dir":
         opts.repoDir = args[++i];
         break;
+      case "--exclude-producer":
+        opts.excludeProducers.push(args[++i] ?? "");
+        break;
       default:
         console.error(`Unknown argument: ${args[i]}`);
         process.exit(1);
@@ -182,6 +191,17 @@ function parseArgs(): CliArgs {
     console.error("--provider and --model are required");
     process.exit(1);
   }
+  try {
+    opts.excludeProducers = normalizeProducerPrefixes(opts.excludeProducers);
+  } catch (err) {
+    console.error(err instanceof Error ? err.message : String(err));
+    process.exit(1);
+  }
+  if (opts.ingest && opts.excludeProducers.length > 0) {
+    // Ingest writes the in-memory golden set back to disk, which would drop the excluded findings.
+    console.error("--exclude-producer cannot be combined with --ingest");
+    process.exit(1);
+  }
 
   return opts;
 }
@@ -189,14 +209,16 @@ function parseArgs(): CliArgs {
 /**
  * The golden directory, read once and held in memory for the whole run.
  * Every later use (scoring, hashing) goes through this store, so the files
- * on disk can be removed after loading.
+ * on disk can be removed after loading. With --exclude-producer the store
+ * holds only the remaining findings, so all golden indices refer to them.
  */
 class GoldenStore {
   readonly keys = new Set<string>();
+  readonly excludedCounts = new Map<string, number>();
   private readonly raw = new Map<string, string>();
   private readonly parsed = new Map<string, GoldenSet | null>();
 
-  constructor(readonly dir: string) {
+  constructor(readonly dir: string, readonly excludedProducers: readonly string[] = []) {
     if (!existsSync(dir)) return;
     for (const f of readdirSync(dir)) {
       if (!f.endsWith(".json")) continue;
@@ -205,7 +227,9 @@ class GoldenStore {
       this.keys.add(key);
       this.raw.set(key, text);
       try {
-        this.parsed.set(key, JSON.parse(text) as GoldenSet);
+        const filtered = excludeGoldenProducers(JSON.parse(text) as GoldenSet, excludedProducers);
+        this.parsed.set(key, filtered.golden);
+        this.excludedCounts.set(key, filtered.excluded);
       } catch {
         this.parsed.set(key, null);
       }
@@ -217,9 +241,11 @@ class GoldenStore {
     return this.parsed.get(key) ?? null;
   }
 
-  /** The file text as loaded, for hashing. */
+  /** The file text as loaded, or the remaining findings when producers are excluded, for hashing. */
   text(key: string): string | undefined {
-    return this.raw.get(key);
+    if (this.excludedProducers.length === 0) return this.raw.get(key);
+    const golden = this.parsed.get(key);
+    return golden ? JSON.stringify(golden) : this.raw.get(key);
   }
 
   /** Remove the loaded files from disk; the store keeps serving them. */
@@ -588,6 +614,7 @@ function computeEvalConfig(
   goldenStore: GoldenStore,
   provider: string,
   modelId: string,
+  excludedProducers: readonly string[] = [],
 ): EvalConfig {
   // Hash golden findings content for evaluated PRs
   const goldenContents: string[] = [];
@@ -612,6 +639,7 @@ function computeEvalConfig(
     matcher_model: judgeName,
     matcher_prompt_hash: matcherPromptHash,
     evaluated_prs_hash: evaluatedPrsHash,
+    ...(excludedProducers.length > 0 ? { excluded_producers: [...excludedProducers] } : {}),
   };
 }
 
@@ -681,7 +709,7 @@ async function main() {
   const candidateByPR = candidateLoad.byPR;
 
   console.log("Loading golden set...");
-  const goldenStore = new GoldenStore(resolve(opts.goldenDir));
+  const goldenStore = new GoldenStore(resolve(opts.goldenDir), opts.excludeProducers);
   const goldenKeys = goldenStore.keys;
   // Inside the runner container the labels stay in memory only, so nothing
   // that runs later in the job can read them from the filesystem.
@@ -718,6 +746,17 @@ async function main() {
 
   // Find common PRs
   const commonKeys = inputSummary.evaluation_keys;
+  if (opts.excludeProducers.length > 0) {
+    let excluded = 0;
+    let emptied = 0;
+    for (const key of commonKeys) {
+      const count = goldenStore.excludedCounts.get(key) ?? 0;
+      excluded += count;
+      if (count > 0 && goldenStore.get(key)?.findings.length === 0) emptied++;
+    }
+    console.log(`  Excluded producers: ${opts.excludeProducers.join(", ")}`);
+    console.log(`  Golden findings excluded: ${excluded} (${emptied} PRs left with no golden findings)`);
+  }
   console.log(`  Concurrency: ${opts.concurrency}`);
   console.log(`\n${commonKeys.length} PRs to evaluate\n`);
 
@@ -739,6 +778,7 @@ async function main() {
     candidates: commonKeys.map((key) => candidateByPR.get(key)),
     goldenSets: commonKeys.map((key) => goldenStore.get(key)),
     manifestEntries: commonKeys.map((key) => getManifestEntry(opts.manifestPath, key)),
+    excludedProducers: opts.excludeProducers,
   });
   const checkpoint = loadCheckpoint(opts.output, fingerprint);
   const completed = checkpoint.scores;
@@ -844,7 +884,7 @@ async function main() {
   }
 
   // Compute eval config fingerprint
-  agg.eval_config = computeEvalConfig(commonKeys, goldenStore, opts.provider, opts.modelId);
+  agg.eval_config = computeEvalConfig(commonKeys, goldenStore, opts.provider, opts.modelId, opts.excludeProducers);
 
   // Write output
   const outputPath = resolve(opts.output);

@@ -253,7 +253,9 @@ npm run judge -- \
 ```
 
 See [How to judge findings](docs/JUDGING.md) for supported API-key variables,
-model selection, full-corpus commands, checkpoints, and output metrics.
+model selection, full-corpus commands, checkpoints, and output metrics. To score
+without the golden findings from a given producer, see
+[Leave-producer-out scoring](docs/JUDGING.md#leave-producer-out-scoring).
 
 ### Costs
 

@@ -60,6 +60,9 @@ export function printSummary(
     console.log(`  Matcher model:     ${agg.eval_config.matcher_model}`);
     console.log(`  Matcher prompt:    ${agg.eval_config.matcher_prompt_hash.slice(0, 12)}...`);
     console.log(`  PR set:            ${agg.eval_config.evaluated_prs_hash.slice(0, 12)}...`);
+    if (agg.eval_config.excluded_producers?.length) {
+      console.log(`  Excluded producers: ${agg.eval_config.excluded_producers.join(", ")}`);
+    }
   }
 
   if (details && details.length > 0) {

@@ -28,8 +28,9 @@ export function checkpointFingerprint(args: {
   candidates: unknown[];
   goldenSets: unknown[];
   manifestEntries: unknown[];
+  excludedProducers?: readonly string[];
 }): string {
-  return [
+  const parts = [
     `${args.provider}/${args.modelId}`,
     hash(args.classifierPrompt),
     hash(args.matcherPrompt),
@@ -39,5 +40,10 @@ export function checkpointFingerprint(args: {
       golden_sets: args.goldenSets,
       manifest_entries: args.manifestEntries,
     }),
-  ].join("|");
+  ];
+  // Only appended when set, so fingerprints of runs without exclusions are unchanged.
+  if (args.excludedProducers?.length) {
+    parts.push(`exclude-producer=${hash([...args.excludedProducers].sort())}`);
+  }
+  return parts.join("|");
 }

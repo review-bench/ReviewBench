@@ -157,3 +157,49 @@ The command prints the final summary and writes:
 Grounded metrics compare against the original golden findings. Augmented
 metrics also credit unmatched findings that your selected LLM judge classifies
 as valid.
+
+## Leave-producer-out scoring
+
+Each golden finding records the `producer` that originally surfaced it, such as
+`llm_review:<model>`, `ccr:<model>`, `human_review`, or
+`deterministic_tool:<tool>`. If your reviewer, or a system closely related to
+it, produced some of the golden findings, its grounded metrics partly measure
+agreement with its own earlier output. To see how it scores without those
+findings, pass `--exclude-producer` with a producer prefix:
+
+```sh
+npm run judge -- \
+  --candidate ./my-agent-findings \
+  --provider openai \
+  --model <your-model-id> \
+  --output ./scoring/results-without-ccr.json \
+  --repo-dir ./.reviewbench-repos \
+  --exclude-producer ccr:
+```
+
+The option is repeatable, and a golden finding is removed when its `producer`
+starts with any given prefix. Removal happens when the golden set is loaded,
+before matching, classification, and scoring, for every evaluated PR. The
+option is off by default and cannot be combined with `--ingest`.
+
+How to read the results:
+
+- Grounded metrics are computed against the remaining golden findings only.
+  A candidate finding that would have matched an excluded golden finding is
+  unmatched, so the judge classifies it and it can only count toward the
+  augmented metrics.
+- A PR whose golden set becomes empty is still scored. It has no golden TPs, so
+  its grounded recall is null and it is skipped in the macro recall average;
+  all of its candidate findings are unmatched and classified by the judge.
+- In `results.details.json`, `matched_golden_index` and
+  `covered_golden_indices` index the remaining golden findings, in their
+  original order, not the full golden file.
+- `results.json` records the prefixes in `eval_config.excluded_producers`, and
+  `eval_config.golden_hash` is computed over the remaining findings. The
+  summary prints the excluded prefixes and the number of removed golden
+  findings. Checkpoints from runs with different exclusions are never resumed
+  into each other.
+
+Compare a leave-producer-out run with an unfiltered run that uses the same
+judge model, candidate findings, and PR set. These numbers are a diagnostic and
+are not comparable to leaderboard results, which always use the full golden set.
