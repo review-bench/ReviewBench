@@ -26,6 +26,7 @@
  *   --provider <name>    Exact LLM provider for matcher/classifier (required)
  *   --model <id>         Exact LLM model ID (required)
  *   --repo-dir <path>    Repo checkout directory (default: /tmp/review-repos)
+ *   --snapshot-dir <path> Trusted frozen checkout for a single-PR evaluation; no fetch
  */
 
 import { existsSync, mkdirSync, readdirSync, readFileSync, unlinkSync, writeFileSync } from "fs";
@@ -57,6 +58,7 @@ import { prKey } from "../lib/types.js";
 import { aggregateCandidateUsage } from "../lib/usage.js";
 import { checkpointFingerprint } from "./checkpoint-fingerprint.js";
 import { outputSidecarPath } from "./output-paths.js";
+import { validateSnapshot } from "../extraction/git.js";
 
 // ---------------------------------------------------------------------------
 // Detailed per-finding output
@@ -108,6 +110,7 @@ interface CliArgs {
   provider: string;
   modelId: string;
   repoDir: string;
+  snapshotDir?: string;
 }
 
 function parseArgs(): CliArgs {
@@ -167,6 +170,10 @@ function parseArgs(): CliArgs {
         break;
       case "--repo-dir":
         opts.repoDir = args[++i];
+        break;
+      case "--snapshot-dir":
+        opts.snapshotDir = args[++i];
+        if (!opts.snapshotDir) throw new Error("--snapshot-dir requires a path");
         break;
       default:
         console.error(`Unknown argument: ${args[i]}`);
@@ -433,6 +440,7 @@ async function evalPR(
           prBody: manifestEntry.body,
           findings: unmatchedFindings,
           repoBaseDir: opts.repoDir,
+          snapshotDir: opts.snapshotDir,
           signal,
           config: {
             provider: opts.provider,
@@ -718,6 +726,11 @@ async function main() {
 
   // Find common PRs
   const commonKeys = inputSummary.evaluation_keys;
+  if (opts.snapshotDir) {
+    if (commonKeys.length !== 1) throw new Error("--snapshot-dir requires exactly one PR");
+    const candidate = candidateByPR.get(commonKeys[0])!;
+    validateSnapshot(opts.snapshotDir, candidate.pr.base, candidate.pr.head);
+  }
   console.log(`  Concurrency: ${opts.concurrency}`);
   console.log(`\n${commonKeys.length} PRs to evaluate\n`);
 

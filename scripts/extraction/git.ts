@@ -19,6 +19,7 @@ interface GitOpts {
   cwd?: string;
   timeout?: number;
   maxBuffer?: number;
+  offline?: boolean;
 }
 
 // Run git with an argv array (never a shell), so commit/ref/path values taken
@@ -30,10 +31,11 @@ interface GitOpts {
 // (the diff shows the pointer change; the classifier reads source, not the
 // LFS-tracked binaries/data).
 function git(args: string[], opts: GitOpts = {}): Buffer {
+  const { offline, ...processOpts } = opts;
   return execFileSync("git", args, {
     stdio: "pipe",
-    ...opts,
-    env: { ...process.env, GIT_LFS_SKIP_SMUDGE: "1" },
+    ...processOpts,
+    env: { ...process.env, GIT_LFS_SKIP_SMUDGE: "1", ...(offline ? { GIT_NO_LAZY_FETCH: "1" } : {}) },
   });
 }
 
@@ -152,6 +154,23 @@ export function checkoutRepo(nwo: string, sha: string, baseDir: string): string 
   return repoDir;
 }
 
+/** Validate a caller-provided frozen checkout without fetching or modifying it. */
+export function validateSnapshot(repoDir: string, base: string, head: string): string {
+  assertHexRef(base);
+  assertHexRef(head);
+  const offline = { offline: true };
+  const actualHead = git(["-C", repoDir, "rev-parse", "HEAD"], offline).toString().trim();
+  if (actualHead !== head) {
+    throw new Error(`Snapshot HEAD differs from expected ${head}: ${actualHead}`);
+  }
+  if (git(["-C", repoDir, "status", "--porcelain", "--untracked-files=all", "--ignored"], offline).length > 0) {
+    throw new Error(`Snapshot must be clean: ${repoDir}`);
+  }
+  git(["-C", repoDir, "cat-file", "-e", `${base}^{commit}`], offline);
+  git(["-C", repoDir, "merge-base", base, head], offline);
+  return repoDir;
+}
+
 export function fetchCommit(cloneDir: string, sha: string): void {
   assertHexRef(sha);
   try {
@@ -228,19 +247,20 @@ export function getFullDiff(
   cloneDir: string,
   shaFrom: string,
   shaTo: string,
+  options: Pick<GitOpts, "offline"> = {},
 ): string {
   assertHexRef(shaFrom);
   assertHexRef(shaTo);
   for (const sha of [shaFrom, shaTo]) {
     try {
-      git(["-C", cloneDir, "cat-file", "-e", `${sha}^{commit}`]);
+      git(["-C", cloneDir, "cat-file", "-e", `${sha}^{commit}`], options);
     } catch {
       throw new Error(`commit ${sha} not present in ${cloneDir}; cannot diff`);
     }
   }
   const result = git(
     ["-C", cloneDir, "diff", ...DIFF_FLAGS, `${shaFrom}...${shaTo}`],
-    { maxBuffer: 50 * 1024 * 1024, timeout: 180_000 },
+    { ...options, maxBuffer: 50 * 1024 * 1024, timeout: 180_000 },
   );
   return result.toString("utf-8");
 }

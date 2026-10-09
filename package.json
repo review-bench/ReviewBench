@@ -6,6 +6,9 @@
   "type": "module",
   "scripts": {
     "judge": "tsx scripts/eval/eval.ts",
+    "harbor:export": "tsx scripts/harbor/export.ts",
+    "harbor:onboard": "tsx scripts/harbor/onboard.ts",
+    "harbor:validate-findings": "tsx scripts/harbor/validate-findings.ts",
     "sync:test-set": "tsx scripts/sync-test-set.ts",
     "check:test-set": "tsx scripts/sync-test-set.ts --check",
     "check:golden": "tsx scripts/validate-golden.ts",

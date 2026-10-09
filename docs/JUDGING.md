@@ -157,3 +157,12 @@ The command prints the final summary and writes:
 Grounded metrics compare against the original golden findings. Augmented
 metrics also credit unmatched findings that your selected LLM judge classifies
 as valid.
+
+## Frozen local snapshots
+
+For single-PR integrations such as the [Harbor adapter](HARBOR.md), pass
+`--snapshot-dir <path>` to use an already materialized, trusted checkout instead
+of the mirror cache. The checkout must be at the exact candidate HEAD, contain
+the base commit and merge base, and have no modified, untracked, or ignored
+files. This mode never fetches or clones and rejects evaluations selecting
+more than one PR. Do not point it at a reviewer-modified checkout.

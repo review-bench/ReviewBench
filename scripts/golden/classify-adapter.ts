@@ -9,7 +9,7 @@ import { classifyPR, type ClassifierConfig } from "../classifier/classify.js";
 import type { FindingInput, ClassificationResult } from "../classifier/types.js";
 import type { ClassifiedFinding } from "../eval/scorer.js";
 import type { Finding } from "../lib/types.js";
-import { checkoutRepo, fetchCommit, getFullDiff } from "../extraction/git.js";
+import { checkoutRepo, fetchCommit, getFullDiff, validateSnapshot } from "../extraction/git.js";
 
 export interface ClassifyOptions {
   nwo: string;
@@ -18,6 +18,7 @@ export interface ClassifyOptions {
   findings: Finding[];
   config: ClassifierConfig;
   repoBaseDir: string;
+  snapshotDir?: string;
   signal?: AbortSignal;
   onProgress?: (index: number, total: number, result: ClassificationResult) => void;
   baseSha: string;
@@ -50,7 +51,9 @@ export async function classifyFindings(opts: ClassifyOptions): Promise<ClassifyR
   }
 
   // Checkout repo for tool access
-  const repoDir = checkoutRepo(nwo, headSha, opts.repoBaseDir);
+  const repoDir = opts.snapshotDir
+    ? validateSnapshot(opts.snapshotDir, opts.baseSha, headSha)
+    : checkoutRepo(nwo, headSha, opts.repoBaseDir);
 
   // Convert to classifier input format
   const inputs: FindingInput[] = findings.map((f, i) => ({
@@ -65,8 +68,8 @@ export async function classifyFindings(opts: ClassifyOptions): Promise<ClassifyR
   if (opts.prTitle.trim().length === 0) {
     throw new Error(`${nwo} (${prUrl}): corpus PR title missing/empty; refusing to classify with empty context`);
   }
-  fetchCommit(repoDir, opts.baseSha);
-  const diff = getFullDiff(repoDir, opts.baseSha, headSha);
+  if (!opts.snapshotDir) fetchCommit(repoDir, opts.baseSha);
+  const diff = getFullDiff(repoDir, opts.baseSha, headSha, { offline: !!opts.snapshotDir });
 
   // Track partial results in case the classifier fails mid-batch
   const partialResults: ClassificationResult[] = [];

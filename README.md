@@ -44,6 +44,9 @@ For each pull request, the benchmark provides a human-reviewed golden set of cod
 - **[The judging CLI](#optional-judge-your-own-findings-locally-for-tuning).**
   Privately score already-normalized findings for tuning with an LLM judge you
   choose.
+- **[Experimental Harbor adapter](docs/HARBOR.md).** Export frozen PR tasks
+  with an isolated verifier and ReviewBench-compatible aggregate metrics for
+  local Harbor runs and a private Harbor Hub pilot.
 
 The full corpus manifest and all golden findings are public.
 

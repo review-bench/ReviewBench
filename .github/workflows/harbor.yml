@@ -1,0 +1,110 @@
+name: Harbor adapter
+
+on:
+  pull_request:
+    paths:
+      - "scripts/**"
+      - "tests/**"
+      - "corpus/**"
+      - "golden/**"
+      - "package*.json"
+      - "tsconfig.json"
+      - ".github/workflows/harbor.yml"
+  push:
+    branches: [main]
+    paths:
+      - "scripts/**"
+      - "tests/**"
+      - "corpus/**"
+      - "golden/**"
+      - "package*.json"
+      - "tsconfig.json"
+      - ".github/workflows/harbor.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v7
+        with:
+          node-version: "22"
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+      - run: npm ci --no-audit --no-fund
+      - run: npm test
+      - name: Install pinned Harbor schema/packager only
+        run: |
+          python -m pip install 'pydantic>=2,<3' toml pathspec
+          python -m pip install --no-deps 'git+https://github.com/harbor-framework/harbor.git@b53b8134e1241686dca7759af188f987ecc48e8b'
+      - name: Export and validate both datasets without network or inference
+        shell: bash
+        run: |
+          set -euo pipefail
+          # Schema-only fixture digest: no image is pulled or built by this job.
+          image="node:22-bookworm-slim@sha256:$(printf 'a%.0s' {1..64})"
+          for split in full test; do
+            npm run harbor:export -- --output ".harbor/$split" --split "$split" \
+              --judge-provider openai --judge-model schema-fixture --base-image "$image" \
+              --agent-host api.openai.com --judge-host api.openai.com \
+              --judge-env OPENAI_API_KEY=RB_HARBOR_JUDGE_KEY
+            python scripts/harbor/check-format.py ".harbor/$split"
+          done
+  docker-smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      PYTHONPATH: ${{ github.workspace }}
+      RB_HARBOR_JUDGE_TOKEN: reviewbench-isolation-sentinel
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v7
+        with:
+          node-version: "22"
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+      - run: npm ci --no-audit --no-fund
+      - name: Install pinned Harbor runtime
+        run: |
+          python -m pip install uv
+          python -m pip install 'git+https://github.com/harbor-framework/harbor.git@b53b8134e1241686dca7759af188f987ecc48e8b'
+      - name: Run no-inference isolation and artifact-transfer trial
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm run harbor:export -- --output .harbor/smoke --split test --limit 1 \
+            --judge-provider github-copilot --judge-model isolation-fixture \
+            --base-image node:22-bookworm-slim@sha256:efd0ab5780c2d9ab1f0f869571a00d5edb17793bff4cce4a2792e3eb0ffc7562 \
+            --agent-host api.githubcopilot.com --judge-host api.githubcopilot.com \
+            --judge-env COPILOT_GITHUB_TOKEN=RB_HARBOR_JUDGE_TOKEN
+          python - <<'PY'
+          from pathlib import Path
+          script = next(Path(".harbor/smoke").glob("*/tests/test.sh"))
+          script.write_text(script.read_text().replace(
+              "set -euo pipefail\n",
+              'set -euo pipefail\ntest "${COPILOT_GITHUB_TOKEN:-}" = "reviewbench-isolation-sentinel"\n',
+          ), encoding="utf-8")
+          PY
+          harbor run -p .harbor/smoke -a scripts.harbor.smoke_agent:EmptyReviewAgent \
+            -e docker -k 1 -n 1 --job-name empty-smoke --jobs-dir .harbor/jobs --yes
+          python scripts/harbor/check-job.py .harbor/jobs/empty-smoke \
+            .harbor/smoke/metric.py --output .harbor/smoke-metrics.json
+      - name: Archive smoke evidence
+        if: always()
+        uses: actions/upload-artifact@v6
+        with:
+          name: harbor-docker-smoke
+          path: |
+            .harbor/jobs/
+            .harbor/smoke-metrics.json
+          if-no-files-found: warn
