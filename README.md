@@ -122,6 +122,22 @@ they are not formal human labels.
 | Other | 40 | 18.3% |
 | **Total** | **219** | **100%** |
 
+#### Finding Producers
+
+Each golden finding records the producer that surfaced it. Shares are of
+findings labeled TP.
+
+| Source type | Test set TPs | Test set share | Full set TPs | Full set share |
+|---|---:|---:|---:|---:|
+| LLM review agents (`llm_review`) | 194 | 55.1% | 1,391 | 53.0% |
+| `ccr` | 153 | 43.5% | 1,185 | 45.2% |
+| Human review comments (`review_comment`) | 4 | 1.1% | 39 | 1.5% |
+| Deterministic tools (`tool`) | 1 | 0.3% | 8 | 0.3% |
+| **Total** | **352** | **100%** | **2,623** | **100%** |
+
+See [Golden Set Composition by Producer](docs/METHODOLOGY.md#55-golden-set-composition-by-producer)
+for per-producer counts, TP rates, and high- and medium-severity shares.
+
 ## Submit your Reviewer to the ReviewBench Leaderboard
 
 Evaluate your code review agent on the same pull requests, against the same

@@ -328,6 +328,86 @@ The golden set is not assumed to be exhaustive: there may be valid
 findings on a PR that no producer surfaced. This is a known limitation
 and motivates the augmented metrics defined in Section 7.
 
+### 5.5 Golden Set Composition by Producer
+
+Every golden finding records the producer that surfaced it (`producer`) and
+its source type (`source.type`). The tables below give, for each source type
+and each producer, the number of labeled findings, the number labeled TP, the
+TP rate, and the producer's share of all golden TPs and of high- and
+medium-severity golden TPs. Counts are taken after the deduplication step in
+Section 5.4, so an issue raised by several producers is attributed only to
+the producer of the surviving finding. TP rates therefore describe the
+surviving labeled findings, not a standalone evaluation of each producer.
+
+The source types correspond to the producers in Section 4 as follows:
+
+- `llm_review`: LLM review agents (Section 4.2). The producer identifier
+  names the model that generated the finding.
+- `ccr`: an LLM-based code review system run with the models named in its
+  producer identifiers. Section 4.2 does not yet name this system.
+- `review_comment`: human review comments on the original PR (Section 4.1),
+  with producer `human_review`.
+- `tool`: deterministic tools (Section 4.2); currently Semgrep only.
+
+None of these source types is labeled as an inferred author action
+(Section 4.1).
+
+**Full set (219 PRs)**
+
+| Source type | Findings | TPs | TP rate | Share of TPs | Share of high+medium TPs |
+|---|---:|---:|---:|---:|---:|
+| `llm_review` | 2960 | 1391 | 47.0% | 53.0% | 47.2% |
+| `ccr` | 1335 | 1185 | 88.8% | 45.2% | 51.4% |
+| `review_comment` | 191 | 39 | 20.4% | 1.5% | 1.1% |
+| `tool` | 146 | 8 | 5.5% | 0.3% | 0.3% |
+| **Total** | **4632** | **2623** | **56.6%** | **100.0%** | **100.0%** |
+
+| Producer | Findings | TPs | TP rate | Share of TPs | Share of high+medium TPs |
+|---|---:|---:|---:|---:|---:|
+| `llm_review:claude-sonnet-4.6` | 1474 | 1206 | 81.8% | 46.0% | 45.4% |
+| `ccr:gpt-5.5[ReasoningEffort=medium]` | 1065 | 957 | 89.9% | 36.5% | 44.9% |
+| `ccr:claude-opus-4.7[ReasoningEffort=medium]` | 270 | 228 | 84.4% | 8.7% | 6.5% |
+| `llm_review:gemini-2.5-pro` | 705 | 149 | 21.1% | 5.7% | 1.4% |
+| `human_review` | 191 | 39 | 20.4% | 1.5% | 1.1% |
+| `llm_review:gpt-4o` | 781 | 36 | 4.6% | 1.4% | 0.4% |
+| `deterministic_tool:semgrep` | 146 | 8 | 5.5% | 0.3% | 0.3% |
+| **Total** | **4632** | **2623** | **56.6%** | **100.0%** | **100.0%** |
+
+Findings without a producer: 0. Findings without a source type: 0.
+
+**Test set (25 PRs)**
+
+| Source type | Findings | TPs | TP rate | Share of TPs | Share of high+medium TPs |
+|---|---:|---:|---:|---:|---:|
+| `llm_review` | 364 | 194 | 53.3% | 55.1% | 57.1% |
+| `ccr` | 159 | 153 | 96.2% | 43.5% | 41.2% |
+| `review_comment` | 25 | 4 | 16.0% | 1.1% | 1.8% |
+| `tool` | 17 | 1 | 5.9% | 0.3% | 0.0% |
+| **Total** | **565** | **352** | **62.3%** | **100.0%** | **100.0%** |
+
+| Producer | Findings | TPs | TP rate | Share of TPs | Share of high+medium TPs |
+|---|---:|---:|---:|---:|---:|
+| `llm_review:claude-sonnet-4.6` | 185 | 159 | 85.9% | 45.2% | 55.3% |
+| `ccr:gpt-5.5[ReasoningEffort=medium]` | 118 | 113 | 95.8% | 32.1% | 33.5% |
+| `ccr:claude-opus-4.7[ReasoningEffort=medium]` | 41 | 40 | 97.6% | 11.4% | 7.6% |
+| `llm_review:gemini-2.5-pro` | 85 | 28 | 32.9% | 8.0% | 1.8% |
+| `llm_review:gpt-4o` | 94 | 7 | 7.4% | 2.0% | 0.0% |
+| `human_review` | 25 | 4 | 16.0% | 1.1% | 1.8% |
+| `deterministic_tool:semgrep` | 17 | 1 | 5.9% | 0.3% | 0.0% |
+| **Total** | **565** | **352** | **62.3%** | **100.0%** | **100.0%** |
+
+Findings without a producer: 0. Findings without a source type: 0.
+
+This composition matters when interpreting grounded metrics. A candidate
+reviewer whose earlier output contributed golden findings may be graded
+partly against its own prior output: its phrasing, line anchoring, and choice
+of issues already shape the golden set it is matched against. The same applies
+to reviewers built on the same models or prompts as a producer. The
+composition is disclosed so that results can be read with this in mind.
+
+The tables can be regenerated from `golden/` and `corpus/test/test.json` with
+`npm run report:producers`.
+
 ## 6. Evaluating a Candidate Agent
 
 Given a candidate review agent, evaluation proceeds in three steps.
@@ -647,7 +727,9 @@ PRs after review feedback has stabilized.
 **Producer bias.** Even with diverse producers, certain finding types
 (for example, project-conventions violations specific to a single
 repository) are easier to surface than others. Aggregate metrics should
-be interpreted with the producer mix in mind.
+be interpreted with the producer mix in mind. Section 5.5 reports that mix. A reviewer that
+also contributed golden findings, or that shares models with a producer, may
+benefit from overlap with its own earlier output.
 
 ## 9. Reproducibility
 
