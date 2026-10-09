@@ -1,0 +1,38 @@
+{
+  "name": "sourceant",
+  "display_name": "Sourceant",
+  "image": "ghcr.io/sourceant/reviewbench@sha256:25a3cd4ac4244125fe49fb06fc33ed8a6ef12402a8eae316b6799f22a2b63aec",
+  "image_visibility": "private",
+  "configuration": [
+    {
+      "key": "model",
+      "value": "deepseek/deepseek-v4-pro"
+    },
+    {
+      "key": "discovery-passes",
+      "value": "3"
+    },
+    {
+      "key": "evaluation-passes",
+      "value": "2"
+    },
+    {
+      "key": "include-nitpicks",
+      "value": "true"
+    }
+  ],
+  "secrets": {
+    "env": [
+      "DEEPSEEK_API_KEY",
+      "GHCR_PULL_TOKEN"
+    ]
+  },
+  "model_api_url": "https://api.deepseek.com/beta",
+  "contacts": [
+    "nfebe"
+  ],
+  "provider": "Sourceant",
+  "egress": [
+    "api.deepseek.com"
+  ]
+}
