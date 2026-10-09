@@ -4,6 +4,8 @@ This kit connects your reviewer to an approved ReviewBench task export. It does
 not copy the dataset, change the judge, install credentials, or publish results.
 The dataset paths in `job.json` refer to the machine running Harbor; regenerate
 the kit if you move the dataset or use a different execution machine.
+The kit's `kit.json` records `task_count`: a full benchmark kit must contain
+all 219 PR tasks, not the 25-PR test split or a smoke subset.
 
 ## Prepare
 
@@ -95,6 +97,10 @@ python scripts\harbor\check-job.py <kit-directory>\jobs\<job-name> <dataset-dire
 Only complete, exception-free runs with the expected evaluation version pass.
 To smoke-test, obtain a limited task export from the maintainer and generate
 its own kit; do not submit a partial run of a full dataset as a complete score.
+For a full run, keep one attempt per task and do not add task filters. Require
+`complete=1`, `expected_prs=219`, and `scored_prs=219`; preserve failures and
+interrupted-run evidence instead of fabricating empty reviews. Use the metric
+for the exact executed judge/transport profile.
 
 Inspect the job for secrets and private source before uploading:
 
@@ -107,3 +113,6 @@ harbor upload <job-directory> --private --org <approved-org>
 Harbor organization membership is separate from GitHub organization membership.
 Uploading results does not launch a hosted job or automatically publish a
 ReviewBench leaderboard row.
+Keep the uploaded directory basename equal to `job_name` in its `config.json`.
+Download the uploaded job with `harbor jobs download <job-id> --output-dir <readback>`
+and rerun the same `check-job.py` gate against the downloaded directory.

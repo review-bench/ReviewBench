@@ -266,6 +266,12 @@ exported as its own dataset.
 
 ## Private result upload
 
+Keep the job directory's basename equal to `job_name` in `config.json`, including
+when downloading artifacts from a remote runner. Harbor's whole-job downloader
+expects that name at the archive root. Do not rename a job directory to `job`
+before uploading. Re-uploading an already finalized job skips its existing
+archive; it does not repair an incorrectly named archive.
+
 After `check-job.py` succeeds, sign in and upload the job directory, not the
 dataset export:
 
@@ -283,6 +289,68 @@ client; no Hub credential needs to be provisioned to the runner.
 Result upload and dataset publication are separate actions. This adapter does
 not automatically publish results, create leaderboard rows, or replace
 ReviewBench's official submission process.
+
+## Full private benchmark
+
+The full **219-PR** corpus is published privately as
+[`review-bench/reviewbench`](https://hub.harborframework.com/datasets/review-bench/reviewbench),
+revision **1**, tagged **`private-full219-v1`**. All 219 referenced task packages
+are private, and their downloaded content digests and packaged metric have
+been verified against the export. This is the full corpus, not the 25-PR test
+set or a smoke subset. Sign in with an account authorized for the `review-bench`
+Harbor organization.
+
+Download a pinned version and generate a full-run kit:
+
+```powershell
+harbor auth login
+harbor datasets download "review-bench/reviewbench@private-full219-v1" --output-dir .\.harbor\hub
+npm run harbor:onboard -- --dataset .\.harbor\hub\reviewbench --output .\.harbor\full-kit --agent codex --model "<provider>/<reviewer-model>" --environment docker
+harbor run -c .\.harbor\full-kit\job.json
+```
+
+Run Docker jobs on an approved **Linux** orchestrator with the required
+allowlist kernel support, not a Windows orchestrator. Alternatively, generate
+the kit for an approved cloud sandbox that supports the same isolation.
+The package does not grant inference access: the approved Sonnet 5 judge
+connection, verifier-only credential delivery, and its SDK model registration
+must be provisioned by the maintainer before execution. Private CAPI transport
+implementation and credentials are not included in the Hub task packages.
+
+Use one attempt per PR, no task filters, and enough runner time, disk space,
+and model capacity for all 219 reviews and verifications. Increase
+`n_concurrent_trials` only within your runner resources and provider quotas.
+The private validation runner uses three concurrent trials, a dedicated
+garbage-collected Docker builder, and retains sanitized interrupted-run
+artifacts. A timeout, model rate limit, missing review, or failed trial must
+remain a failure; do not convert it into an empty review or a zero score.
+A reviewer-written, valid empty findings array is permitted and scored normally.
+
+The private authenticated validation profile uses the unchanged public
+evaluator with a separately provisioned Sonnet 5 transport. That integration is
+fingerprinted into **distinct evaluation IDs** for all 219 tasks; it does not
+silently reuse the canonical package's evaluation IDs. Use the metric exported
+with the executed profile when checking its results. Record the dataset
+revision/tag, public evaluator commit, private transport fingerprint when
+applicable, reviewer version/model, and every task/evaluation identity.
+Do not mix profile versions or describe a partial run as a full-benchmark score.
+
+After every PR has completed, check and upload the actual job:
+
+```powershell
+python scripts\harbor\check-job.py .\.harbor\full-kit\jobs\reviewbench .\.harbor\hub\reviewbench\metric.py --output .\.harbor\full-kit\verified-metrics.json
+harbor upload .\.harbor\full-kit\jobs\reviewbench --private --org review-bench
+harbor jobs download "<uploaded-job-id>" --output-dir .\.harbor\readback
+python scripts\harbor\check-job.py .\.harbor\readback\reviewbench .\.harbor\hub\reviewbench\metric.py --output .\.harbor\readback\verified-metrics.json
+```
+
+Only `complete=1`, `expected_prs=219`, `scored_prs=219`, and zero Harbor trial
+exceptions establish a successful full run. Verify downloaded findings,
+scores, rewards, and metric results against the originals. A successful
+one-PR authenticated smoke run proves integration, not full-run completion.
+Private package publication is also not public release or official leaderboard
+acceptance. Public redistribution and publication of prebuilt images still
+require the maintainer's licensing/privacy approvals.
 
 ## Optional hosted execution and dataset publication
 
