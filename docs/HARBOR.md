@@ -34,6 +34,38 @@ does not automatically add a ReviewBench leaderboard row or make vendor-supplied
 scores authoritative; the complete run and scoring provenance must be checked
 before a submission is accepted.
 
+## Generate a user kit
+
+Given an approved local task export, create a model-independent user kit:
+
+```powershell
+npm run harbor:onboard -- --dataset .\.harbor\smoke --output .\.harbor\my-kit --agent codex --model "<provider>/<reviewer-model>" --environment docker
+harbor run -c .\.harbor\my-kit\job.json
+```
+
+The kit includes a ready job configuration, the dataset's custom metric, a
+custom-harness adapter template, and findings-format instructions. It references
+the original dataset; it does not copy task assets, change the judge, or include
+credentials. Generate it on the machine orchestrating Harbor so paths resolve.
+Use `daytona`, `modal`, or `e2b` instead of `docker` for a supported, approved
+cloud sandbox, with the matching Harbor provider dependencies and credentials.
+
+For your own harness, replace `--agent ... --model ...` with `--custom-agent`,
+then implement the generated `custom_agent.py` and make its directory importable.
+The template intentionally fails until the harness installation is implemented.
+Reviewer endpoints and credentials are yours; the approved judge connection and
+its SDK registration must already be configured by the dataset maintainer.
+
+Check a sample findings file without invoking any model:
+
+```powershell
+npm run harbor:validate-findings -- --candidate .\findings.json --pr .\.harbor\smoke\<task>\environment\pr.json
+```
+
+This uses the same format and PR-identity validator as the separate verifier.
+It does not judge finding correctness. Start with a limited export for a
+smoke test before running the full approved dataset.
+
 ## Export
 
 Requirements: Node 22+, `npm ci`, and a Debian-based Node container image pinned
