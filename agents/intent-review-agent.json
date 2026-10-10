@@ -1,0 +1,21 @@
+{
+  "name": "intent-review-agent",
+  "display_name": "intent-review-agent",
+  "image": "ghcr.io/intent-review-agent-package/intent-review-agent@sha256:1411943fb312808cb34b0daf96eda92bf53c8f9f3527b71ec64d18e4035aa109",
+  "image_visibility": "private",
+  "secrets": {
+    "env": [
+      "REVIEW_API_TOKEN",
+      "GHCR_PULL_TOKEN"
+    ]
+  },
+  "model_api_url": "https://review-agent.intentlab.ai",
+  "egress": [
+    "8718ae535c00ef61c5fba131667c211e.r2.cloudflarestorage.com",
+    "review-agent.intentlab.ai"
+  ],
+  "contacts": [
+    "zengxh"
+  ],
+  "provider": "intent-review-agent"
+}
