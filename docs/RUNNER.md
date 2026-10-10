@@ -16,7 +16,7 @@ scripts/try-agent.sh my-reviewer:dev --set full -e OPENAI_API_KEY  # the full se
 
 `--set full` reads the full set's manifest, [`corpus/manifest.json`](../corpus/manifest.json).
 
-It needs docker, git and jq. It fetches each pull request's base and head commits from its mirror in the [review-bench organization](https://github.com/review-bench), `review-bench/<owner>_<repo>` (for example, `review-bench/AA-Factory_aafactory-prototype`), which is the same copy the judge checks out. If the mirror lacks a commit, it falls back to the upstream repository; if neither has it, that pull request fails. Set `MIRROR_ORG` to fetch from a different organization. Findings land in `./findings/`. It stops at checking the format; it does not judge the findings.
+It needs docker, git and jq. It fetches each pull request's base and head commits from its mirror in the [review-bench organization](https://github.com/review-bench), `review-bench/<owner>_<repo>` (for example, `review-bench/AA-Factory_aafactory-prototype`), which is the same copy the judge checks out. If the mirror lacks a commit, it falls back to the upstream repository; if neither has it, that pull request fails. Set `MIRROR_ORG` to fetch from a different organization. Findings land in `./findings/`. It stops at checking the format. To score the findings, pass `./findings` to the [judging CLI](JUDGING.md); see [Evaluate your reviewer offline](OFFLINE_EVAL.md).
 
 ## In the portal, with scoring
 

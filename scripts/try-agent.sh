@@ -103,7 +103,7 @@ for i in $indices; do
     -e RB_AGENT=try-agent -e RB_REPO=/work/repo \
     -e RB_DIFF=/work/pr/diff.patch -e RB_PR_JSON=/work/pr/pr.json -e RB_OUT=/work/out/findings.json \
     -e RB_ATTEMPT=1 \
-    "${env_args[@]}" "$image" || status=$?
+    ${env_args[@]+"${env_args[@]}"} "$image" || status=$?
 
   file="$out/findings.json"
   if [ "$status" -ne 0 ]; then

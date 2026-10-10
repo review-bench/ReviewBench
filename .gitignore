@@ -2,3 +2,7 @@ node_modules/
 scoring/
 findings/
 .reviewbench-repos/
+.try-agent/
+classifier-output/
+.judge/
+runs/

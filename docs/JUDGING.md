@@ -95,7 +95,9 @@ an authenticated model; the evaluator does not fall back to another provider.
 
 ## Prepare the input
 
-Candidate files must follow the [judging input format](JUDGING_INPUT.md). PR
+Candidate files must follow the [judging input format](JUDGING_INPUT.md).
+The `./findings` directory written by `scripts/try-agent.sh` is already in this
+format; see [Evaluate your reviewer offline](OFFLINE_EVAL.md). PR
 identity and commit SHAs must match [`corpus/manifest.json`](../corpus/manifest.json).
 
 Strict validation is enabled by default. It rejects malformed files, candidate
