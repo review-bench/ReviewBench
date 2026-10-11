@@ -1,0 +1,31 @@
+{
+  "name": "block-review",
+  "display_name": "block/review",
+  "image": "ghcr.io/block/review@sha256:5079ecf889ee148e7fac66126bee7420093c06dc253d875f64504cefbf077ffd",
+  "image_visibility": "public",
+  "configuration": [
+    {
+      "key": "panel",
+      "value": "sol-opus"
+    },
+    {
+      "key": "gate",
+      "value": "off"
+    }
+  ],
+  "secrets": {
+    "env": [
+      "OPENAI_API_KEY",
+      "ANTHROPIC_API_KEY"
+    ]
+  },
+  "model_api_url": "https://api.openai.com/v1",
+  "egress": [
+    "api.anthropic.com",
+    "api.openai.com"
+  ],
+  "contacts": [
+    "joahg"
+  ],
+  "provider": "block/review"
+}
