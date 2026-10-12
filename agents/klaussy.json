@@ -1,0 +1,25 @@
+{
+  "name": "klaussy",
+  "display_name": "Klaussy",
+  "image": "ghcr.io/steph-dove/klaussy-reviewbench@sha256:9b84bfd2df593b4529133d0aaeed388052ca32771a349cd1a09159d4306bc087",
+  "image_visibility": "public",
+  "configuration": [
+    {
+      "key": "model",
+      "value": "claude-sonnet-5-5"
+    }
+  ],
+  "secrets": {
+    "env": [
+      "ANTHROPIC_API_KEY"
+    ]
+  },
+  "model_api_url": "https://api.anthropic.com",
+  "contacts": [
+    "steph-dove"
+  ],
+  "provider": "Klaussy",
+  "egress": [
+    "api.anthropic.com"
+  ]
+}
