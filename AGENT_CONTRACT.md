@@ -97,8 +97,8 @@ run rather than publishing a partial score.
   `docker build --platform linux/amd64`, or the image will not start. The
   image runs with no arguments, so its `ENTRYPOINT` (or `CMD`) must start
   your adapter.
-- **Time.** 15 minutes per pull request by default. Ask if your agent needs
-  longer.
+- **Time.** 30 minutes per pull request by default. You can set up to an hour
+  when you register in the portal.
 - **Network.** Enforced during every run: only the hosts listed in your
   manifest's `egress` are reachable, on port 443, through a forward proxy.
   The host of your model API URL is added for you. Anything else is refused;
