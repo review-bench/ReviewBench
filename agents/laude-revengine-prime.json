@@ -1,0 +1,25 @@
+{
+  "name": "laude-revengine-prime",
+  "display_name": "Laude RevEngine Prime",
+  "image": "ghcr.io/laude-institute/rev-engine-prime@sha256:55eedec127aad5601fccbe94514ad0311dc9b02ef1bfaf46ffe20673a49900a9",
+  "image_visibility": "public",
+  "configuration": [
+    {
+      "key": "model",
+      "value": "anthropic/claude-opus-5.5"
+    }
+  ],
+  "secrets": {
+    "env": [
+      "OPENROUTER_API_KEY"
+    ]
+  },
+  "model_api_url": "https://openrouter.ai/api/v1",
+  "contacts": [
+    "nickjalbert"
+  ],
+  "provider": "Laude RevEngine Prime",
+  "egress": [
+    "openrouter.ai"
+  ]
+}
