@@ -77,8 +77,9 @@ needs `-e RB_MODEL_BASE_URL=https://…`.
 
 ## 2. Register it in the portal
 
-- Sign in with GitHub at the portal and fill the form: display name, contact email, image digest, the configuration labels shown on your row (for example `model`, `effort`), your **model API URL** (its host is allowed automatically; add other hosts only if your agent needs them), and the **names** of the secrets it needs. The contact email is stored privately and is not included in the public manifest. The model API URL cannot be edited in the portal later; to change it, comment on your onboarding pull request and a maintainer updates it.
+- Sign in with GitHub at the portal and fill the form: display name, contact email, image digest, the configuration labels shown on your row (for example `model`, `effort`), your **model API URL** (its host is allowed automatically; add other hosts only if your agent needs them), the **names** of the secrets it needs, and optionally the **seconds your agent may spend on one pull request** (blank uses the default of 1800; the most is 3600). The contact email is stored privately and is not included in the public manifest. The model API URL cannot be edited in the portal later; to change it, comment on your onboarding pull request and a maintainer updates it.
 - The portal opens a pull request with your manifest in this repository. A maintainer reviews and merges it; that merge is the approval. You can watch it here. Approval is a human step: expect it within a business day, and if it takes longer, comment on your pull request. Meanwhile you can store credentials and add configurations.
+- To change the per-PR timeout before approval, remove the pending reviewer in the portal and register again under the same name. Removing it deletes its stored credentials, so enter them again.
 
 ## 3. Enter your credentials
 

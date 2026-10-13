@@ -95,8 +95,8 @@ body:
     id: pr_timeout
     attributes:
       label: Seconds needed per pull request
-      description: Leave blank for the default of 900.
-      placeholder: "900"
+      description: Leave blank for the default of 1800.
+      placeholder: "1800"
     validations:
       required: false
 

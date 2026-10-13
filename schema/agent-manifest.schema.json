@@ -111,7 +111,7 @@
       "description": "Seconds your agent needs for one pull request. Ask for more only if you need it; longer runs are more likely to be cut short.",
       "minimum": 60,
       "maximum": 3600,
-      "default": 900
+      "default": 1800
     },
     "contacts": {
       "type": "array",
