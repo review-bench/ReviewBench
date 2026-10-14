@@ -17,5 +17,6 @@
   "contacts": [
     "zengxh"
   ],
-  "provider": "intent-review-agent"
+  "provider": "intent-review-agent",
+  "pr_timeout_seconds": 3600
 }
