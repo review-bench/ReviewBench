@@ -1,0 +1,21 @@
+{
+  "name": "diffox",
+  "display_name": "diffox",
+  "image": "ghcr.io/diffox-bench/diffox-reviewbench@sha256:e2bb2c9f3656a1d44624e5987498da500354a82f194696d3e0aeb16e3ba7228f",
+  "image_visibility": "private",
+  "secrets": {
+    "env": [
+      "ANTHROPIC_API_KEY",
+      "GHCR_PULL_TOKEN"
+    ]
+  },
+  "model_api_url": "https://api.anthropic.com",
+  "pr_timeout_seconds": 1800,
+  "contacts": [
+    "diffox-bench-bot"
+  ],
+  "provider": "diffox",
+  "egress": [
+    "api.anthropic.com"
+  ]
+}
