@@ -1,0 +1,37 @@
+{
+  "name": "emirtuncer-claude",
+  "display_name": "emirtuncer-claude",
+  "image": "ghcr.io/emirtuncer/code-rew-reviewer@sha256:a1b0bf884985939fc90ed3018598c43514ca0c0ffe2495a07e4347ae6c7a1d25",
+  "image_visibility": "private",
+  "configuration": [
+    {
+      "key": "model",
+      "value": "claude-sonnet-5-5"
+    },
+    {
+      "key": "effort",
+      "value": "medium"
+    },
+    {
+      "key": "prescreen",
+      "value": "decisions"
+    }
+  ],
+  "secrets": {
+    "env": [
+      "ANTHROPIC_API_KEY",
+      "OPENAI_API_KEY",
+      "GHCR_PULL_TOKEN"
+    ]
+  },
+  "model_api_url": "https://api.anthropic.com",
+  "egress": [
+    "api.openai.com",
+    "api.anthropic.com"
+  ],
+  "pr_timeout_seconds": 1800,
+  "contacts": [
+    "emirtuncer"
+  ],
+  "provider": "emirtuncer-claude"
+}
