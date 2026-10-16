@@ -86,6 +86,8 @@ export interface EvalConfig {
   matcher_model: string;
   matcher_prompt_hash: string;
   evaluated_prs_hash: string;
+  /** Producer prefixes removed from the golden set before matching (--exclude-producer); absent when none. */
+  excluded_producers?: string[];
 }
 
 export interface CorpusStats {
