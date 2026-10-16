@@ -15,6 +15,7 @@ EMPTY_RESULTS = {
     EMPTY,
     "No actionable findings in the reviewed changes.",
     "No actionable, high-confidence bugs or logic errors found in the reviewed changes.",
+    "No actionable correctness regression was confirmed.",
 }
 
 
@@ -27,16 +28,6 @@ def require_no_judge_credentials():
             raise RuntimeError(f"Judge credential exposed to reviewer: {key}")
 
 
-def review_metadata(text):
-    return all(re.match(
-        r"^(?:\*\*)?(?:Review(?:ed)? scope|Review limitations?|Validation(?: limitation)?|"
-        r"Scope(?: reviewed)?|Limitations?|Material limitation|Coverage limitations?)"
-        r"(?::|\*\*:)|^Reviewed\b|^The working tree is clean; reviewed\b|"
-        r"^Validation (?:was )?limited to\b|^\u2713 Review conducted following guidelines\b",
-        paragraph.strip(),
-    ) for paragraph in re.split(r"\n[ \t]*\n", text.strip()) if paragraph.strip())
-
-
 def issue_locations(chunk, repo):
     location = re.search(
         r"(?ms)^\*\*Files?:\*\*[ \t]*(.*?)\n(?=\*\*(?:Severity|Problem|Evidence|Suggested fix):\*\*)",
@@ -45,8 +36,9 @@ def issue_locations(chunk, repo):
     if not location:
         raise ValueError("Incomplete native issue format: missing file locations")
     locations = []
-    for line in location[1].strip().splitlines():
-        value = re.sub(r"^[-*][ \t]+", "", line.strip()).strip("`")
+    values = [value for line in location[1].strip().splitlines() for value in line.split(";")]
+    for value in values:
+        value = re.sub(r"^[-*][ \t]+", "", value.strip()).strip("`")
         match = re.fullmatch(r"(.+?):(\d+(?:[-\u2013]\d+)?(?:,[ \t]*\d+(?:[-\u2013]\d+)?)*)", value)
         if not match:
             raise ValueError("Unrecognized native issue location")
@@ -69,19 +61,30 @@ def issue_locations(chunk, repo):
 
 def findings_from_review(text, repo):
     text = text.strip()
-    if re.search(r"(?i)\breview paused\b|\bno correctness review was performed\b", text):
+    if re.search(
+        r"(?i)\breview paused\b|\bno correctness review was performed\b|"
+        r"\b(?:could not|unable to|did not|cannot|failed to) complete (?:the |this )?(?:code |static )?review\b|"
+        r"\b(?:code |static )?review (?:is |was |remains )?(?:incomplete|not completed)\b",
+        text,
+    ):
         raise ValueError("Native reviewer declined the review; refusing empty fallback")
     chunks = re.split(r"(?m)^## Issue:\s*", text)
+    paragraphs = re.split(r"\n[ \t]*\n", text)
+    empty = [paragraph for paragraph in paragraphs if paragraph.strip() in EMPTY_RESULTS]
     if len(chunks) < 2:
-        paragraphs = re.split(r"\n[ \t]*\n", text)
-        empty = [index for index, paragraph in enumerate(paragraphs) if paragraph.strip() in EMPTY_RESULTS]
-        if len(empty) == 1 and review_metadata("\n\n".join(
-            paragraph for index, paragraph in enumerate(paragraphs) if index != empty[0]
-        )):
+        # An explicit native no-finding verdict is authoritative; ancillary prose has no fixed schema.
+        contradictory = re.search(
+            r"(?im)^(?:[-*] |\d+[.)] )?(?:\*\*)?(?:File|Files|Severity|Problem|Evidence|Suggested fix):|"
+            r"\b(?:found|identified|confirmed|detected) (?:an? |the |\d+ )?"
+            r"(?:(?:actionable|correctness|significant|high-confidence) )?"
+            r"(?:bugs?|issues?|regressions?|findings?)\b",
+            "\n\n".join(paragraph for paragraph in paragraphs if paragraph.strip() not in EMPTY_RESULTS),
+        )
+        if len(empty) == 1 and not contradictory:
             return []
         raise ValueError("Unrecognized native code-review output; refusing empty fallback")
-    if not review_metadata(chunks[0]):
-        raise ValueError("Unrecognized native review preamble")
+    if empty:
+        raise ValueError("Contradictory native review verdict and findings")
     findings = []
     for chunk in chunks[1:]:
         if not all(re.search(rf"(?m)^\*\*{field}:\*\*[ \t]*\S", chunk)
@@ -112,8 +115,11 @@ def read_events(home):
     return events
 
 
-def review_result(events):
+def review_result(events, *, final=False):
     calls = set()
+    pending = set()
+    result = None
+    failed = False
     for event in events:
         data = event.get("data", {})
         if event["type"] == "tool.execution_start" and data.get("toolName") == "task":
@@ -122,16 +128,31 @@ def review_result(events):
                 args = json.loads(args)
             if args.get("agent_type") == "code-review":
                 calls.add(data["toolCallId"])
+                pending.add(data["toolCallId"])
         if event["type"] == "tool.execution_complete" and data.get("toolCallId") in calls:
+            pending.discard(data["toolCallId"])
             if data.get("success") is not True:
-                raise RuntimeError("Native code-review tool failed")
-            result = data.get("result")
-            if isinstance(result, dict):
-                result = result.get("content")
-            if not isinstance(result, str):
+                failed = True
+                continue
+            content = data.get("result")
+            if isinstance(content, dict):
+                content = content.get("content")
+            if not isinstance(content, str):
                 raise RuntimeError("Unexpected native task response shape")
-            return result
-    return None
+            result = content
+    if final and result is None and failed:
+        raise RuntimeError("Native code-review tool failed without a successful retry")
+    return None if pending else result
+
+
+def review_settled(events, *, successful):
+    last_tool = max((i for i, event in enumerate(events)
+                     if event["type"] in ("tool.execution_start", "tool.execution_complete")), default=-1)
+    terminal = ("session.idle", "assistant.turn_end") if successful else ("session.idle",)
+    return last_tool >= 0 and any(
+        event["type"] in terminal and not event.get("parentToolCallId")
+        for event in events[last_tool + 1:]
+    )
 
 
 def review_command(base, head):
@@ -216,16 +237,12 @@ def main():
                             os.write(master, b"\x1b[1;1R")
                 events = read_events(home)
                 result = review_result(events)
-                if result is not None:
-                    # Wait for the parent response to settle, not just an intermediate tool result.
-                    completed_index = max(i for i, e in enumerate(events) if e["type"] == "tool.execution_complete")
-                    settled = any(e["type"] in ("session.idle", "assistant.turn_end") and not e.get("parentToolCallId")
-                                  for e in events[completed_index + 1:])
-                    if settled:
-                        complete_at = complete_at or time.monotonic()
-                    if complete_at and time.monotonic() - complete_at > 5:
-                        os.write(master, b"/exit\r")
-                        break
+                settled = review_settled(events, successful=result is not None)
+                complete_at = (complete_at or time.monotonic()) if settled else None
+                if complete_at and time.monotonic() - complete_at > 5:
+                    review_result(events, final=True)
+                    os.write(master, b"/exit\r")
+                    break
                 if process.poll() is not None:
                     break
             else:
@@ -240,7 +257,7 @@ def main():
         os.close(master)
         events = read_events(home)
         (logs / "native-events.jsonl").write_text("".join(json.dumps(e) + "\n" for e in events))
-    result = review_result(events)
+    result = review_result(events, final=True)
     native = native_dispatch(events, transcript.decode(errors="replace"))
     if not native or result is None:
         raise RuntimeError("No verified native /review dispatch and successful code-review result")

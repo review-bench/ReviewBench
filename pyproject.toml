@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "reviewbench-harbor"
-version = "0.1.0rc4"
+version = "0.1.0rc5"
 description = "ReviewBench Harbor runtime and native Copilot CLI review adapter"
 requires-python = ">=3.12"
 license = "MIT"

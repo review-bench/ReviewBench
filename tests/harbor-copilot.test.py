@@ -401,6 +401,14 @@ class NativeReviewTests(unittest.TestCase):
             "The working tree is clean; reviewed `main...HEAD`.",
             "Validation limited to static inspection: build tools are unavailable.",
             "\u2713 Review conducted following guidelines defined in `.github/copilot-instructions.md`",
+            "Completed review of all six changed files, including relevant callers.\n\n"
+            "Tests could not be run because Cargo is unavailable.",
+            "**Completion status:** Completed review of all 11 changed files.\n\n"
+            "Both shell scripts passed syntax checks. Automated tests were not run. No files modified.",
+            "**Coverage:** Reviewed the entire frozen diff.\n\n"
+            "**Validation remains incomplete:** Go is unavailable. Static review is complete.",
+            "**Scope/completion:** Completed the entire frozen pull-request review.",
+            "Full frozen diff review completed across all three files. Terraform was not run.",
         )
         with tempfile.TemporaryDirectory() as temp:
             repo = Path(temp)
@@ -417,6 +425,10 @@ class NativeReviewTests(unittest.TestCase):
                 "", "No issues.", "Review paused: the diff exceeds the review limit.",
                 f"{native.EMPTY}\n\nReview paused: No correctness review was performed.",
                 f"{native.EMPTY}\n\nFound a bug in source.py:1.",
+                f"{native.EMPTY}\n\nIdentified 2 actionable issues.",
+                f"{native.EMPTY}\n\n**File:** source.py:1",
+                f"{native.EMPTY}\n\nUnable to complete the review.",
+                f"{native.EMPTY}\n\nReview remains incomplete.",
                 f"{native.EMPTY}\n\n## Issue: Missing fields",
                 f"{native.EMPTY}\n\n{native.EMPTY}",
             ):
@@ -431,10 +443,12 @@ class NativeReviewTests(unittest.TestCase):
             for location in (
                 "**File:** `source.py:1, 2\u20133`",
                 "**Files:**\n- source.py:1\n- `other.py:2\u20133`",
+                "**File:** source.py:1; other.py:2\u20133",
+                "**File:** `source.py:1`; `other.py:2\u20133`",
             ):
                 with self.subTest(location=location):
                     text = (
-                        "**Reviewed scope:** Clean worktree; reviewed `main...HEAD`.\n\n"
+                        "Completed read-only review of all 177 changed files, including relevant callers.\n\n"
                         f"## Issue: Fixture\n{location}\n**Severity:** Medium\n"
                         "**Problem:** Broken\n**Evidence:** Source\n**Suggested fix:** Fix\n\n"
                         "**Validation limitation:** Tooling unavailable."
@@ -454,6 +468,9 @@ class NativeReviewTests(unittest.TestCase):
                 "**File:**",
                 "**Files:**\n- source.py:1\n- ../outside.py:1",
                 "**Files:**\n- source.py:1\n- missing.py:1",
+                "**File:** source.py:1; other.py:1",
+                "**File:** source.py:1; source.py:99",
+                "**File:** source.py:1;",
             ):
                 with self.subTest(location=location), self.assertRaises(ValueError):
                     native.findings_from_review(
@@ -489,9 +506,56 @@ class NativeReviewTests(unittest.TestCase):
         complete = {"toolCallId": "review", "success": True, "result": {"content": native.EMPTY}}
         self.assertEqual(native.review_result([*events, {"type": "tool.execution_complete", "data": complete}]),
                          native.EMPTY)
-        for changed in ({"success": False}, {"result": None}):
-            with self.subTest(changed=changed), self.assertRaises(RuntimeError):
-                native.review_result([*events, {"type": "tool.execution_complete", "data": {**complete, **changed}}])
+        failed = [*events, {"type": "tool.execution_complete", "data": {**complete, "success": False}}]
+        self.assertIsNone(native.review_result(failed))
+        with self.assertRaisesRegex(RuntimeError, "without a successful retry"):
+            native.review_result(failed, final=True)
+        with self.assertRaisesRegex(RuntimeError, "Unexpected native task response shape"):
+            native.review_result([*events, {"type": "tool.execution_complete", "data": {**complete, "result": None}}])
+
+    def test_failed_native_task_can_retry_after_a_parent_turn_ends(self):
+        events = [
+            {"type": "tool.execution_start", "data": {
+                "toolName": "task", "toolCallId": "invalid", "arguments": {"agent_type": "code-review"},
+            }},
+            {"type": "tool.execution_complete", "data": {
+                "toolCallId": "invalid", "success": False, "error": "name: Required",
+            }},
+            {"type": "assistant.turn_end"},
+        ]
+        self.assertIsNone(native.review_result(events))
+        self.assertFalse(native.review_settled(events, successful=False))
+        events.append({"type": "tool.execution_start", "data": {
+            "toolName": "task", "toolCallId": "retry",
+            "arguments": {"agent_type": "code-review", "name": "frozen-pr-review"},
+        }})
+        self.assertIsNone(native.review_result(events))
+        events.extend([
+            {"type": "tool.execution_complete", "data": {
+                "toolCallId": "retry", "success": True, "result": native.EMPTY,
+            }},
+            {"type": "assistant.turn_end"},
+        ])
+        self.assertEqual(native.review_result(events, final=True), native.EMPTY)
+        self.assertTrue(native.review_settled(events, successful=True))
+
+    def test_only_root_idle_ends_an_unsuccessful_native_session(self):
+        events = [
+            {"type": "tool.execution_start", "data": {
+                "toolName": "task", "toolCallId": "review", "arguments": {"agent_type": "code-review"},
+            }},
+            {"type": "tool.execution_complete", "data": {"toolCallId": "review", "success": False}},
+            {"type": "session.idle", "parentToolCallId": "review"},
+        ]
+        self.assertFalse(native.review_settled(events, successful=False))
+        events.append({"type": "session.idle"})
+        self.assertTrue(native.review_settled(events, successful=False))
+        with self.assertRaisesRegex(RuntimeError, "without a successful retry"):
+            native.review_result(events, final=True)
+        events.append({"type": "tool.execution_start", "data": {
+            "toolName": "task", "toolCallId": "retry", "arguments": {"agent_type": "code-review"},
+        }})
+        self.assertFalse(native.review_settled(events, successful=False))
 
     def test_judge_keys_are_never_accepted_in_reviewer_environment(self):
         for key in ("ANTHROPIC_API_KEY", "AZURE_OPENAI_API_KEY", "RB_HARBOR_JUDGE_KEY",
