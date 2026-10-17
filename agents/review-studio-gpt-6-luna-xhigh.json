@@ -1,0 +1,34 @@
+{
+  "name": "review-studio-gpt-6-luna-xhigh",
+  "display_name": "Review Studio · GPT-6 Luna xhigh",
+  "image": "ghcr.io/hezongxi/review-studio-reviewbench-agent@sha256:b2da61b666bf02c81f45f579f616a0207f3fda489428a81ddd3323518d1b2396",
+  "image_visibility": "private",
+  "configuration": [
+    {
+      "key": "model",
+      "value": "gpt-6-luna"
+    },
+    {
+      "key": "effort",
+      "value": "xhigh"
+    },
+    {
+      "key": "strategy",
+      "value": "parallel"
+    }
+  ],
+  "secrets": {
+    "env": [
+      "OPENAI_API_KEY",
+      "GHCR_PULL_TOKEN"
+    ]
+  },
+  "model_api_url": "https://api.openai.com/v1",
+  "contacts": [
+    "hezongxi"
+  ],
+  "provider": "Review Studio · GPT-6 Luna xhigh",
+  "egress": [
+    "api.openai.com"
+  ]
+}
