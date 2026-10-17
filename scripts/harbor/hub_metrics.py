@@ -17,6 +17,10 @@ METRICS = (
 )
 
 
+class StaleMetricsError(RuntimeError):
+    pass
+
+
 def f1(precision, recall):
     if precision is None or recall is None:
         return None
@@ -121,18 +125,23 @@ async def read_remote(client, job_id):
     return {row["id"]: row["rewards"] for row in rows}
 
 
-async def sync_metrics(client, prepared):
-    job_id, trials = prepared["job_id"], prepared["trials"]
-    remote = await read_remote(client, job_id)
-    if set(remote) != set(trials):
+def validate_remote(remote, trials, *, require_all=True):
+    if not set(remote).issubset(trials) or (require_all and set(remote) != set(trials)):
         raise ValueError("Upload the identical full job first; Hub trial IDs differ from local evidence")
-    for trial_id, row in trials.items():
+    for trial_id, reward in remote.items():
+        row = trials[trial_id]
         previous_display = (
             {key: value for key, value in row["display"].items() if not key.endswith("_f1")}
             if row["display"] is not None else None
         )
-        if remote[trial_id] not in (row["original"], row["display"], previous_display):
+        if reward not in (row["original"], row["display"], previous_display):
             raise ValueError("Hub rewards differ from both original evidence and the intended display")
+
+
+async def sync_metrics(client, prepared):
+    job_id, trials = prepared["job_id"], prepared["trials"]
+    remote = await read_remote(client, job_id)
+    validate_remote(remote, trials)
     updated = 0
     for trial_id, row in trials.items():
         if remote[trial_id] == row["display"]:
@@ -159,6 +168,11 @@ async def publish_metrics(client, hub_client, copy_job, prepared, *, refresh_dis
     if not copied.complete:
         raise RuntimeError("Hub display copy is incomplete; re-run to resume it")
     overview = await hub_client.get_job_overview([copied.job_id], combined=True)
+    verify_overview(overview, output)
+    return view_result(output, prepared["job_id"], copied.job_id)
+
+
+def verify_overview(overview, output):
     if (overview.n_total_trials, overview.n_errors) != (output["planned_trials"], output["failed_trials"]):
         raise RuntimeError("Hub display copy changed trial coverage or failure counts")
     if len(overview.eval_rows) != 1:
@@ -169,16 +183,125 @@ async def publish_metrics(client, hub_client, copy_job, prepared, *, refresh_dis
         not math.isclose(actual[key], value, rel_tol=1e-12, abs_tol=1e-12)
         for key, value in expected.items()
     ):
-        raise RuntimeError(
+        raise StaleMetricsError(
             "Hub overview does not expose the expected six macro metrics; "
             "use --refresh-display to refresh an existing display snapshot"
         )
+
+
+def view_result(output, source_job_id, display_job_id):
     return {
-        **output, "source_job_id": prepared["job_id"],
-        "display_job_id": copied.job_id,
+        **output, "source_job_id": source_job_id,
+        "display_job_id": display_job_id,
         "primary_metric": PRIMARY_METRIC,
-        "url": f"https://hub.harborframework.com/jobs/{copied.job_id}?breakdown_metric={PRIMARY_METRIC}",
+        "url": f"https://hub.harborframework.com/jobs/{display_job_id}?breakdown_metric={PRIMARY_METRIC}",
     }
+
+
+def load_upload(job_dir, prepared):
+    from harbor.models.job.config import JobConfig
+    from harbor.models.job.lock import TrialLock
+    from harbor.models.job.result import JobResult
+    from harbor.models.trial.result import TrialResult
+
+    job = JobResult.model_validate_json((job_dir / "result.json").read_text(encoding="utf-8"))
+    config = JobConfig.model_validate_json((job_dir / "config.json").read_text(encoding="utf-8"))
+    trials = []
+    for path in sorted(job_dir.glob("*/result.json")):
+        trial = TrialResult.model_validate_json(path.read_text(encoding="utf-8"))
+        lock = TrialLock.model_validate_json(
+            (path.parent / "lock.json").read_text(encoding="utf-8"),
+        )
+        projected = trial.model_copy(deep=True)
+        if projected.verifier_result is not None:
+            projected.verifier_result.rewards = prepared["trials"][str(trial.id)]["display"]
+        trials.append((projected, path.parent, lock))
+    return job, config, trials
+
+
+async def upload_metrics(job_dir, prepared, uploader, client, hub_client, copy_job,
+                         *, refresh_display=False):
+    job_dir = Path(job_dir)
+    job, config, trials = load_upload(job_dir, prepared)
+    name = config.job_name
+    if not prepared["summary"]["complete"]:
+        name += (
+            f" - partial {prepared['summary']['scored_trials']}"
+            f" of {prepared['summary']['planned_trials']}"
+        )
+    start = await uploader.start_job(
+        job_id=job.id, job_name=name, started_at=job.started_at,
+        config=config.model_dump(mode="json", exclude_defaults=True),
+        visibility="private", n_planned_trials=job.n_total_trials,
+    )
+    validate_remote(await read_remote(client, prepared["job_id"]), prepared["trials"], require_all=False)
+    semaphore = asyncio.Semaphore(10)
+
+    async def upload(trial, directory, lock):
+        async with semaphore:
+            return await uploader.upload_single_trial(
+                trial_result=trial, trial_dir=directory, trial_lock=lock, job_id=job.id,
+                agent_cache=start.agent_cache, model_cache=start.model_cache,
+            )
+
+    results = await asyncio.gather(*(upload(*trial) for trial in trials))
+    errors = [f"{result.trial_name}: {result.error}" for result in results if result.error]
+    if errors:
+        raise RuntimeError("Upload incomplete; re-run to resume:\n" + "\n".join(errors))
+    output = await sync_metrics(client, prepared)
+    remote = await uploader.db.get_job(job.id)
+    if remote is None:
+        raise RuntimeError("Uploaded job is not accessible; upload is incomplete")
+    if remote.get("archive_path") is None:
+        await uploader.finalize_job(job_dir, job_result=job, job_config=config)
+    overview = await hub_client.get_job_overview([prepared["job_id"]], combined=True)
+    try:
+        verify_overview(overview, output)
+    except StaleMetricsError:
+        if not start.already_existed:
+            raise
+        # A prior stock upload can have a finalized overview of the raw counters.
+        output = await publish_metrics(
+            client, hub_client, copy_job, prepared, refresh_display=refresh_display,
+        )
+    else:
+        output = view_result(output, prepared["job_id"], prepared["job_id"])
+    return {
+        **output, "visibility": "private",
+        "uploaded_trials": sum(not result.skipped for result in results),
+        "skipped_trials": sum(result.skipped for result in results),
+    }
+
+
+def upload_main():
+    parser = argparse.ArgumentParser(
+        description="Upload a private ReviewBench job with only six headline macro metrics.",
+    )
+    parser.add_argument("job_dir", type=Path)
+    parser.add_argument("--allow-partial", action="store_true",
+                        help="Retain all failed trials and label this as a partial result")
+    parser.add_argument("--dry-run", action="store_true", help="Preview scores without accessing Hub")
+    parser.add_argument("--refresh-display", action="store_true",
+                        help="Refresh an existing legacy display snapshot when its metrics are stale")
+    args = parser.parse_args()
+    prepared = prepare_job(args.job_dir, allow_partial=args.allow_partial)
+    if args.dry_run:
+        output = prepared["summary"]
+    else:
+        async def upload():
+            from harbor.auth.client import create_authenticated_client, require_user_id
+            from harbor.hub.client import HubClient
+            from harbor.hub.copy import copy_job
+            from harbor.upload.uploader import Uploader
+
+            await require_user_id()
+            return await upload_metrics(
+                args.job_dir, prepared, Uploader(), await create_authenticated_client(),
+                HubClient(), copy_job, refresh_display=args.refresh_display,
+            )
+
+        output = asyncio.run(upload())
+    print(json.dumps(output, indent=2, allow_nan=False))
 
 
 def main():

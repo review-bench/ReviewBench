@@ -196,8 +196,7 @@ After verification, inspect the job for credentials or other sensitive content:
 
 ```bash
 harbor auth login --no-browser
-harbor upload "jobs/$job" --private
-reviewbench-sync-hub-metrics "jobs/$job"
+reviewbench-upload "jobs/$job"
 ```
 
 Uploads are not automatic and do not create official leaderboard entries.
@@ -208,8 +207,8 @@ their retained metric before trusting their scores.
 ### Six headline metrics in Hub
 
 Hub derives its metric dropdown from uploaded trial rewards, not the custom
-job-level aggregate. Run `reviewbench-sync-hub-metrics` after uploading to show
-only `grounded_precision`, `grounded_recall`, `grounded_f1`,
+job-level aggregate. `reviewbench-upload` submits only
+`grounded_precision`, `grounded_recall`, `grounded_f1`,
 `augmented_precision`, `augmented_recall`, and `augmented_f1`.
 The returned link selects **augmented F1** as the main displayed metric.
 These are **macro** scores: Hub averages each defined per-PR score.
@@ -219,20 +218,27 @@ F1 is undefined if either input is undefined, and zero if both are zero.
 Undefined scores stay undefined rather than becoming zero.
 They are not the pooled **micro** scores in `reviewbench-summary.json`.
 
-The command updates Hub's trial reward metadata and uses Harbor's official
-copy feature to create a private display snapshot, returning its new URL.
-This is a presentation copy of the existing run, not another benchmark run:
-it retains all trials, failures, and copy provenance. The command checks the
-actual Hub overview's six scores and coverage before reporting success.
-Use the returned URL; a finalized original page can retain old metric keys.
+The command uses Harbor's upload SDK with an in-memory metric projection.
+New jobs submit only those six fields as Hub trial reward metadata from the
+first upload. The original files are archived unchanged, including their
+detailed raw counts. No second synchronization command or display copy is
+needed for a new upload. Jobs are uploaded privately, and the command checks
+the actual Hub overview's six scores and coverage before reporting success.
 
 Original local trial results, uploaded evidence archives, frozen task
 identities, detailed counts, and local verification reports remain unchanged.
-Re-running is safe and resumes an incomplete display copy; a plain re-upload
-alone skips existing trial metadata and will not change the dropdown.
-When upgrading an existing display from four metrics to six, add
-`--refresh-display` to explicitly recapture that private snapshot at the
-same URL. This refreshes the derived display, not the original evidence.
+Re-running resumes incomplete uploads without changing completed evidence.
+For an existing job uploaded with stock `harbor upload`, the command also
+synchronizes its reward metadata. If that job's finalized overview retains
+the old counter keys, it uses Harbor's official private copy feature and
+returns the corrected display URL. This preserves all trials, failures,
+and copy provenance; it is not another benchmark run. A previously created
+display snapshot with outdated metrics requires explicit `--refresh-display`
+to recapture it. Use the returned URL.
+
+`reviewbench-sync-hub-metrics` remains available for already-uploaded jobs
+when no artifact upload is needed. Stock `harbor upload` itself is unchanged
+and still submits every raw reward field.
 
 The default requires a complete single-round job. To inspect an intentionally
 partial run, explicitly add `--allow-partial`; its scores describe only scored

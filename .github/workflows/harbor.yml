@@ -96,7 +96,7 @@ jobs:
       - name: Check installed runtime outside the source checkout
         run: |
           python -m pip wheel --no-deps . --wheel-dir .harbor/wheels
-          wheel="$PWD/.harbor/wheels/reviewbench_harbor-0.1.0rc8-py3-none-any.whl"
+          wheel="$PWD/.harbor/wheels/reviewbench_harbor-0.1.0rc9-py3-none-any.whl"
           tests="$PWD/tests"
           cd "$(mktemp -d)"
           unset PYTHONPATH
@@ -106,6 +106,7 @@ jobs:
           reviewbench-check-job --help
           reviewbench-check-dataset --help
           reviewbench-sync-hub-metrics --help
+          reviewbench-upload --help
           REVIEWBENCH_TEST_INSTALLED=1 python "$tests/harbor-run.test.py"
           REVIEWBENCH_TEST_INSTALLED=1 python "$tests/harbor-hub.test.py"
       - name: Run no-inference isolation and artifact-transfer trial
