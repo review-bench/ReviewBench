@@ -1,35 +1,25 @@
 # Public ReviewBench on Harbor
 
-Run the public **219-PR** benchmark with Copilot CLI's native `/review`, score
-its findings in a separate verifier, and optionally upload the verified results
+Run the public **219-PR** benchmark with a Harbor-compatible reviewer, score
+its findings in a separate verifier, and optionally upload verified results
 to Harbor Hub. Execution uses CPU-only Linux x86-64 sandboxes; no GPU is needed.
+This package provides the benchmark runtime, not a reviewer-specific adapter.
 
 | Component | Version or reference |
 | --- | --- |
 | Public dataset | [`review-bench/reviewbench-public@v1`](https://hub.harborframework.com/datasets/review-bench/reviewbench-public) |
 | Harbor | `0.24.0`, installed automatically from the package's dependency pin |
-| Reviewer CLI inside the sandbox | `1.0.96`, downloaded and SHA-256 verified by the adapter |
-| Host CLI used for login | `1.0.98` |
 | Judge | Anthropic `claude-opus-5`, via `api.anthropic.com` |
 | Judge SDK | `@earendil-works/pi-coding-agent@0.75.5` |
 
-The adapter invokes the real interactive `/review` command, requires evidence
-that its code-review tool succeeded, and converts findings without an LLM
-rewrite. Copilot selects the review model; **do not pass `-m`**.
-The native review prompt explicitly requests the complete frozen base-to-HEAD
-diff, including large changes, rather than applying a repository's PR
-approval-size or split-request gates. It does not modify commits or narrow the
-review scope; refusals and incomplete reviews remain failures.
 The judge preserves the existing ReviewBench matcher, classifier, and scoring:
 adaptive thinking, low matcher effort, medium classifier effort, and an
-8,192-token output budget.
+8,192-token output budget. The dataset requires no Hub login. You need your
+reviewer's credentials and a separate Anthropic API key with access to the
+judge. Review and judging incur charges. These are self-funded benchmark runs,
+not automatic official leaderboard submissions.
 
-The dataset is public and requires no Hub login. You need a Copilot-enabled
-GitHub account and a separate Anthropic API key with access to the judge.
-Review and judging incur charges. Results are self-funded benchmark runs, not
-automatic official leaderboard submissions.
-
-## 1. Prepare Ubuntu and Docker
+## 1. Prepare Linux and Docker
 
 Use a Linux Docker runner or **WSL2 Ubuntu with Docker Desktop** on Windows.
 Harbor must run inside Ubuntu, not native PowerShell.
@@ -43,8 +33,8 @@ winget install --exact --id Docker.DockerDesktop
 
 Docker's actual kernel must support `CONFIG_NFT_FIB_INET=y` or `m`.
 The validated Windows setup uses **WSL 3.0.3 / kernel 6.18.54.1**; the older
-6.6.87.2 WSL kernel does not satisfy this requirement.
-Update WSL with `wsl --update`. If that returns HTTP 403, use Microsoft's
+6.6.87.2 WSL kernel does not satisfy this requirement. Update WSL with
+`wsl --update`. If that returns HTTP 403, use Microsoft's
 [official WSL 3.0.3 installer](https://github.com/microsoft/WSL/releases/tag/3.0.3)
 for your architecture and verify its Microsoft signature.
 Save work before restarting WSL to load the new kernel.
@@ -53,116 +43,92 @@ Start Docker Desktop, use Linux containers, and enable **Settings > Resources >
 WSL Integration > Ubuntu**, then **Apply & Restart**. Do not also install a
 second Docker engine inside Ubuntu.
 
-Open Ubuntu from PowerShell:
-
-```powershell
-wsl -d Ubuntu
-```
-
-All remaining commands run in **Ubuntu Bash**. Install the host tools:
+All remaining commands run in **Linux/Ubuntu Bash**:
 
 ```bash
 sudo apt-get update &&
-sudo apt-get install -y git curl ca-certificates libsecret-tools
+sudo apt-get install -y git curl ca-certificates
 
 curl -LsSf https://astral.sh/uv/install.sh | sh
-curl -fsSL https://gh.io/copilot-install | VERSION=v1.0.98 bash
 export PATH="$HOME/.local/bin:$PATH"
 
 docker info
 docker compose version
 ```
 
-## 2. Install Harbor and the adapter together
+## 2. Install the public runtime
 
-The public Python package contains both the run plugin/checkers and
-`reviewbench_copilot.local_agent:NativeCopilotReview`. There is no separate
-private adapter download and no host-side Node.js requirement.
-While this change is under review, install from this PR's public Git ref:
+While this change is under review, install from the public PR ref:
 
 ```bash
 uv tool install --force --refresh --python 3.12 --with-executables-from harbor \
   "reviewbench-harbor @ git+https://github.com/review-bench/ReviewBench.git@refs/pull/51/head"
 ```
 
-This installs Harbor, the adapter, plugin, and checkers in one isolated Python
-environment. ReviewBench's package metadata pins the compatible Harbor release;
-users do not need a Harbor Git commit or a separate runtime wheel URL.
-The reviewer image remains harness-neutral; the adapter uploads its verified
-CLI archive without requiring reviewer-side installation access.
+This installs Harbor, the run plugin, and result checkers in one isolated
+Python environment. No host-side Node.js or Harbor Git commit is needed.
+Reviewer-specific adapters, authentication, and model configuration are
+separate. If your reviewer is a Python package, include it in the same
+installation with uv's `--with` option.
 
-### Updating independently
+Do not upgrade an environment while a job is running. Updates are explicit:
+re-run installation with the chosen runtime release and reviewer package.
+The PR ref is a temporary pre-release source, not an immutable release;
+`--refresh` updates it, whereas plain `uv tool upgrade` does not advance this
+Git ref. Record resolved versions or commit SHAs with the run evidence.
 
-Updates are explicit, not automatic. Do not upgrade an environment while a job
-is running.
+Dataset and judge versions are independent of runtime upgrades. Select a new
+published dataset version when its reference findings or judge policy changes;
+normally no tool reinstall is needed. An upgraded runtime must not silently
+replace a frozen dataset's judge.
 
-| Change | User action |
-| --- | --- |
-| Runtime, adapter, or Harbor compatibility | Re-run installation with the chosen ReviewBench release; the package selects its tested Harbor dependency |
-| Dataset, reference findings, or judge policy | Select the newly published dataset version, such as `review-bench/reviewbench-public@v2`, once available; normally no tool reinstall is needed |
-| Judge API key | Set `RB_HARBOR_JUDGE_KEY` for the next run; no installation change |
+## 3. Configure your reviewer and check readiness
 
-The PR ref above is a temporary pre-release source, not an immutable release.
-Re-running its install command explicitly refreshes the PR source; plain
-`uv tool upgrade` does not advance this Git ref.
-Released installations should use a versioned ReviewBench package artifact.
-Published dataset versions keep their frozen judge and task identities:
-upgrading the runtime does not silently replace the judge or dataset, and a
-changed judge policy must use a new dataset version. Keep the package version
-and dataset version with run evidence; do not compare changed judge versions
-as if they were the same benchmark.
+Use a Harbor-compatible agent that follows each task's `instruction.md`:
+review the frozen base/HEAD changes and write the required findings JSON to
+`/work/out/findings.json`. Keep paths and line numbers anchored to the frozen
+HEAD. Emit an empty findings array only after a completed review with no
+findings; incomplete reviews must fail.
 
-## 3. Authenticate and check readiness
+Provide the installed agent name or import path using `REVIEWBENCH_AGENT`.
+Configure its credentials according to its own documentation, without exposing
+the judge key to it. The published reviewer endpoint allowlist must support its
+provider; an adapter cannot override the dataset's network policy.
 
-Log in **inside Ubuntu**; a Windows Copilot login is not automatically shared:
-
-```bash
-copilot login --device-code
-```
-
-Open the displayed URL, authorize the device code, and wait for the terminal
-to confirm success. If no system keychain is available, the CLI asks whether
-to save the token in its owner-only plaintext configuration. Accept only if
-that storage is appropriate for your runner. Never print or upload that file.
-
-Check the exact credential loader and Docker kernel capability before spending
-model requests:
+Check Docker's network-isolation support before spending model requests:
 
 ```bash
 "$(uv tool dir)/reviewbench-harbor/bin/python" - <<'PY'
 from harbor.environments.docker.docker import DockerEnvironment
-from reviewbench_copilot.local_agent import reviewer_token
 
-reviewer_token()
 if not DockerEnvironment._egress_control_kernel_support():
     raise SystemExit("Docker kernel lacks Harbor's required network-isolation support.")
-print("Reviewer credential and Docker kernel checks passed; no token displayed.")
+print("Docker kernel check passed.")
 PY
 ```
 
 Unsupported network policies must fail; do not bypass the check or disable
-isolation. The adapter supports the CLI's saved `authTokens` plaintext format,
-legacy saved credentials, Linux keychain lookup, or an explicitly supplied
-`COPILOT_GITHUB_TOKEN`. Only the selected account's credential is used.
+isolation. Reviewer containers must not receive reference findings or verifier
+assets.
 
 ## 4. Run, then verify
 
-Start with one PR. Enter the **Anthropic judge key**, not a GitHub token, at the
-hidden prompt; `export` succeeding silently is normal.
+Start with one PR. Set `REVIEWBENCH_AGENT` to your configured reviewer first.
+Enter the **Anthropic judge key** at the hidden prompt:
 
 ```bash
-mkdir -p ~/reviewbench-copilot
-cd ~/reviewbench-copilot
+mkdir -p ~/reviewbench-harbor
+cd ~/reviewbench-harbor
 
 read -rsp 'Anthropic judge key: ' RB_HARBOR_JUDGE_KEY
 printf '\n'
 export RB_HARBOR_JUDGE_KEY
 
-job="copilot-smoke-$(date +%Y%m%d-%H%M%S)"
+job="reviewbench-smoke-$(date +%Y%m%d-%H%M%S)"
 
 harbor run \
   -d review-bench/reviewbench-public@v1 \
-  -a reviewbench_copilot.local_agent:NativeCopilotReview \
+  -a "${REVIEWBENCH_AGENT:?Set your installed Harbor reviewer agent}" \
   -e docker \
   --plugin reviewbench_harbor.reviewbench_plugin:ReviewBenchPlugin \
   -n 1 -l 1 -k 1 \
@@ -177,12 +143,10 @@ printf '\nVerification passed. Metrics: %s\n' "$job-metrics.json"
 unset RB_HARBOR_JUDGE_KEY
 ```
 
-Keep the terminal open. The judge key is mapped to `ANTHROPIC_API_KEY` **only
-inside the separate verifier**. The reviewer receives its own Copilot
-credential, not the judge key, goldens, or verifier assets. It is restricted to
-the published endpoint allowlist.
+The judge key is mapped to `ANTHROPIC_API_KEY` **only inside the separate
+verifier**. Keep the terminal open while the job runs.
 
-Use the same command with a new job name and these controls for larger runs:
+Use a fresh job name and these controls for larger runs:
 
 | Run | Flags | Planned trials |
 | --- | --- | --- |
@@ -190,10 +154,9 @@ Use the same command with a new job name and these controls for larger runs:
 | First 50 PRs, concurrency 10 | `-n 10 -l 50 -k 1` | 50 |
 | All 219 PRs, concurrency 10 | `-n 10 -k 1` | 219 |
 
-`-n` caps concurrent trials, `-l` limits the selected tasks, and `-k` repeats
-each selected task. A limit selects a subset, not a random sample. Set a fresh
-`job` and export the judge key again if it was unset. Concurrency also depends
-on Docker resources and both providers' rate limits; one trial can make
+`-n` caps concurrent trials, `-l` limits selected tasks, and `-k` repeats each
+selected task. A limit selects a subset, not a random sample. Concurrency also
+depends on Docker resources and provider rate limits; one trial can make
 multiple model requests.
 
 The plugin freezes task/evaluation identities and round membership in
@@ -201,17 +164,17 @@ The plugin freezes task/evaluation identities and round membership in
 Each round is scored independently; complete repeated runs report means,
 population standard deviations, and defined-round counts. Attempts are not
 pooled or selected by best score. Resume only with the same configuration and
-plugin; keep failed evidence instead of turning failures into empty findings.
+plugin; back up failed evidence before retrying instead of converting failures
+to empty findings.
 
 ## 5. Interpret the results
 
-**"1/1 Complete" or Harbor's exit code alone is not the scoring gate.**
+**Harbor's completion counter or exit code alone is not the scoring gate.**
 Require the checker to succeed, `complete=1`, the intended `expected_prs`,
 `scored_trials=expected_prs*n_attempts`, and no trial exceptions or duplicates.
 `source_prs=219` and `expected_prs=219` are required for a full benchmark.
 
-Use the named metrics in `$job-metrics.json` or the job's
-`reviewbench-summary.json`:
+Use the named metrics in `$job-metrics.json` or `reviewbench-summary.json`:
 
 | Field | Meaning |
 | --- | --- |
@@ -223,25 +186,23 @@ Use the named metrics in `$job-metrics.json` or the job's
 
 Macro metrics average per-PR results; micro metrics pool the underlying counts.
 Undefined ratios remain undefined, not zero. The terminal's **Reward / Count**
-table mixes count fields and flags without useful labels. Large `rb_task` and
+table mixes counts and flags without useful labels. Large `rb_task` and
 `rb_evaluation` numbers are integrity identifiers, not scores.
-A successful one-PR smoke establishes integration, not overall reviewer quality.
+A successful one-PR smoke establishes integration, not reviewer quality.
 
 ## 6. Optional private Hub upload
 
-After verification, inspect the job for credentials or other sensitive content.
-From the same terminal:
+After verification, inspect the job for credentials or other sensitive content:
 
 ```bash
 harbor auth login --no-browser
 harbor upload "jobs/$job" --private
 ```
 
-Follow the returned Hub link to inspect the job. Uploads are not automatic
-and do not create official ReviewBench leaderboard entries. Preserve the job
-directory's original basename, plan, metric, findings, native proof, and judge
-evidence. Recheck downloaded jobs with their retained metric before trusting
-their scores.
+Uploads are not automatic and do not create official leaderboard entries.
+Preserve the job directory's original basename, plan, retained metric,
+findings, reviewer evidence, and judge evidence. Recheck downloaded jobs with
+their retained metric before trusting their scores.
 
 ## Maintainer checks
 
@@ -250,10 +211,11 @@ harbor:validate-findings` checks the findings contract without inference.
 Exports preserve pinned base/HEAD commits, the existing matcher/classifier,
 separate verifier execution, exact-host network policies, and content digests.
 The standard Anthropic Opus 5 model definition is explicit, not an alias.
-Changing sources or judge policy requires newly versioned evaluation identities;
-do not overwrite the published `v1` profile.
+Changing sources or judge policy requires new evaluation identities; do not
+overwrite the published `v1` profile.
 
-CI covers schema/content validation, scorer parity, native run controls, Copilot
-credential and findings-format regressions, installed-wheel behavior, and
-no-inference Docker isolation/CLI setup. It does not run paid reviews or publish
-datasets, images, results, or leaderboard entries.
+CI covers schema/content validation, scorer parity, generic Harbor run
+controls, installed-runtime behavior, and no-inference Docker isolation.
+Reviewer-specific integration tests belong with their respective adapters.
+CI does not run paid reviews or publish datasets, images, results, or
+leaderboard entries.
