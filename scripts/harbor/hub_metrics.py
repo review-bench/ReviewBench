@@ -1,4 +1,4 @@
-"""Create a four-metric macro Hub view without changing canonical run evidence."""
+"""Create a six-metric macro Hub view with augmented F1 selected."""
 
 import argparse
 import asyncio
@@ -9,10 +9,18 @@ import runpy
 from uuid import UUID
 
 
+PRIMARY_METRIC = "augmented_f1"
 METRICS = (
+    PRIMARY_METRIC, "grounded_f1",
     "grounded_precision", "grounded_recall",
     "augmented_precision", "augmented_recall",
 )
+
+
+def f1(precision, recall):
+    if precision is None or recall is None:
+        return None
+    return 2 * precision * recall / (precision + recall) if precision + recall else 0.0
 
 
 def prepare_job(job_dir, *, allow_partial=False):
@@ -64,6 +72,10 @@ def prepare_job(job_dir, *, allow_partial=False):
             counts = metric["read_counts"](clean)["overall"]
             if not unsuccessful:
                 ratios = metric["ratios"](counts)
+                for prefix in ("grounded", "augmented"):
+                    ratios[f"{prefix}_f1"] = f1(
+                        ratios[f"{prefix}_precision"], ratios[f"{prefix}_recall"],
+                    )
                 display = {key: ratios[key] for key in METRICS if ratios[key] is not None}
         failed += int(unsuccessful)
         rewards.append(reward)
@@ -115,7 +127,11 @@ async def sync_metrics(client, prepared):
     if set(remote) != set(trials):
         raise ValueError("Upload the identical full job first; Hub trial IDs differ from local evidence")
     for trial_id, row in trials.items():
-        if remote[trial_id] != row["original"] and remote[trial_id] != row["display"]:
+        previous_display = (
+            {key: value for key, value in row["display"].items() if not key.endswith("_f1")}
+            if row["display"] is not None else None
+        )
+        if remote[trial_id] not in (row["original"], row["display"], previous_display):
             raise ValueError("Hub rewards differ from both original evidence and the intended display")
     updated = 0
     for trial_id, row in trials.items():
@@ -133,13 +149,13 @@ async def sync_metrics(client, prepared):
     return {**prepared["summary"], "updated_trials": updated}
 
 
-async def publish_metrics(client, hub_client, copy_job, prepared):
+async def publish_metrics(client, hub_client, copy_job, prepared, *, refresh_display=False):
     output = await sync_metrics(client, prepared)
     label = f"{prepared['job_name']} - macro metrics"
     if not output["complete"]:
         label += f" - partial {output['scored_trials']} of {output['planned_trials']}"
     # Hub's finalized overview can retain the original metric keys after row updates.
-    copied = await copy_job(prepared["job_id"], name=label)
+    copied = await copy_job(prepared["job_id"], name=label, overwrite=refresh_display)
     if not copied.complete:
         raise RuntimeError("Hub display copy is incomplete; re-run to resume it")
     overview = await hub_client.get_job_overview([copied.job_id], combined=True)
@@ -153,11 +169,15 @@ async def publish_metrics(client, hub_client, copy_job, prepared):
         not math.isclose(actual[key], value, rel_tol=1e-12, abs_tol=1e-12)
         for key, value in expected.items()
     ):
-        raise RuntimeError("Hub overview does not expose the expected four macro metrics")
+        raise RuntimeError(
+            "Hub overview does not expose the expected six macro metrics; "
+            "use --refresh-display to refresh an existing display snapshot"
+        )
     return {
         **output, "source_job_id": prepared["job_id"],
         "display_job_id": copied.job_id,
-        "url": f"https://hub.harborframework.com/jobs/{copied.job_id}",
+        "primary_metric": PRIMARY_METRIC,
+        "url": f"https://hub.harborframework.com/jobs/{copied.job_id}?breakdown_metric={PRIMARY_METRIC}",
     }
 
 
@@ -167,6 +187,8 @@ def main():
     parser.add_argument("--allow-partial", action="store_true",
                         help="Display scored trials from an incomplete job without hiding failed trials")
     parser.add_argument("--dry-run", action="store_true", help="Preview scores without accessing Hub")
+    parser.add_argument("--refresh-display", action="store_true",
+                        help="Replace an existing private display snapshot with current metric metadata")
     args = parser.parse_args()
     prepared = prepare_job(args.job_dir, allow_partial=args.allow_partial)
     if args.dry_run:
@@ -180,6 +202,7 @@ def main():
             await require_user_id()
             return await publish_metrics(
                 await create_authenticated_client(), HubClient(), copy_job, prepared,
+                refresh_display=args.refresh_display,
             )
 
         output = asyncio.run(publish())

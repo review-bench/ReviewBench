@@ -205,32 +205,40 @@ Preserve the job directory's original basename, plan, retained metric,
 findings, reviewer evidence, and judge evidence. Recheck downloaded jobs with
 their retained metric before trusting their scores.
 
-### Four headline metrics in Hub
+### Six headline metrics in Hub
 
 Hub derives its metric dropdown from uploaded trial rewards, not the custom
 job-level aggregate. Run `reviewbench-sync-hub-metrics` after uploading to show
-only `grounded_precision`, `grounded_recall`, `augmented_precision`, and
-`augmented_recall`. These are **macro** scores: Hub averages each defined
-per-PR ratio. Undefined ratios stay undefined rather than becoming zero.
+only `grounded_precision`, `grounded_recall`, `grounded_f1`,
+`augmented_precision`, `augmented_recall`, and `augmented_f1`.
+The returned link selects **augmented F1** as the main displayed metric.
+These are **macro** scores: Hub averages each defined per-PR score.
+F1 is the harmonic mean of each PR's precision and recall, then averaged
+across PRs, not the harmonic mean of the macro precision and recall.
+F1 is undefined if either input is undefined, and zero if both are zero.
+Undefined scores stay undefined rather than becoming zero.
 They are not the pooled **micro** scores in `reviewbench-summary.json`.
 
 The command updates Hub's trial reward metadata and uses Harbor's official
 copy feature to create a private display snapshot, returning its new URL.
 This is a presentation copy of the existing run, not another benchmark run:
 it retains all trials, failures, and copy provenance. The command checks the
-actual Hub overview's four scores and coverage before reporting success.
+actual Hub overview's six scores and coverage before reporting success.
 Use the returned URL; a finalized original page can retain old metric keys.
 
 Original local trial results, uploaded evidence archives, frozen task
 identities, detailed counts, and local verification reports remain unchanged.
 Re-running is safe and resumes an incomplete display copy; a plain re-upload
 alone skips existing trial metadata and will not change the dropdown.
+When upgrading an existing display from four metrics to six, add
+`--refresh-display` to explicitly recapture that private snapshot at the
+same URL. This refreshes the derived display, not the original evidence.
 
 The default requires a complete single-round job. To inspect an intentionally
 partial run, explicitly add `--allow-partial`; its scores describe only scored
 PRs and are not a verified full benchmark result. Repeated-round jobs must be
 viewed as independent single rounds rather than silently pooling their ratios.
-Use `--dry-run` to preview the four scores without accessing Hub.
+Use `--dry-run` to preview the six scores without accessing Hub.
 
 ## Maintainer checks
 

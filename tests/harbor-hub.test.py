@@ -76,13 +76,20 @@ class Fixture(unittest.TestCase):
 
 
 class PreparationTests(Fixture):
-    def test_only_four_macro_scores_and_original_evidence_unchanged(self):
+    def test_only_six_macro_scores_and_original_evidence_unchanged(self):
         before = {str(path): path.read_bytes() for path in self.job.rglob("*") if path.is_file()}
         prepared = self.prepare()
         self.assertTrue(prepared["summary"]["complete"])
         self.assertEqual(set(prepared["summary"]["scores"]), set(hub.METRICS))
         self.assertAlmostEqual(prepared["summary"]["scores"]["grounded_precision"], .75)
         self.assertNotAlmostEqual(prepared["summary"]["scores"]["grounded_precision"], 2 / 3)
+        self.assertAlmostEqual(prepared["summary"]["scores"]["grounded_f1"], .45)
+        self.assertAlmostEqual(prepared["summary"]["scores"]["augmented_f1"], (12 / 19 + .4) / 2)
+        self.assertNotAlmostEqual(
+            prepared["summary"]["scores"]["grounded_f1"],
+            hub.f1(prepared["summary"]["scores"]["grounded_precision"],
+                   prepared["summary"]["scores"]["grounded_recall"]),
+        )
         for row in prepared["trials"].values():
             self.assertEqual(set(row["display"]), set(hub.METRICS))
             self.assertIn("overall.golden_tp_count", row["original"])
@@ -97,6 +104,14 @@ class PreparationTests(Fixture):
         prepared = self.prepare()
         self.assertEqual(prepared["trials"][self.trials[0]["id"]]["display"], {})
         self.assertEqual(prepared["summary"]["scores"]["grounded_precision"], 1)
+
+    def test_f1_zero_and_undefined_are_distinct(self):
+        self.assertEqual(hub.f1(0, 0), 0)
+        self.assertEqual(hub.f1(1, 0), 0)
+        self.assertEqual(hub.f1(0, 1), 0)
+        self.assertIsNone(hub.f1(None, 0))
+        self.assertIsNone(hub.f1(0, None))
+        self.assertAlmostEqual(hub.f1(.5, 1), 2 / 3)
 
     def test_partial_display_requires_explicit_flag_and_preserves_failure(self):
         self.trials[1]["exception_info"] = {"exception_type": "RuntimeError"}
@@ -220,6 +235,17 @@ class SyncTests(Fixture, unittest.IsolatedAsyncioTestCase):
                 await hub.sync_metrics(client, prepared)
             self.assertEqual(client.writes, [])
 
+    async def test_previous_four_metric_display_can_be_upgraded(self):
+        prepared = self.prepare()
+        client = FakeClient({
+            key: {metric: value for metric, value in row["display"].items()
+                  if not metric.endswith("_f1")}
+            for key, row in prepared["trials"].items()
+        })
+        result = await hub.sync_metrics(client, prepared)
+        self.assertEqual(result["updated_trials"], 2)
+        self.assertEqual(client.rows, {key: row["display"] for key, row in prepared["trials"].items()})
+
     async def test_denied_update_is_not_success(self):
         prepared = self.prepare()
         client = FakeClient({key: row["original"] for key, row in prepared["trials"].items()})
@@ -239,9 +265,14 @@ class SyncTests(Fixture, unittest.IsolatedAsyncioTestCase):
         result = await hub.publish_metrics(client, hub_client, copy_job, prepared)
         self.assertEqual(result["display_job_id"], "display")
         self.assertEqual(result["source_job_id"], prepared["job_id"])
+        self.assertEqual(result["primary_metric"], "augmented_f1")
+        self.assertTrue(result["url"].endswith("?breakdown_metric=augmented_f1"))
         copy_job.assert_awaited_once()
+        self.assertFalse(copy_job.await_args.kwargs["overwrite"])
+        await hub.publish_metrics(client, hub_client, copy_job, prepared, refresh_display=True)
+        self.assertTrue(copy_job.await_args.kwargs["overwrite"])
         overview.eval_rows[0]["metrics"] = [{"overall.candidate_count": 3}]
-        with self.assertRaisesRegex(RuntimeError, "expected four"):
+        with self.assertRaisesRegex(RuntimeError, "expected six"):
             await hub.publish_metrics(client, hub_client, copy_job, prepared)
 
     async def test_incomplete_copy_or_lost_failures_are_not_success(self):

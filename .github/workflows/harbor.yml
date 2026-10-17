@@ -96,7 +96,7 @@ jobs:
       - name: Check installed runtime outside the source checkout
         run: |
           python -m pip wheel --no-deps . --wheel-dir .harbor/wheels
-          wheel="$PWD/.harbor/wheels/reviewbench_harbor-0.1.0rc7-py3-none-any.whl"
+          wheel="$PWD/.harbor/wheels/reviewbench_harbor-0.1.0rc8-py3-none-any.whl"
           tests="$PWD/tests"
           cd "$(mktemp -d)"
           unset PYTHONPATH
