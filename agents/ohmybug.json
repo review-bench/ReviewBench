@@ -1,0 +1,26 @@
+{
+  "name": "ohmybug",
+  "display_name": "OhMyBug",
+  "image": "ghcr.io/explyt/ohmybug-reviewbench@sha256:991290fd567383070b5fdd63c1760008987c7cac42dcbde3fc364922e2096499",
+  "image_visibility": "public",
+  "configuration": [
+    {
+      "key": "mode",
+      "value": "fast"
+    }
+  ],
+  "secrets": {
+    "env": [
+      "OHMYBUG_API_KEY"
+    ]
+  },
+  "model_api_url": "https://mcp.ohmybug.ai",
+  "pr_timeout_seconds": 1800,
+  "contacts": [
+    "i123111"
+  ],
+  "provider": "OhMyBug",
+  "egress": [
+    "mcp.ohmybug.ai"
+  ]
+}
