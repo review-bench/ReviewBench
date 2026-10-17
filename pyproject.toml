@@ -4,17 +4,16 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "reviewbench-harbor"
-version = "0.1.0rc9"
+version = "0.1.0rc10"
 description = "ReviewBench public benchmark runtime for Harbor"
 requires-python = ">=3.12"
 license = "MIT"
-dependencies = ["harbor==0.24.0"]
+dependencies = ["harbor @ git+https://github.com/MiichelleZhou/harbor.git@6ce6abee0b9fa94a50c88f0557d030a419998d78"]
 
 [project.scripts]
 reviewbench-check-job = "reviewbench_harbor:check_job_main"
 reviewbench-check-dataset = "reviewbench_harbor:check_dataset_main"
 reviewbench-sync-hub-metrics = "reviewbench_harbor.hub_metrics:main"
-reviewbench-upload = "reviewbench_harbor.hub_metrics:upload_main"
 
 [tool.setuptools]
 packages = ["reviewbench_harbor"]

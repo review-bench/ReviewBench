@@ -2,6 +2,7 @@
 
 import asyncio
 from datetime import datetime
+import hashlib
 import importlib
 import json
 import math
@@ -257,6 +258,7 @@ class NativeHarborTests(unittest.TestCase):
                 job_result = json.loads((self.job / "result.json").read_text())
                 live = next(iter(job_result["stats"]["evals"].values()))["metrics"][0]
                 self.assertEqual(live, report)
+                self.assertFalse((self.job / "upload-metrics.json").exists())
 
     def test_native_other_limits_and_filters_freeze_actual_selection(self):
         result = self.invoke(["-n", "1", "-l", "1", "-k", "2", "--include-task-name", "task-1"])
@@ -271,6 +273,30 @@ class NativeHarborTests(unittest.TestCase):
         self.assertEqual(result.exit_code, 0, result.output + repr(result.exception))
         report = CHECK(self.job, self.metric)
         self.assertEqual((report["full_dataset"], report["expected_prs"], report["n_attempts"]), (1, 3, 1))
+        manifest = json.loads((self.job / "upload-metrics.json").read_text())
+        self.assertEqual(manifest["primary_metric"], "augmented_f1")
+        self.assertFalse(manifest["partial"])
+        self.assertEqual(len(manifest["trials"]), 3)
+        for path in self.job.glob("*/result.json"):
+            trial = json.loads(path.read_text())
+            projected = manifest["trials"][trial["id"]]
+            self.assertEqual(projected["source_result_sha256"], hashlib.sha256(path.read_bytes()).hexdigest())
+            self.assertEqual(set(projected["rewards"]), {
+                "grounded_precision", "grounded_recall", "grounded_f1",
+                "augmented_precision", "augmented_recall", "augmented_f1",
+            })
+
+    def test_partial_single_round_exports_all_trials_without_weakening_the_gate(self):
+        self.fail_trial = True
+        result = self.invoke(["-k", "1"])
+        self.assertEqual(self.executed, 2, result.output)
+        with self.assertRaises(ValueError):
+            CHECK(self.job, self.metric)
+        self.assertFalse((self.job / "reviewbench-summary.json").exists())
+        manifest = json.loads((self.job / "upload-metrics.json").read_text())
+        self.assertTrue(manifest["partial"])
+        self.assertEqual(len(manifest["trials"]), 2)
+        self.assertEqual(sum(row["rewards"] is None for row in manifest["trials"].values()), 1)
 
     def test_invalid_native_numbers_never_execute_trials(self):
         for arguments in (["-n", "0"], ["-l", "0"], ["-k", "0"], ["-k", "-1"], ["-l", "not-a-number"]):

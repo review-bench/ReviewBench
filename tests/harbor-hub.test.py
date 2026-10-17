@@ -11,7 +11,7 @@ import tempfile
 from types import SimpleNamespace
 import unittest
 from unittest.mock import AsyncMock
-from uuid import uuid4
+from uuid import UUID, uuid4
 
 if os.environ.get("REVIEWBENCH_TEST_INSTALLED") == "1":
     from reviewbench_harbor import hub_metrics as hub
@@ -293,7 +293,7 @@ class SyncTests(Fixture, unittest.IsolatedAsyncioTestCase):
 class UploadTests(Fixture, unittest.IsolatedAsyncioTestCase):
     def setUp(self):
         super().setUp()
-        from harbor.upload.uploader import Uploader
+        from harbor.upload.uploader import JobStartResult, Uploader
 
         self.result["started_at"] = "2026-10-15T23:00:00Z"
         self.result["stats"]["n_completed_trials"] = 2
@@ -321,8 +321,8 @@ class UploadTests(Fixture, unittest.IsolatedAsyncioTestCase):
         self.remote_job = {"archive_path": None}
         self.archives = {}
         self.uploader = Uploader()
-        self.uploader.start_job = AsyncMock(return_value=SimpleNamespace(
-            already_existed=False, agent_cache={}, model_cache={},
+        self.uploader.start_job = AsyncMock(return_value=JobStartResult(
+            job_id=UUID(self.job_id), visibility="private", already_existed=False,
         ))
         self.uploader.db = SimpleNamespace(
             get_trial=AsyncMock(side_effect=lambda trial_id: self.remote_trials.get(str(trial_id))),
@@ -331,12 +331,14 @@ class UploadTests(Fixture, unittest.IsolatedAsyncioTestCase):
             finalize_trial_artifacts=AsyncMock(side_effect=self.finalize_trial),
             get_job=AsyncMock(return_value=self.remote_job),
             finalize_job=AsyncMock(side_effect=self.finalize_job),
+            list_trials_for_job=AsyncMock(side_effect=lambda job_id: [
+                {"id": key, "archive_path": row.get("archive_path")}
+                for key, row in self.remote_trials.items()
+            ]),
         )
         self.uploader.storage = SimpleNamespace(
             upload_resumable_file=AsyncMock(side_effect=self.capture_archive),
         )
-        self.hub_client = SimpleNamespace(get_job_overview=AsyncMock(side_effect=self.overview))
-        self.copy_job = AsyncMock()
 
     async def insert_trial(self, **row):
         key = str(row["id"])
@@ -356,32 +358,18 @@ class UploadTests(Fixture, unittest.IsolatedAsyncioTestCase):
                 for member in archive.getmembers() if member.isfile()
             }
 
-    async def overview(self, job_ids, *, combined):
-        self.assertTrue(combined)
-        scores = {}
-        for key in hub.METRICS:
-            values = [row[key] for row in self.client.rows.values() if row is not None and key in row]
-            if values:
-                scores[key] = sum(values) / len(values)
-        return SimpleNamespace(
-            n_total_trials=len(self.client.rows),
-            n_errors=sum(bool(row["exception_type"]) for row in self.remote_trials.values()),
-            eval_rows=[{"metrics": [{key: value} for key, value in scores.items()]}],
-        )
-
     async def upload(self, *, allow_partial=False):
-        return await hub.upload_metrics(
-            self.job, self.prepare(allow_partial=allow_partial), self.uploader,
-            self.client, self.hub_client, self.copy_job,
-        )
+        hub.write_upload_metrics(self.job, allow_partial=allow_partial)
+        return await self.uploader.upload_job(self.job, allow_partial=allow_partial)
 
     async def test_first_upload_submits_only_six_metrics_and_archives_original_evidence(self):
+        hub.write_upload_metrics(self.job)
         before = {str(path): path.read_bytes() for path in self.job.rglob("*") if path.is_file()}
         result = await self.upload()
-        self.assertEqual((result["uploaded_trials"], result["skipped_trials"]), (2, 0))
-        self.assertEqual(result["display_job_id"], self.job_id)
-        self.assertTrue(result["url"].endswith("?breakdown_metric=augmented_f1"))
-        self.assertEqual(self.uploader.start_job.await_args.kwargs["visibility"], "private")
+        self.assertEqual((result.n_trials_uploaded, result.n_trials_skipped), (2, 0))
+        self.assertEqual(result.job_id, self.job_id)
+        self.assertEqual(result.primary_metric, "augmented_f1")
+        self.assertTrue(result.projected_metrics)
         for trial in self.trials:
             key = trial["id"]
             submitted = self.remote_trials[key]["rewards"]
@@ -391,16 +379,14 @@ class UploadTests(Fixture, unittest.IsolatedAsyncioTestCase):
                              trial["verifier_result"]["rewards"])
         self.assertEqual(before, {str(path): path.read_bytes() for path in self.job.rglob("*") if path.is_file()})
         self.assertEqual(self.client.writes, [])
-        self.copy_job.assert_not_awaited()
 
     async def test_reupload_skips_completed_archives_and_needs_no_display_copy(self):
         await self.upload()
         self.uploader.start_job.return_value.already_existed = True
         again = await self.upload()
-        self.assertEqual((again["uploaded_trials"], again["skipped_trials"]), (0, 2))
+        self.assertEqual((again.n_trials_uploaded, again.n_trials_skipped), (0, 2))
         self.assertEqual(self.uploader.storage.upload_resumable_file.await_count, 3)
         self.uploader.db.finalize_job.assert_awaited_once()
-        self.copy_job.assert_not_awaited()
 
     async def test_partial_upload_retains_failure_and_labels_coverage(self):
         self.trials[1]["exception_info"] = {
@@ -415,54 +401,46 @@ class UploadTests(Fixture, unittest.IsolatedAsyncioTestCase):
             await self.upload()
         self.uploader.start_job.assert_not_awaited()
         result = await self.upload(allow_partial=True)
-        self.assertEqual((result["planned_trials"], result["scored_trials"], result["failed_trials"]), (2, 1, 1))
+        self.assertEqual(result.n_trials_uploaded, 2)
+        manifest = json.loads((self.job / "upload-metrics.json").read_text())
+        self.assertTrue(manifest["partial"])
+        self.assertEqual(len(manifest["trials"]), 2)
         failed = self.remote_trials[self.trials[1]["id"]]
         self.assertIsNone(failed["rewards"])
         self.assertEqual(failed["exception_type"], "RuntimeError")
         self.assertIn("partial 1 of 2", self.uploader.start_job.await_args.kwargs["job_name"])
 
-    async def test_missing_lock_prevents_any_remote_writes(self):
+    async def test_missing_lock_does_not_finalize_the_job(self):
         (self.job / "trial-2/lock.json").unlink()
-        with self.assertRaises(FileNotFoundError):
-            await self.upload()
-        self.uploader.start_job.assert_not_awaited()
-        self.assertEqual(self.remote_trials, {})
+        result = await self.upload()
+        self.assertEqual(result.n_trials_failed, 1)
+        self.uploader.db.finalize_job.assert_not_awaited()
 
     async def test_storage_failure_does_not_finalize_or_report_success(self):
         self.uploader.storage.upload_resumable_file.side_effect = RuntimeError("fixture upload failure")
-        with self.assertRaisesRegex(RuntimeError, "Upload incomplete"):
+        with self.assertRaisesRegex(RuntimeError, "fixture upload failure"):
             await self.upload()
         self.uploader.db.finalize_job.assert_not_awaited()
-        self.hub_client.get_job_overview.assert_not_awaited()
-        self.copy_job.assert_not_awaited()
 
-    async def test_unknown_existing_remote_trials_abort_before_uploading_artifacts(self):
-        for remote in ({str(uuid4()): None}, {self.trials[0]["id"]: {"unexpected": 1}}):
-            self.client.rows = remote
-            with self.subTest(remote=remote), self.assertRaises(ValueError):
-                await self.upload()
-            self.uploader.storage.upload_resumable_file.assert_not_awaited()
-            self.uploader.db.insert_trial.assert_not_awaited()
+    async def test_changed_canonical_source_invalidates_projection_before_upload(self):
+        hub.write_upload_metrics(self.job)
+        path = self.job / "trial-1/result.json"
+        path.write_bytes(path.read_bytes() + b"\n")
+        with self.assertRaisesRegex(ValueError, "source digest"):
+            await self.uploader.upload_job(self.job)
+        self.uploader.start_job.assert_not_awaited()
+        self.uploader.storage.upload_resumable_file.assert_not_awaited()
 
-    async def test_legacy_upload_is_migrated_in_one_command(self):
+    async def test_completed_legacy_metadata_is_not_silently_overwritten(self):
         await self.upload()
         self.uploader.start_job.return_value.already_existed = True
         for trial in self.trials:
             self.client.rows[trial["id"]] = trial["verifier_result"]["rewards"]
-        valid = await self.overview([self.job_id], combined=True)
-        valid.eval_rows[0]["metrics"] = [
-            {key: value} for key, value in self.prepare()["summary"]["scores"].items()
-        ]
-        stale = copy.deepcopy(valid)
-        stale.eval_rows[0]["metrics"] = [{"overall.candidate_count": 3}]
-        self.hub_client.get_job_overview.side_effect = [stale, valid]
-        self.copy_job.return_value = SimpleNamespace(complete=True, job_id="display")
         result = await self.upload()
-        self.assertEqual(result["display_job_id"], "display")
-        self.assertEqual((result["uploaded_trials"], result["skipped_trials"]), (0, 2))
-        self.assertEqual(len(self.client.writes), 2)
-        self.copy_job.assert_awaited_once()
-        self.assertFalse(self.copy_job.await_args.kwargs["overwrite"])
+        self.assertEqual((result.n_trials_uploaded, result.n_trials_skipped), (0, 2))
+        for trial in self.trials:
+            self.assertEqual(self.client.rows[trial["id"]], trial["verifier_result"]["rewards"])
+        self.assertEqual(self.client.writes, [])
 
 
 if __name__ == "__main__":

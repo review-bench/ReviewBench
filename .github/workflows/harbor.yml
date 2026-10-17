@@ -51,7 +51,7 @@ jobs:
           import tomllib
           from pathlib import Path
           dependencies = tomllib.loads(Path("pyproject.toml").read_text())["project"]["dependencies"]
-          harbor = next(dependency for dependency in dependencies if dependency.startswith("harbor=="))
+          harbor = next(dependency for dependency in dependencies if dependency.startswith("harbor @ "))
           subprocess.run([sys.executable, "-m", "pip", "install", "--no-deps", harbor], check=True)
           PY
       - run: python tests/harbor-format.test.py
@@ -96,17 +96,16 @@ jobs:
       - name: Check installed runtime outside the source checkout
         run: |
           python -m pip wheel --no-deps . --wheel-dir .harbor/wheels
-          wheel="$PWD/.harbor/wheels/reviewbench_harbor-0.1.0rc9-py3-none-any.whl"
+          wheel="$PWD/.harbor/wheels/reviewbench_harbor-0.1.0rc10-py3-none-any.whl"
           tests="$PWD/tests"
           cd "$(mktemp -d)"
           unset PYTHONPATH
           python -m pip install --force-reinstall --no-deps "$wheel"
           python -c "from reviewbench_harbor.reviewbench_plugin import ReviewBenchPlugin; from pathlib import Path; import reviewbench_harbor; root = Path(reviewbench_harbor.__file__).parent; assert all((root / name).is_file() for name in ('metric.py', 'check-job.py'))"
-          python -c "from importlib.metadata import distribution; dist = distribution('reviewbench-harbor'); assert all(str(path).startswith('reviewbench_harbor/') for path in dist.files if str(path).endswith('.py')); assert dist.requires == ['harbor==0.24.0']"
+          python -c "from importlib.metadata import distribution; from packaging.requirements import Requirement; from harbor.upload.metrics import UploadMetrics; dist = distribution('reviewbench-harbor'); assert all(str(path).startswith('reviewbench_harbor/') for path in dist.files if str(path).endswith('.py')); assert len(dist.requires) == 1; dependency = Requirement(dist.requires[0]); assert dependency.name == 'harbor' and dependency.url == 'git+https://github.com/MiichelleZhou/harbor.git@6ce6abee0b9fa94a50c88f0557d030a419998d78'"
           reviewbench-check-job --help
           reviewbench-check-dataset --help
           reviewbench-sync-hub-metrics --help
-          reviewbench-upload --help
           REVIEWBENCH_TEST_INSTALLED=1 python "$tests/harbor-run.test.py"
           REVIEWBENCH_TEST_INSTALLED=1 python "$tests/harbor-hub.test.py"
       - name: Run no-inference isolation and artifact-transfer trial

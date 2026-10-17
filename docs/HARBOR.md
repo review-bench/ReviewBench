@@ -67,6 +67,10 @@ uv tool install --force --refresh --python 3.12 --with-executables-from harbor \
 
 This installs Harbor, the run plugin, and result checkers in one isolated
 Python environment. No host-side Node.js or Harbor Git commit is needed.
+This pre-release temporarily pins an immutable commit of a Harbor fork that
+adds native upload-metric projections. Released Harbor 0.24.0 does not yet
+support that extension; installing the runtime installs the required native
+CLI dependency automatically.
 Reviewer-specific adapters, authentication, and model configuration are
 separate. If your reviewer is a Python package, include it in the same
 installation with uv's `--with` option.
@@ -196,7 +200,7 @@ After verification, inspect the job for credentials or other sensitive content:
 
 ```bash
 harbor auth login --no-browser
-reviewbench-upload "jobs/$job"
+harbor upload "jobs/$job" --private
 ```
 
 Uploads are not automatic and do not create official leaderboard entries.
@@ -207,7 +211,8 @@ their retained metric before trusting their scores.
 ### Six headline metrics in Hub
 
 Hub derives its metric dropdown from uploaded trial rewards, not the custom
-job-level aggregate. `reviewbench-upload` submits only
+job-level aggregate. The run plugin writes `upload-metrics.json` for
+single-round jobs so native `harbor upload` submits only
 `grounded_precision`, `grounded_recall`, `grounded_f1`,
 `augmented_precision`, `augmented_recall`, and `augmented_f1`.
 The returned link selects **augmented F1** as the main displayed metric.
@@ -218,33 +223,32 @@ F1 is undefined if either input is undefined, and zero if both are zero.
 Undefined scores stay undefined rather than becoming zero.
 They are not the pooled **micro** scores in `reviewbench-summary.json`.
 
-The command uses Harbor's upload SDK with an in-memory metric projection.
+Native Harbor reads the declarative projection and applies it in memory.
 New jobs submit only those six fields as Hub trial reward metadata from the
 first upload. The original files are archived unchanged, including their
 detailed raw counts. No second synchronization command or display copy is
-needed for a new upload. Jobs are uploaded privately, and the command checks
-the actual Hub overview's six scores and coverage before reporting success.
+needed for a new upload. Use `--private` to explicitly keep the uploaded job
+private.
 
 Original local trial results, uploaded evidence archives, frozen task
 identities, detailed counts, and local verification reports remain unchanged.
-Re-running resumes incomplete uploads without changing completed evidence.
-For an existing job uploaded with stock `harbor upload`, the command also
-synchronizes its reward metadata. If that job's finalized overview retains
-the old counter keys, it uses Harbor's official private copy feature and
-returns the corrected display URL. This preserves all trials, failures,
-and copy provenance; it is not another benchmark run. A previously created
-display snapshot with outdated metrics requires explicit `--refresh-display`
-to recapture it. Use the returned URL.
+Harbor validates the projection's job/trial identities and original result-file
+SHA-256 digests before uploading. Changed evidence requires regenerating its
+projection, not editing scores by hand. Re-running resumes incomplete uploads
+without replacing completed evidence or trial metadata.
 
-`reviewbench-sync-hub-metrics` remains available for already-uploaded jobs
-when no artifact upload is needed. Stock `harbor upload` itself is unchanged
-and still submits every raw reward field.
+An intentionally partial projection requires native `harbor upload
+"jobs/$job" --private --allow-partial`. All failed trials remain present;
+these macro scores describe only scored PRs, not a verified full benchmark
+result. Projection generation does not weaken the strict checker. Repeated-round
+jobs retain independent-round verification but do not receive a headline
+projection; use independent single-round jobs for this Hub presentation.
 
-The default requires a complete single-round job. To inspect an intentionally
-partial run, explicitly add `--allow-partial`; its scores describe only scored
-PRs and are not a verified full benchmark result. Repeated-round jobs must be
-viewed as independent single rounds rather than silently pooling their ratios.
-Use `--dry-run` to preview the six scores without accessing Hub.
+Existing uploads retain their original trial metadata and cached overview.
+For those legacy jobs only, `reviewbench-sync-hub-metrics` can still synchronize
+metadata and create a corrected private display copy without rerunning reviews.
+An outdated display snapshot requires explicit `--refresh-display`. This legacy
+repair is unnecessary for a new native upload with a projection.
 
 ## Maintainer checks
 

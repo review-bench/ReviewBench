@@ -181,6 +181,11 @@ class ReviewBenchPlugin:
             )
 
     async def on_job_end(self, job_result):
+        if self.plan["n_attempts"] == 1:
+            projector = runpy.run_path(str(Path(__file__).with_name("hub_metrics.py")))["write_upload_metrics"]
+            projector(self.job_dir, allow_partial=True)
+        else:
+            print("Hub headline metrics require independent single-round jobs; round verification is unchanged.")
         # Reuse the offline gate so the retained report and live metric agree.
         checker = Path(__file__).with_name("check-job.py")
         check = runpy.run_path(str(checker))["check_job"]
