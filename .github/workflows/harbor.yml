@@ -92,10 +92,11 @@ jobs:
       - name: Check native run controls with synthetic trials and no inference
         run: |
           python tests/harbor-run.test.py
+          python tests/harbor-hub.test.py
       - name: Check installed runtime outside the source checkout
         run: |
           python -m pip wheel --no-deps . --wheel-dir .harbor/wheels
-          wheel="$PWD/.harbor/wheels/reviewbench_harbor-0.1.0rc6-py3-none-any.whl"
+          wheel="$PWD/.harbor/wheels/reviewbench_harbor-0.1.0rc7-py3-none-any.whl"
           tests="$PWD/tests"
           cd "$(mktemp -d)"
           unset PYTHONPATH
@@ -104,7 +105,9 @@ jobs:
           python -c "from importlib.metadata import distribution; dist = distribution('reviewbench-harbor'); assert all(str(path).startswith('reviewbench_harbor/') for path in dist.files if str(path).endswith('.py')); assert dist.requires == ['harbor==0.24.0']"
           reviewbench-check-job --help
           reviewbench-check-dataset --help
+          reviewbench-sync-hub-metrics --help
           REVIEWBENCH_TEST_INSTALLED=1 python "$tests/harbor-run.test.py"
+          REVIEWBENCH_TEST_INSTALLED=1 python "$tests/harbor-hub.test.py"
       - name: Run no-inference isolation and artifact-transfer trial
         shell: bash
         run: |
