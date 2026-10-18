@@ -1,0 +1,39 @@
+{
+  "name": "alma-reviewer",
+  "display_name": "alma-reviewer",
+  "image": "ghcr.io/almaoficial/alma-reviewbench@sha256:51b18cf15224022b668a8db8845bd4db5a8a85ffb64a0ead0d8d7130ed71f4b2",
+  "image_visibility": "public",
+  "configuration": [
+    {
+      "key": "backend",
+      "value": "llm"
+    },
+    {
+      "key": "governance",
+      "value": "base"
+    },
+    {
+      "key": "model",
+      "value": "gpt-5.6-sol"
+    },
+    {
+      "key": "effort",
+      "value": "medium"
+    }
+  ],
+  "secrets": {
+    "env": [
+      "OPENAI_API_KEY",
+      "ALLOW_REAL_LLM",
+      "RB_MAX_SPEND_USD"
+    ]
+  },
+  "model_api_url": "https://api.openai.com/v1",
+  "contacts": [
+    "almaoficial"
+  ],
+  "provider": "alma-reviewer",
+  "egress": [
+    "api.openai.com"
+  ]
+}
