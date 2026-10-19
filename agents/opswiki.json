@@ -1,0 +1,31 @@
+{
+  "name": "opswiki",
+  "display_name": "opswiki",
+  "image": "ghcr.io/xuanheya/opswiki-reviewbench@sha256:b93a131b16a25f6829d9c0a0a086f99fb53fe766641173bf6a04f20ea9b2dee8",
+  "image_visibility": "private",
+  "configuration": [
+    {
+      "key": "profile",
+      "value": "opswiki-hybrid-review-v2"
+    },
+    {
+      "key": "model",
+      "value": "deepseek-v4-flash"
+    }
+  ],
+  "secrets": {
+    "env": [
+      "DEEPSEEK_API_KEY",
+      "GHCR_PULL_TOKEN"
+    ]
+  },
+  "model_api_url": "https://api.deepseek.com/v1",
+  "pr_timeout_seconds": 2489,
+  "contacts": [
+    "xuanheya"
+  ],
+  "provider": "opswiki",
+  "egress": [
+    "api.deepseek.com"
+  ]
+}
