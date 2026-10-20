@@ -36,7 +36,7 @@
  * code 2 and keeps the checkpoint; run the same command again to resume.
  */
 
-import { existsSync, mkdirSync, readdirSync, readFileSync, unlinkSync, writeFileSync } from "fs";
+import { existsSync, mkdirSync, readdirSync, readFileSync, renameSync, unlinkSync, writeFileSync } from "fs";
 import { createHash } from "crypto";
 import { dirname, resolve } from "path";
 
@@ -304,6 +304,17 @@ interface Checkpoint {
   details: Record<string, PRDetailedOutput>;
 }
 
+/**
+ * Move a checkpoint this run can't use out of the way instead of letting the
+ * first saved PR overwrite it: it may hold many hours of judging that a rerun
+ * with the original inputs could still resume.
+ */
+function setCheckpointAside(cpPath: string, why: string): void {
+  const aside = cpPath.replace(/\.json$/i, `.${new Date().toISOString().replace(/[:.]/g, "-")}.json`);
+  renameSync(cpPath, aside);
+  console.warn(`Ignoring existing checkpoint: ${why}. Re-scoring from scratch; the old checkpoint was moved to ${aside}.`);
+}
+
 /** Load completed PR scores only when all compatibility inputs match. */
 function loadCheckpoint(
   outputPath: string,
@@ -313,24 +324,23 @@ function loadCheckpoint(
   const empty = () => ({ scores: new Map<string, PRScoreResult>(), details: new Map<string, PRDetailedOutput>() });
   if (!existsSync(cpPath)) return empty();
 
+  let data: Checkpoint;
   try {
-    const data: Checkpoint = JSON.parse(readFileSync(cpPath, "utf-8"));
-    // Discard a checkpoint from a different judge (or a pre-fingerprint one),
-    // rather than resuming its scores under this run's model label.
-    if (data.fingerprint !== expectedFingerprint) {
-      console.warn(
-        "Ignoring existing checkpoint: its judge, prompts, or evaluation inputs differ. " +
-          "Re-scoring from scratch.",
-      );
-      return empty();
-    }
-    return {
-      scores: new Map(Object.entries(data.completed)),
-      details: new Map(Object.entries(data.details ?? {})),
-    };
+    data = JSON.parse(readFileSync(cpPath, "utf-8"));
   } catch {
+    setCheckpointAside(cpPath, "it is not valid JSON");
     return empty();
   }
+  // Discard a checkpoint from a different judge (or a pre-fingerprint one),
+  // rather than resuming its scores under this run's model label.
+  if (data.fingerprint !== expectedFingerprint) {
+    setCheckpointAside(cpPath, "its judge, prompts, or evaluation inputs differ");
+    return empty();
+  }
+  return {
+    scores: new Map(Object.entries(data.completed)),
+    details: new Map(Object.entries(data.details ?? {})),
+  };
 }
 
 function saveCheckpoint(
@@ -346,7 +356,10 @@ function saveCheckpoint(
     completed: Object.fromEntries(scores),
     details: Object.fromEntries(details),
   };
-  writeFileSync(resolve(cpPath), JSON.stringify(data, null, 2));
+  // Write then rename, so a crash mid-write can't leave a truncated checkpoint.
+  const tmpPath = `${resolve(cpPath)}.tmp`;
+  writeFileSync(tmpPath, JSON.stringify(data, null, 2));
+  renameSync(tmpPath, resolve(cpPath));
 }
 
 function removeCheckpoint(outputPath: string): void {
