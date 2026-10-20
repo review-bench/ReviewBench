@@ -30,6 +30,10 @@
  *                        Drop golden findings whose producer starts with <prefix>
  *                        before matching and scoring (repeatable; see docs/JUDGING.md)
  *   --snapshot-dir <path> Trusted frozen checkout for a single-PR evaluation; no fetch
+ *   --max-retries <n>    Retries per PR after a rate limit or outage (default: 3; 0 disables)
+ *
+ * A rejected or expired API key, or exhausted quota, stops the run with exit
+ * code 2 and keeps the checkpoint; run the same command again to resume.
  */
 
 import { existsSync, mkdirSync, readdirSync, readFileSync, unlinkSync, writeFileSync } from "fs";
@@ -56,6 +60,7 @@ import {
   type PRFindings,
 } from "./input-validation.js";
 import { askJudge, JUDGE_CALL_PER_FINDING_MS, JUDGE_CALL_TIMEOUT_MS } from "./judge-call.js";
+import { classifyJudgeFailure, JUDGE_RETRY_DEFAULT, retryTransient } from "./judge-retry.js";
 import type { ManifestEntry } from "../lib/types.js";
 import { prKey } from "../lib/types.js";
 import { aggregateCandidateUsage } from "../lib/usage.js";
@@ -116,6 +121,7 @@ interface CliArgs {
   repoDir: string;
   excludeProducers: string[];
   snapshotDir?: string;
+  maxRetries: number;
 }
 
 function parseArgs(): CliArgs {
@@ -134,6 +140,7 @@ function parseArgs(): CliArgs {
     modelId: "",
     repoDir: "/tmp/review-repos",
     excludeProducers: [],
+    maxRetries: JUDGE_RETRY_DEFAULT,
   };
 
   for (let i = 0; i < args.length; i++) {
@@ -183,6 +190,13 @@ function parseArgs(): CliArgs {
       case "--snapshot-dir":
         opts.snapshotDir = args[++i];
         if (!opts.snapshotDir) throw new Error("--snapshot-dir requires a path");
+        break;
+      case "--max-retries":
+        opts.maxRetries = Number(args[++i]);
+        if (!Number.isInteger(opts.maxRetries) || opts.maxRetries < 0) {
+          console.error("--max-retries requires a non-negative integer");
+          process.exit(1);
+        }
         break;
       default:
         console.error(`Unknown argument: ${args[i]}`);
@@ -805,9 +819,12 @@ async function main() {
   let nextIndex = 0;
   let errorCount = 0;
   let missingGoldenDuringEval = 0;
+  // Set by the first failure that every remaining PR would repeat.
+  let fatalError: string | undefined;
+  const stopRun = new AbortController();
 
   async function worker() {
-    while (nextIndex < commonKeys.length) {
+    while (nextIndex < commonKeys.length && !stopRun.signal.aborted) {
       const i = nextIndex++;
       const prKeyStr = commonKeys[i];
       const candidate = candidateByPR.get(prKeyStr)!;
@@ -819,7 +836,19 @@ async function main() {
       }
 
       try {
-        const evalResult = await evalPR(prKeyStr, candidate, goldenStore, opts, label);
+        const evalResult = await retryTransient(
+          () => evalPR(prKeyStr, candidate, goldenStore, opts, label),
+          {
+            maxRetries: opts.maxRetries,
+            signal: stopRun.signal,
+            onRetry: (retry, delayMs, err) => {
+              const msg = err instanceof Error ? err.message : String(err);
+              console.log(
+                `${label}: ${msg.slice(0, 200)}; retry ${retry}/${opts.maxRetries} in ${Math.round(delayMs / 1000)}s`,
+              );
+            },
+          },
+        );
 
         if (!evalResult) {
           missingGoldenDuringEval++;
@@ -842,6 +871,10 @@ async function main() {
         errorCount++;
         const msg = err instanceof Error ? err.message : String(err);
         console.log(`${label}: FAILED: ${msg.slice(0, 200)}`);
+        if (classifyJudgeFailure(err) === "fatal" && !stopRun.signal.aborted) {
+          fatalError = msg;
+          stopRun.abort();
+        }
       }
     }
   }
@@ -851,6 +884,20 @@ async function main() {
     () => worker(),
   );
   await Promise.all(workers);
+
+  const resumeHint = completed.size > 0
+    ? `${completed.size}/${commonKeys.length} PRs are saved in ${outputSidecarPath(opts.output, "checkpoint")}; ` +
+      "run the same command again to judge only the rest."
+    : "Run the same command again to retry.";
+
+  if (fatalError !== undefined) {
+    console.error(
+      `\nStopped: the judge failed in a way every remaining PR would repeat ` +
+      `(rejected or expired API key, exhausted quota, or unavailable model):\n  ${fatalError.slice(0, 500)}\n` +
+      `Fix the cause, then resume. ${resumeHint}`,
+    );
+    process.exit(2);
+  }
 
   if (opts.strict && missingGoldenDuringEval > 0) {
     console.error(
@@ -862,7 +909,7 @@ async function main() {
   if (opts.strict && errorCount > 0) {
     console.error(
       `\nInput validation failed: ${errorCount} PR(s) errored during eval; refusing to write a partial leaderboard. ` +
-      `Investigate the failures above (re-run, or pass --no-strict to accept partial results).`,
+      `Investigate the failures above (re-run, or pass --no-strict to accept partial results). ${resumeHint}`,
     );
     process.exit(1);
   }
