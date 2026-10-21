@@ -159,7 +159,7 @@ jobs:
           PY
       - name: Archive smoke evidence
         if: always()
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: harbor-docker-smoke
           path: |
