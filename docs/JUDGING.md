@@ -27,17 +27,34 @@ this command does not currently accept those intermediate judgments as input.
 
 ## Install
 
-The judging tools require Node.js 20 or newer.
+The judging tools require Node.js 22.19 or newer, as required by the bundled Pi SDK.
 
 ```sh
 npm ci
 ```
 
-## Configure your API key
+## Configure provider authentication
+
+You can authenticate with a provider API key or with a subscription supported by
+Pi. Keep credentials out of candidate files, command arguments, and the
+repository.
+
+### Use a Pi subscription
+
+Start Pi and sign in to the provider:
+
+```sh
+npx pi
+```
+
+In Pi, run `/login` and select the subscription provider. ReviewBench reads the
+saved Pi credentials from the configured agent directory (by default,
+`~/.pi/agent`); no API key is required for this path.
+
+### Use an API key
 
 Set your provider's API key in the environment before running the judge. The
-pipeline reads the key through the bundled pi model registry; keys do not belong
-in candidate files, command arguments, or the repository.
+pipeline reads the key through Pi's model runtime.
 
 The pi package is used as an SDK for provider authentication, model discovery,
 LLM calls, and read-only classifier tools. ReviewBench initializes an API
@@ -67,7 +84,7 @@ In PowerShell:
 $env:OPENAI_API_KEY = "<your key>"
 ```
 
-See the [pi provider documentation](https://github.com/badlogic/pi-mono/blob/main/packages/coding-agent/docs/providers.md)
+See the [pi provider documentation](https://github.com/earendil-works/pi/blob/main/packages/coding-agent/docs/providers.md)
 for the full provider list and provider-specific settings.
 
 ## Choose a judge model
@@ -79,8 +96,8 @@ npx pi --list-models
 ```
 
 This optional command only prints models from the pi CLI. It does not run the
-ReviewBench judging pipeline. You do not need to run `npx pi` when using an API
-key environment variable.
+ReviewBench judging pipeline. With a subscription, use the exact provider and
+model shown by the Pi registry after logging in.
 
 Pass the selected provider and model to the ReviewBench pipeline:
 

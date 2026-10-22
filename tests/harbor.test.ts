@@ -5,7 +5,7 @@ import { existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, 
 import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import test, { type TestContext } from "node:test";
-import { AuthStorage, ModelRegistry } from "@earendil-works/pi-coding-agent";
+import { ModelRegistry, ModelRuntime } from "@earendil-works/pi-coding-agent";
 
 import { aggregate, scorePR, type ClassifiedFinding, type PRScoreResult } from "../scripts/eval/scorer.js";
 import { getFullDiff, validateSnapshot } from "../scripts/extraction/git.js";
@@ -220,7 +220,7 @@ test("Harbor task hashing matches the documented path/content algorithm", () => 
     hash(`a.txt\0${hash("a")}\nb.txt\0${hash("b")}\n`));
 });
 
-test("Standard public exports register the exact Opus 5 judge only in the verifier", (t) => {
+test("Standard public exports register the exact Opus 5 judge only in the verifier", async (t) => {
   const dir = fixture(t);
   sourceFixture(dir);
   const opts: ExportOptions = {
@@ -233,7 +233,13 @@ test("Standard public exports register the exact Opus 5 judge only in the verifi
   const models = readFileSync(modelsPath, "utf8");
   assert.equal(createHash("sha256").update(models).digest("hex"),
     "45e00e73f4862bb83b847a210cb68b7a162d74ab7acb2dc1d3712ebe445b0c68");
-  const registry = ModelRegistry.create(AuthStorage.create(join(dir, "auth.json")), modelsPath);
+  const modelRuntime = await ModelRuntime.create({
+    authPath: join(dir, "auth.json"),
+    modelsPath,
+    allowModelNetwork: false,
+    refreshOnCreate: false,
+  });
+  const registry = new ModelRegistry(modelRuntime);
   const model = registry.find("anthropic", "claude-opus-5");
   assert.ok(model, "the pinned judge SDK must load the exact model ID");
   assert.equal(model.baseUrl, "https://api.anthropic.com");

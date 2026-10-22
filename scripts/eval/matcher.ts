@@ -12,7 +12,7 @@
  */
 
 import {
-  AuthStorage,
+  ModelRuntime,
   createAgentSession,
   DefaultResourceLoader,
   getAgentDir,
@@ -20,6 +20,7 @@ import {
   SessionManager,
   SettingsManager,
 } from "@earendil-works/pi-coding-agent";
+import { join } from "path";
 
 import type { Finding } from "../lib/types.js";
 import type { RawCorrespondence } from "../lib/match-types.js";
@@ -84,7 +85,7 @@ function buildMatcherPrompt(
 }
 
 export function resolveModel(
-  modelRegistry: ReturnType<typeof ModelRegistry.create>,
+  modelRegistry: ModelRegistry,
   provider: string,
   modelId: string,
 ) {
@@ -272,15 +273,18 @@ export async function matchFindings(
   });
 
   // Create a single session for all matching
-  const authStorage = AuthStorage.create();
-  const modelRegistry = ModelRegistry.create(authStorage);
+  const agentDir = getAgentDir();
+  const modelRuntime = await ModelRuntime.create({
+    authPath: join(agentDir, "auth.json"),
+    modelsPath: join(agentDir, "models.json"),
+  });
+  const modelRegistry = new ModelRegistry(modelRuntime);
   const model = resolveModel(modelRegistry, config.provider, config.modelId);
 
   if (!model) {
     throw new Error(`Requested matcher model is unavailable: ${config.provider}/${config.modelId}`);
   }
 
-  const agentDir = getAgentDir();
   const loader = new DefaultResourceLoader({
     cwd: process.cwd(),
     agentDir,
@@ -292,8 +296,8 @@ export async function matchFindings(
     cwd: process.cwd(),
     model,
     thinkingLevel: "low",
-    authStorage,
-    modelRegistry,
+    agentDir,
+    modelRuntime,
     resourceLoader: loader,
     sessionManager: SessionManager.inMemory(),
     settingsManager: SettingsManager.inMemory({
