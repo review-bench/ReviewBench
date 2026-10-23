@@ -11,10 +11,10 @@
  */
 
 import { mkdirSync } from "fs";
-import { resolve } from "path";
+import { join, resolve } from "path";
 
 import {
-  AuthStorage,
+  ModelRuntime,
   createAgentSession,
   DefaultResourceLoader,
   getAgentDir,
@@ -91,11 +91,15 @@ export interface PRSessionResult {
  * to build context and avoid redundant exploration.
  */
 export async function classifyPR(opts: PRSessionOptions): Promise<PRSessionResult> {
-  const authStorage = AuthStorage.create();
+  const agentDir = getAgentDir();
+  const modelRuntime = await ModelRuntime.create({
+    authPath: join(agentDir, "auth.json"),
+    modelsPath: join(agentDir, "models.json"),
+  });
   if (opts.config.apiKey) {
-    authStorage.setRuntimeApiKey(opts.config.provider, opts.config.apiKey);
+    await modelRuntime.setRuntimeApiKey(opts.config.provider, opts.config.apiKey);
   }
-  const modelRegistry = ModelRegistry.create(authStorage);
+  const modelRegistry = new ModelRegistry(modelRuntime);
 
   const model = resolveModel(modelRegistry, opts.config);
   if (!model) {
@@ -108,8 +112,6 @@ export async function classifyPR(opts: PRSessionOptions): Promise<PRSessionResul
 
   // Determine working directory — if a repo checkout is available, use it
   const cwd = opts.config?.repoDir ?? process.cwd();
-  const agentDir = getAgentDir();
-
   const loader = new DefaultResourceLoader({
     cwd,
     agentDir,
@@ -127,8 +129,8 @@ export async function classifyPR(opts: PRSessionOptions): Promise<PRSessionResul
     cwd,
     model,
     thinkingLevel: "medium",
-    authStorage,
-    modelRegistry,
+    agentDir,
+    modelRuntime,
     resourceLoader: loader,
     sessionManager: SessionManager.create(cwd, resolvedSessionDir),
     settingsManager: SettingsManager.inMemory({
@@ -315,7 +317,7 @@ async function promptAndCollect(session: any, message: string): Promise<string> 
 // ---------------------------------------------------------------------------
 
 export function resolveModel(
-  modelRegistry: ReturnType<typeof ModelRegistry.create>,
+  modelRegistry: ModelRegistry,
   config: ClassifierConfig,
 ) {
   const available = modelRegistry.getAvailable();
