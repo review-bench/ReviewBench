@@ -1,0 +1,30 @@
+{
+  "name": "tracehound",
+  "display_name": "TraceHound",
+  "image": "ghcr.io/sunnybagal/tracehound-reviewbench@sha256:ff22b972feb243d7c4f73db69ced12ee4a811e66f552a094e77794e1276b23ba",
+  "image_visibility": "public",
+  "configuration": [
+    {
+      "key": "pipeline",
+      "value": "pool-raw"
+    },
+    {
+      "key": "model",
+      "value": "nvidia/nemotron-3-super-120b-a12b"
+    }
+  ],
+  "secrets": {
+    "env": [
+      "NEBIUS_API_KEY"
+    ]
+  },
+  "model_api_url": "https://api.tokenfactory.us-central1.nebius.com/v1",
+  "egress": [
+    "api.tokenfactory.us-north1.nebius.com",
+    "api.tokenfactory.us-central1.nebius.com"
+  ],
+  "contacts": [
+    "sunnybagal"
+  ],
+  "provider": "TraceHound"
+}
