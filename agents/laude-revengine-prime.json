@@ -1,6 +1,6 @@
 {
   "name": "laude-revengine-prime",
-  "display_name": "Laude RevEngine Prime",
+  "display_name": "Laude RevEngine",
   "image": "ghcr.io/laude-institute/rev-engine-prime@sha256:55eedec127aad5601fccbe94514ad0311dc9b02ef1bfaf46ffe20673a49900a9",
   "image_visibility": "public",
   "configuration": [
@@ -18,7 +18,7 @@
   "contacts": [
     "nickjalbert"
   ],
-  "provider": "Laude RevEngine Prime",
+  "provider": "Laude RevEngine",
   "egress": [
     "openrouter.ai"
   ]
