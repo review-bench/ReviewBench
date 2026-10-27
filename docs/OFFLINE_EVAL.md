@@ -93,6 +93,9 @@ classifier. A slow endpoint or a high `--concurrency` can exceed it, and the
 judge then refuses to write partial results. Raise the budget with
 `REVIEW_BENCH_JUDGE_TIMEOUT_MS` (for example `1800000`) and run the same
 command again. Pull requests that already finished resume from the checkpoint.
+Rate limits and provider outages are retried, and a rejected or expired API key
+stops the run early so you can fix it and resume; see
+[Resume and inspect results](JUDGING.md#resume-and-inspect-results).
 
 ### Use the leaderboard's judge model
 

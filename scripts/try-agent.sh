@@ -5,7 +5,7 @@
 # variables, and the same checks on the findings file. It does not score; a
 # test run in the portal does that.
 #
-#   scripts/try-agent.sh <image> [--set test|full] [--pr <index>] [-e NAME[=VALUE] ...]
+#   scripts/try-agent.sh <image> [--set test|full] [--pr <index>] [--resume] [-e NAME[=VALUE] ...]
 #
 #   scripts/try-agent.sh my-reviewer:dev --pr 0
 #   scripts/try-agent.sh my-reviewer:dev -e OPENAI_API_KEY -e RB_CONFIG_MODEL=gpt-5.5
@@ -13,21 +13,24 @@
 #
 # --set test (the default) runs the 25 pull requests in corpus/test/test.json.
 # --set full runs the full set of 219 in corpus/manifest.json.
+# --resume skips pull requests already in ./findings; clear it when the image changes.
 #
 # Needs docker, git and jq. Findings land in ./findings/<pr key>.json.
 set -euo pipefail
 
-usage() { sed -n '8,17p' "$0" | sed 's/^# \{0,1\}//' >&2; exit 2; }
+usage() { sed -n '8,18p' "$0" | sed 's/^# \{0,1\}//' >&2; exit 2; }
 [ $# -ge 1 ] || usage
 image="$1"; shift
 only=""
 set_name=test
+resume=0
 env_args=()
 while [ $# -gt 0 ]; do
   case "$1" in
     # Each option takes a value; without one, show the usage instead of an unbound-variable error.
     --set) [ $# -ge 2 ] || usage; set_name="$2"; shift 2 ;;
     --pr) [ $# -ge 2 ] || usage; only="$2"; shift 2 ;;
+    --resume) resume=1; shift ;;
     -e) [ $# -ge 2 ] || usage; env_args+=(-e "$2"); shift 2 ;;
     *) usage ;;
   esac
@@ -52,9 +55,24 @@ has_commits() {
   done
 }
 
+# Prints why a findings file is unusable for this pull request; nothing when it is fine.
+findings_problem() {
+  local file="$1" head="$2" pr="$3"
+  if ! jq -e . "$file" >/dev/null 2>&1; then
+    echo "no valid JSON at RB_OUT"; return
+  fi
+  jq -r --arg head "$head" --argjson pr "$pr" '
+    if .pr.head != $head then "pr.head is not RB_HEAD"
+    elif (.pr.pr_number | tonumber? // null) != $pr then "pr.pr_number is not RB_PR_NUMBER"
+    elif (.findings | type) != "array" then "findings is not an array"
+    else ([.findings[] | select((.file | type) != "string" or (.start_line | type) != "number" or (.end_line | type) != "number" or (.message | type) != "string" or (.file | startswith("./") or startswith("/")))] | length) as $bad
+      | if $bad > 0 then "\($bad) finding(s) miss file, start_line, end_line or message, or use a ./ or / path" else "" end
+    end' "$file"
+}
+
 count=$(jq length "$manifest")
 indices=$(if [ -n "$only" ]; then echo "$only"; else seq 0 $((count - 1)); fi)
-passed=0; failed=0
+passed=0; failed=0; resumed=0
 
 for i in $indices; do
   entry=$(jq -c ".[$i]" "$manifest")
@@ -63,6 +81,11 @@ for i in $indices; do
   key="${nwo/\//_}_${pr}-${head:0:8}"
   repo="$work/repos/${nwo/\//_}"
   echo "== [$i] $nwo#$pr ($key)" >&2
+
+  if [ "$resume" -eq 1 ] && [ -f "$out_dir/$key.json" ] && [ -z "$(findings_problem "$out_dir/$key.json" "$head" "$pr")" ]; then
+    echo "   skipped: findings from an earlier run" >&2
+    resumed=$((resumed + 1)); continue
+  fi
 
   # A checkout at head with base reachable, like the one the benchmark mounts.
   # Fetch from the review-bench mirror (the snapshot the judge also uses), and
@@ -109,16 +132,7 @@ for i in $indices; do
   if [ "$status" -ne 0 ]; then
     echo "   FAIL: exit code $status" >&2; failed=$((failed + 1)); continue
   fi
-  if ! jq -e . "$file" >/dev/null 2>&1; then
-    echo "   FAIL: no valid JSON at RB_OUT" >&2; failed=$((failed + 1)); continue
-  fi
-  problem=$(jq -r --arg head "$head" --argjson pr "$pr" '
-    if .pr.head != $head then "pr.head is not RB_HEAD"
-    elif (.pr.pr_number | tonumber? // null) != $pr then "pr.pr_number is not RB_PR_NUMBER"
-    elif (.findings | type) != "array" then "findings is not an array"
-    else ([.findings[] | select((.file | type) != "string" or (.start_line | type) != "number" or (.end_line | type) != "number" or (.message | type) != "string" or (.file | startswith("./") or startswith("/")))] | length) as $bad
-      | if $bad > 0 then "\($bad) finding(s) miss file, start_line, end_line or message, or use a ./ or / path" else "" end
-    end' "$file")
+  problem=$(findings_problem "$file" "$head" "$pr")
   if [ -n "$problem" ]; then
     echo "   FAIL: $problem" >&2; failed=$((failed + 1)); continue
   fi
@@ -127,5 +141,5 @@ for i in $indices; do
   passed=$((passed + 1))
 done
 
-echo "passed $passed, failed $failed; findings in $out_dir" >&2
+echo "passed $passed, failed $failed, resumed $resumed; findings in $out_dir" >&2
 [ "$failed" -eq 0 ]
