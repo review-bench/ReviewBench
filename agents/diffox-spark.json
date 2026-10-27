@@ -1,0 +1,23 @@
+{
+  "name": "diffox-spark",
+  "display_name": "diffox spark",
+  "image": "ghcr.io/diffox-bench/diffox-reviewbench@sha256:f009c1dc83c8a83ebf9480cee150c61483c0c5af4ad210707b95787427076441",
+  "image_visibility": "private",
+  "secrets": {
+    "env": [
+      "ANTHROPIC_API_KEY",
+      "OPENROUTER_API_KEY",
+      "GHCR_PULL_TOKEN"
+    ]
+  },
+  "model_api_url": "https://api.anthropic.com",
+  "egress": [
+    "openrouter.ai",
+    "api.anthropic.com"
+  ],
+  "pr_timeout_seconds": 3600,
+  "contacts": [
+    "diffox-bench-bot"
+  ],
+  "provider": "diffox spark"
+}
