@@ -17,8 +17,11 @@
     "test": "npm run typecheck && npm run test:judge"
   },
   "license": "MIT",
+  "engines": {
+    "node": ">=22.19.0"
+  },
   "dependencies": {
-    "@earendil-works/pi-coding-agent": "0.75.5"
+    "@earendil-works/pi-coding-agent": "^1.4.0"
   },
   "devDependencies": {
     "@types/node": "^25.6.0",
