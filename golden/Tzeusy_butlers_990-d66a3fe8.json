@@ -368,6 +368,46 @@
       }
     },
     {
+      "file": "frontend/src/pages/QaPatrolDetailPage.tsx",
+      "start_line": 47,
+      "end_line": 51,
+      "message": "The severity badge mapping is duplicated across the new QA pages. Since these pages use the same severity labels and colors, keeping separate copies makes future severity changes easy to apply inconsistently; consider extracting a shared QA badge component/helper.",
+      "tp_fp": "fp",
+      "severity": "low",
+      "category": "maintainability",
+      "scope": "introduced-by-pr",
+      "difficulty": "easy",
+      "context_required": "diff-only",
+      "tp_fp_justification": "This is a duplicate of Finding 2, which already identified the same DRY violation — SeverityBadge, SourceTypeBadge, PatrolStatusBadge, formatTs, and formatDuration are all duplicated across QaOverviewPage.tsx, QaPatrolDetailPage.tsx, and QaInvestigationDetailPage.tsx. This finding restates the same issue with narrower scope (just SeverityBadge), but the substance is identical to Finding 2.",
+      "severity_justification": "Same as Finding 2 — contained duplication in new files with no current behavioral impact.",
+      "category_justification": "DRY violation across new QA page files.",
+      "producer": "ccr:gpt-5.5[ReasoningEffort=medium]",
+      "source": {
+        "type": "ccr",
+        "alignment": "generated"
+      }
+    },
+    {
+      "file": "frontend/src/pages/QaInvestigationDetailPage.tsx",
+      "start_line": 42,
+      "end_line": 46,
+      "message": "The severity badge mapping is duplicated across the new QA pages. Since these pages use the same severity labels and colors, keeping separate copies makes future severity changes easy to apply inconsistently; consider extracting a shared QA badge component/helper.",
+      "tp_fp": "fp",
+      "severity": "low",
+      "category": "maintainability",
+      "scope": "introduced-by-pr",
+      "difficulty": "easy",
+      "context_required": "diff-only",
+      "tp_fp_justification": "This is a duplicate of Finding 2, which already identified the same DRY violation across all three QA page files. The finding is factually correct but restates the same issue already covered by Finding 2.",
+      "severity_justification": "Contained duplication in new files with no current behavioral impact.",
+      "category_justification": "DRY violation across new QA page files.",
+      "producer": "ccr:gpt-5.5[ReasoningEffort=medium]",
+      "source": {
+        "type": "ccr",
+        "alignment": "generated"
+      }
+    },
+    {
       "file": "frontend/src/pages/QaOverviewPage.tsx",
       "start_line": 237,
       "end_line": 240,

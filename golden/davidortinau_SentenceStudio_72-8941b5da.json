@@ -371,6 +371,26 @@
       "file": "tests/SentenceStudio.Api.Tests/Infrastructure/JwtBearerApiFactory.cs",
       "start_line": 14,
       "end_line": 14,
+      "message": "Same issue as in `DevAuthApiFactory.cs`: `WebApplicationFactory<Program>` cannot reference the API's implicit top-level `Program` class because it is internal and there is no `public partial class Program { }` shim or `InternalsVisibleTo` attribute in the `SentenceStudio.Api` project. The tests will fail to compile until the entry point is made accessible to the test assembly.",
+      "tp_fp": "tp",
+      "severity": "high",
+      "category": "testing",
+      "scope": "introduced-by-pr",
+      "difficulty": "medium",
+      "context_required": "diff-plus-related-files",
+      "tp_fp_justification": "Same root cause as Finding 1, verified in the same investigation: no 'public partial class Program {}' or InternalsVisibleTo exists in SentenceStudio.Api, and JwtBearerApiFactory also uses WebApplicationFactory<Program>. This is a duplicate of Finding 1 on a different file/line but the same underlying issue.",
+      "severity_justification": "Same compile-time blocker as Finding 1 — the test project cannot compile without access to the internal Program type.",
+      "category_justification": "Test infrastructure issue preventing the test project from compiling.",
+      "producer": "ccr:claude-opus-4.7[ReasoningEffort=medium]",
+      "source": {
+        "type": "ccr",
+        "alignment": "generated"
+      }
+    },
+    {
+      "file": "tests/SentenceStudio.Api.Tests/Infrastructure/JwtBearerApiFactory.cs",
+      "start_line": 14,
+      "end_line": 14,
       "message": "These test factories reference the API's top-level `Program` type from a separate assembly, but the API project does not expose a `public partial class Program` or `InternalsVisibleTo` for the test assembly. The generated top-level `Program` class is internal, so the new test project will not compile until the entry point is made visible to tests.",
       "tp_fp": "tp",
       "severity": "high",

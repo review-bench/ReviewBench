@@ -48,6 +48,26 @@
       }
     },
     {
+      "file": "src/index.ts",
+      "start_line": 124,
+      "end_line": 124,
+      "message": "RuleBrandStyleManualRequest is re-exported from the public entry point despite being @deprecated from the moment it was introduced in this PR. Exporting a deprecated type with no prior usage creates unnecessary permanent API surface. See also src/types/api.ts:955-957.",
+      "tp_fp": "tp",
+      "severity": "low",
+      "category": "api-architecture",
+      "scope": "introduced-by-pr",
+      "difficulty": "easy",
+      "context_required": "diff-plus-related-files",
+      "tp_fp_justification": "Factually correct: line 124 of src/index.ts re-exports RuleBrandStyleManualRequest which was @deprecated from the moment it was introduced in this PR (confirmed via git history — version stayed 0.2.0, type was never published non-deprecated). This is the same issue as Finding 2 viewed from the public entry point.",
+      "severity_justification": "Same as Finding 2 — no runtime impact, but adds permanent public API surface that must be maintained per the project's own backward-compat rules.",
+      "category_justification": "Concerns the public API contract via src/index.ts, the single public entry point for the SDK.",
+      "producer": "llm_review:claude-sonnet-4.6",
+      "source": {
+        "type": "llm_review",
+        "alignment": "generated"
+      }
+    },
+    {
       "file": "src/types/api.ts",
       "start_line": 916,
       "end_line": 923,

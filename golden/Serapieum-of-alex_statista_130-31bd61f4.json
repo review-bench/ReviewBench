@@ -48,6 +48,26 @@
       }
     },
     {
+      "file": "docs/LICENSE.md",
+      "start_line": 3,
+      "end_line": 3,
+      "message": "The copyright year is set to 2026, which is in the future. It should be the year of creation or last significant update. It is conventional to use the current year or a range of years (e.g., '2023-2024'). Using a future year might be legally problematic or simply a typo that should be corrected.",
+      "tp_fp": "fp",
+      "severity": "low",
+      "category": "documentation",
+      "scope": "introduced-by-pr",
+      "difficulty": "easy",
+      "context_required": "diff-only",
+      "tp_fp_justification": "Same as Finding 2 — the current date is 2026-05-19, so 2026 is the current year, not a future year. The copyright year is accurate.",
+      "severity_justification": "Even if the year were wrong, it would be a minor documentation issue with negligible legal impact for open source software.",
+      "category_justification": "The finding concerns the copyright notice in the license file.",
+      "producer": "llm_review:gemini-2.5-pro",
+      "source": {
+        "type": "llm_review",
+        "alignment": "generated"
+      }
+    },
+    {
       "file": "pyproject.toml",
       "start_line": 21,
       "end_line": 21,

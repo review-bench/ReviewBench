@@ -316,6 +316,116 @@
       }
     },
     {
+      "file": "python/packages/gmail/src/matimo_gmail/__init__.py",
+      "start_line": 4,
+      "end_line": 4,
+      "message": "[python.lang.compatibility.python37.python37-compatibility-importlib2] Found 'importlib.resources', which is a module only available on Python 3.7+. This does not work in lower versions, and therefore is not backwards compatible. Use importlib_resources instead for older Python versions.",
+      "tp_fp": "fp",
+      "severity": "low",
+      "category": "reliability",
+      "scope": "introduced-by-pr",
+      "difficulty": "easy",
+      "context_required": "diff-plus-related-files",
+      "tp_fp_justification": "Same as Finding 14 — the project declares `requires-python = \">=3.11\"` in `pyproject.toml`, making the Python <3.7 compatibility warning entirely irrelevant. `importlib.resources` and `importlib.resources.files()` are both well within the 3.11+ minimum requirement.",
+      "severity_justification": "No real compatibility issue given the Python 3.11+ requirement.",
+      "category_justification": "The finding concerns Python version compatibility.",
+      "producer": "deterministic_tool:semgrep",
+      "source": {
+        "type": "tool",
+        "alignment": "generated",
+        "tool": "semgrep",
+        "rule_id": "python.lang.compatibility.python37.python37-compatibility-importlib2"
+      }
+    },
+    {
+      "file": "python/packages/hubspot/src/matimo_hubspot/__init__.py",
+      "start_line": 4,
+      "end_line": 4,
+      "message": "[python.lang.compatibility.python37.python37-compatibility-importlib2] Found 'importlib.resources', which is a module only available on Python 3.7+. This does not work in lower versions, and therefore is not backwards compatible. Use importlib_resources instead for older Python versions.",
+      "tp_fp": "fp",
+      "severity": "low",
+      "category": "reliability",
+      "scope": "introduced-by-pr",
+      "difficulty": "easy",
+      "context_required": "diff-plus-related-files",
+      "tp_fp_justification": "Same as Findings 14 and 15 — the project declares `requires-python = \">=3.11\"` in `pyproject.toml`, making the Python <3.7 compatibility warning entirely irrelevant. `importlib.resources` is well within the 3.11+ minimum requirement.",
+      "severity_justification": "No real compatibility issue given the Python 3.11+ requirement.",
+      "category_justification": "The finding concerns Python version compatibility.",
+      "producer": "deterministic_tool:semgrep",
+      "source": {
+        "type": "tool",
+        "alignment": "generated",
+        "tool": "semgrep",
+        "rule_id": "python.lang.compatibility.python37.python37-compatibility-importlib2"
+      }
+    },
+    {
+      "file": "python/packages/mailchimp/src/matimo_mailchimp/__init__.py",
+      "start_line": 4,
+      "end_line": 4,
+      "message": "[python.lang.compatibility.python37.python37-compatibility-importlib2] Found 'importlib.resources', which is a module only available on Python 3.7+. This does not work in lower versions, and therefore is not backwards compatible. Use importlib_resources instead for older Python versions.",
+      "tp_fp": "fp",
+      "severity": "low",
+      "category": "reliability",
+      "scope": "introduced-by-pr",
+      "difficulty": "easy",
+      "context_required": "diff-plus-related-files",
+      "tp_fp_justification": "Same as Findings 14–16 — the project declares `requires-python = \">=3.11\"` in `pyproject.toml`, making the Python <3.7 compatibility warning entirely irrelevant. `importlib.resources` is well within the 3.11+ minimum requirement.",
+      "severity_justification": "No real compatibility issue given the Python 3.11+ requirement.",
+      "category_justification": "The finding concerns Python version compatibility.",
+      "producer": "deterministic_tool:semgrep",
+      "source": {
+        "type": "tool",
+        "alignment": "generated",
+        "tool": "semgrep",
+        "rule_id": "python.lang.compatibility.python37.python37-compatibility-importlib2"
+      }
+    },
+    {
+      "file": "python/packages/notion/src/matimo_notion/__init__.py",
+      "start_line": 4,
+      "end_line": 4,
+      "message": "[python.lang.compatibility.python37.python37-compatibility-importlib2] Found 'importlib.resources', which is a module only available on Python 3.7+. This does not work in lower versions, and therefore is not backwards compatible. Use importlib_resources instead for older Python versions.",
+      "tp_fp": "fp",
+      "severity": "low",
+      "category": "reliability",
+      "scope": "introduced-by-pr",
+      "difficulty": "easy",
+      "context_required": "diff-plus-related-files",
+      "tp_fp_justification": "Same as Findings 14–17 — the project declares `requires-python = \">=3.11\"` in `pyproject.toml`, making the Python <3.7 compatibility warning entirely irrelevant. `importlib.resources` is well within the 3.11+ minimum requirement.",
+      "severity_justification": "No real compatibility issue given the Python 3.11+ requirement.",
+      "category_justification": "The finding concerns Python version compatibility.",
+      "producer": "deterministic_tool:semgrep",
+      "source": {
+        "type": "tool",
+        "alignment": "generated",
+        "tool": "semgrep",
+        "rule_id": "python.lang.compatibility.python37.python37-compatibility-importlib2"
+      }
+    },
+    {
+      "file": "python/packages/postgres/src/matimo_postgres/__init__.py",
+      "start_line": 4,
+      "end_line": 4,
+      "message": "[python.lang.compatibility.python37.python37-compatibility-importlib2] Found 'importlib.resources', which is a module only available on Python 3.7+. This does not work in lower versions, and therefore is not backwards compatible. Use importlib_resources instead for older Python versions.",
+      "tp_fp": "fp",
+      "severity": "low",
+      "category": "reliability",
+      "scope": "introduced-by-pr",
+      "difficulty": "easy",
+      "context_required": "diff-plus-related-files",
+      "tp_fp_justification": "Same as Findings 14–18 — the project declares `requires-python = \">=3.11\"` in `pyproject.toml`, making the Python <3.7 compatibility warning entirely irrelevant. `importlib.resources` is well within the 3.11+ minimum requirement.",
+      "severity_justification": "No real compatibility issue given the Python 3.11+ requirement.",
+      "category_justification": "The finding concerns Python version compatibility.",
+      "producer": "deterministic_tool:semgrep",
+      "source": {
+        "type": "tool",
+        "alignment": "generated",
+        "tool": "semgrep",
+        "rule_id": "python.lang.compatibility.python37.python37-compatibility-importlib2"
+      }
+    },
+    {
       "file": "python/packages/postgres/src/matimo_postgres/tools/execute-sql/execute-sql.py",
       "start_line": 64,
       "end_line": 64,
@@ -401,6 +511,50 @@
         "alignment": "generated",
         "tool": "semgrep",
         "rule_id": "python.sqlalchemy.security.sqlalchemy-execute-raw-query.sqlalchemy-execute-raw-query"
+      }
+    },
+    {
+      "file": "python/packages/slack/src/matimo_slack/__init__.py",
+      "start_line": 4,
+      "end_line": 4,
+      "message": "[python.lang.compatibility.python37.python37-compatibility-importlib2] Found 'importlib.resources', which is a module only available on Python 3.7+. This does not work in lower versions, and therefore is not backwards compatible. Use importlib_resources instead for older Python versions.",
+      "tp_fp": "fp",
+      "severity": "low",
+      "category": "reliability",
+      "scope": "introduced-by-pr",
+      "difficulty": "easy",
+      "context_required": "diff-plus-related-files",
+      "tp_fp_justification": "Same as Findings 14–19 — the project declares `requires-python = \">=3.11\"` in `pyproject.toml`, making the Python <3.7 compatibility warning entirely irrelevant. `importlib.resources` is well within the 3.11+ minimum requirement.",
+      "severity_justification": "No real compatibility issue given the Python 3.11+ requirement.",
+      "category_justification": "The finding concerns Python version compatibility.",
+      "producer": "deterministic_tool:semgrep",
+      "source": {
+        "type": "tool",
+        "alignment": "generated",
+        "tool": "semgrep",
+        "rule_id": "python.lang.compatibility.python37.python37-compatibility-importlib2"
+      }
+    },
+    {
+      "file": "python/packages/twilio/src/matimo_twilio/__init__.py",
+      "start_line": 4,
+      "end_line": 4,
+      "message": "[python.lang.compatibility.python37.python37-compatibility-importlib2] Found 'importlib.resources', which is a module only available on Python 3.7+. This does not work in lower versions, and therefore is not backwards compatible. Use importlib_resources instead for older Python versions.",
+      "tp_fp": "fp",
+      "severity": "low",
+      "category": "reliability",
+      "scope": "introduced-by-pr",
+      "difficulty": "easy",
+      "context_required": "diff-plus-related-files",
+      "tp_fp_justification": "Same as Findings 14–19 and 24 — the project declares `requires-python = \">=3.11\"` in `pyproject.toml`, making the Python <3.7 compatibility warning entirely irrelevant. `importlib.resources` is well within the 3.11+ minimum requirement.",
+      "severity_justification": "No real compatibility issue given the Python 3.11+ requirement.",
+      "category_justification": "The finding concerns Python version compatibility.",
+      "producer": "deterministic_tool:semgrep",
+      "source": {
+        "type": "tool",
+        "alignment": "generated",
+        "tool": "semgrep",
+        "rule_id": "python.lang.compatibility.python37.python37-compatibility-importlib2"
       }
     },
     {
@@ -684,6 +838,86 @@
       }
     },
     {
+      "file": "python/packages/hubspot/src/matimo_hubspot/tools/hubspot-update-order/definition.yaml",
+      "start_line": 22,
+      "end_line": 24,
+      "message": "In the Python SDK, `HttpExecutor._template_object()` stringifies placeholders with `str(...)` and does not preserve object parameters. Passing `properties` as an object will therefore send a string instead of the JSON object HubSpot expects.",
+      "tp_fp": "tp",
+      "severity": "high",
+      "category": "correctness",
+      "scope": "introduced-by-pr",
+      "difficulty": "hard",
+      "context_required": "diff-plus-related-files",
+      "tp_fp_justification": "Verified: hubspot-update-order/definition.yaml has `properties: '{properties}'` in the body, identical to Findings 13 and 14. The same _template_object stringification bug applies — object params are converted to Python string repr instead of JSON objects.",
+      "severity_justification": "All update-order calls with object properties will send malformed JSON to HubSpot, causing API failures.",
+      "category_justification": "Same logic error as Findings 13 and 14 — object parameters incorrectly stringified by HTTP executor templating.",
+      "producer": "ccr:gpt-5.5[ReasoningEffort=medium]",
+      "source": {
+        "type": "ccr",
+        "alignment": "generated"
+      }
+    },
+    {
+      "file": "python/packages/hubspot/src/matimo_hubspot/tools/hubspot-update-line-item/definition.yaml",
+      "start_line": 22,
+      "end_line": 24,
+      "message": "In the Python SDK, `HttpExecutor._template_object()` stringifies placeholders with `str(...)` and does not preserve object parameters. Passing `properties` as an object will therefore send a string instead of the JSON object HubSpot expects.",
+      "tp_fp": "tp",
+      "severity": "high",
+      "category": "correctness",
+      "scope": "introduced-by-pr",
+      "difficulty": "hard",
+      "context_required": "diff-plus-related-files",
+      "tp_fp_justification": "Verified: hubspot-update-line-item/definition.yaml has `properties: '{properties}'` in the body, identical to Findings 13–15. The same _template_object stringification bug applies.",
+      "severity_justification": "All update-line-item calls with object properties will send malformed JSON to HubSpot, causing API failures.",
+      "category_justification": "Same logic error as Findings 13–15 — object parameters incorrectly stringified by HTTP executor templating.",
+      "producer": "ccr:gpt-5.5[ReasoningEffort=medium]",
+      "source": {
+        "type": "ccr",
+        "alignment": "generated"
+      }
+    },
+    {
+      "file": "python/packages/hubspot/src/matimo_hubspot/tools/hubspot-update-lead/definition.yaml",
+      "start_line": 22,
+      "end_line": 24,
+      "message": "In the Python SDK, `HttpExecutor._template_object()` stringifies placeholders with `str(...)` and does not preserve object parameters. Passing `properties` as an object will therefore send a string instead of the JSON object HubSpot expects.",
+      "tp_fp": "tp",
+      "severity": "high",
+      "category": "correctness",
+      "scope": "introduced-by-pr",
+      "difficulty": "hard",
+      "context_required": "diff-plus-related-files",
+      "tp_fp_justification": "Verified: hubspot-update-lead/definition.yaml has `properties: '{properties}'` in the body, identical to Findings 13–16. The same _template_object stringification bug applies.",
+      "severity_justification": "All update-lead calls with object properties will send malformed JSON to HubSpot, causing API failures.",
+      "category_justification": "Same logic error as Findings 13–16 — object parameters incorrectly stringified by HTTP executor templating.",
+      "producer": "ccr:gpt-5.5[ReasoningEffort=medium]",
+      "source": {
+        "type": "ccr",
+        "alignment": "generated"
+      }
+    },
+    {
+      "file": "python/packages/hubspot/src/matimo_hubspot/tools/hubspot-update-invoice/definition.yaml",
+      "start_line": 22,
+      "end_line": 24,
+      "message": "In the Python SDK, `HttpExecutor._template_object()` stringifies placeholders with `str(...)` and does not preserve object parameters. Passing `properties` as an object will therefore send a string instead of the JSON object HubSpot expects.",
+      "tp_fp": "tp",
+      "severity": "high",
+      "category": "correctness",
+      "scope": "introduced-by-pr",
+      "difficulty": "hard",
+      "context_required": "diff-plus-related-files",
+      "tp_fp_justification": "Verified: hubspot-update-invoice/definition.yaml has `properties: '{properties}'` in the body, identical to Findings 13–17. The same _template_object stringification bug applies.",
+      "severity_justification": "All update-invoice calls with object properties will send malformed JSON to HubSpot, causing API failures.",
+      "category_justification": "Same logic error as Findings 13–17 — object parameters incorrectly stringified by HTTP executor templating.",
+      "producer": "ccr:gpt-5.5[ReasoningEffort=medium]",
+      "source": {
+        "type": "ccr",
+        "alignment": "generated"
+      }
+    },
+    {
       "file": "python/packages/hubspot/src/matimo_hubspot/tools/hubspot-create-invoice/definition.yaml",
       "start_line": 18,
       "end_line": 20,
@@ -857,6 +1091,26 @@
       "tp_fp_justification": "Verified: hubspot-get-product uses `query_params: properties: '{properties}'` with an array-type parameter. The executor calls _template() which does str(params[name]), producing \"['email', 'firstname']\" — Python list repr. httpx sends this as a single URL-encoded string rather than a comma-separated or repeated query param, causing HubSpot to receive an invalid property name.",
       "severity_justification": "All HubSpot GET requests using the properties filter will send malformed query parameters, causing HubSpot to either return an error or ignore the property filter entirely.",
       "category_justification": "Array parameters are incorrectly stringified by the HTTP executor's query param templating, sending wrong data types to the API.",
+      "producer": "ccr:gpt-5.5[ReasoningEffort=medium]",
+      "source": {
+        "type": "ccr",
+        "alignment": "generated"
+      }
+    },
+    {
+      "file": "python/packages/hubspot/src/matimo_hubspot/tools/hubspot-list-products/definition.yaml",
+      "start_line": 25,
+      "end_line": 29,
+      "message": "For Python, array placeholders in query parameters are converted with `str(list)`, producing values like `['name', 'price']` rather than HubSpot's expected comma-separated property list. Requests using `properties` will therefore ask HubSpot for an invalid property name instead of the requested fields.",
+      "tp_fp": "tp",
+      "severity": "high",
+      "category": "correctness",
+      "scope": "introduced-by-pr",
+      "difficulty": "hard",
+      "context_required": "diff-plus-related-files",
+      "tp_fp_justification": "Verified: hubspot-list-products has `properties: '{properties}'` in query_params with an array-type parameter, identical to Finding 27. The same str(list) stringification produces Python list repr instead of comma-separated values.",
+      "severity_justification": "All list-products calls using the properties filter will send malformed query parameters to HubSpot.",
+      "category_justification": "Same array stringification bug as Finding 27 — array parameters incorrectly converted to Python list repr in query params.",
       "producer": "ccr:gpt-5.5[ReasoningEffort=medium]",
       "source": {
         "type": "ccr",

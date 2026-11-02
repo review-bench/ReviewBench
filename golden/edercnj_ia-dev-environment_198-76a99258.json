@@ -748,6 +748,26 @@
       }
     },
     {
+      "file": "java/src/main/resources/targets/claude/skills/core/x-story-plan/README.md",
+      "start_line": 97,
+      "end_line": 100,
+      "message": "This README states that `x-dev-lifecycle` can invoke `x-story-plan`, but there is no `x-story-plan` reference in the existing lifecycle skill. This documents an integration that users cannot actually trigger unless the lifecycle skill is updated in the same change.",
+      "tp_fp": "tp",
+      "severity": "low",
+      "category": "documentation",
+      "scope": "introduced-by-pr",
+      "difficulty": "easy",
+      "context_required": "diff-plus-related-files",
+      "tp_fp_justification": "Verified: README.md line 99 states x-dev-lifecycle 'can invoke this skill', but x-dev-lifecycle/SKILL.md has no reference to x-story-plan (confirmed in Finding 11 investigation). Same non-existent integration claim, in the README rather than SKILL.md.",
+      "severity_justification": "Same as Finding 11 — documentation inaccuracy about a planned but unimplemented integration with no runtime impact.",
+      "category_justification": "The finding identifies a stale/aspirational cross-skill reference in the README that documents a relationship not present in the codebase.",
+      "producer": "ccr:gpt-5.5[ReasoningEffort=medium]",
+      "source": {
+        "type": "ccr",
+        "alignment": "generated"
+      }
+    },
+    {
       "file": "java/src/main/resources/targets/claude/skills/core/x-story-plan/SKILL.md",
       "start_line": 474,
       "end_line": 480,

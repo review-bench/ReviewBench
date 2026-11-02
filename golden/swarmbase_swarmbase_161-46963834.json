@@ -757,6 +757,26 @@
     },
     {
       "file": "docker-compose.yaml",
+      "start_line": 47,
+      "end_line": 50,
+      "message": "This passes the relay's advertised `wsMultiaddr` directly to the browser container, but `relay-info.json` is generated from listen addresses such as `/ip4/0.0.0.0/tcp/9001/ws/...`. From another container, dialing `0.0.0.0` does not reach the relay service; the compose setup should rewrite the host to the Docker service name (for example `/dns4/relay/...`) or publish an externally reachable address.",
+      "tp_fp": "fp",
+      "severity": "medium",
+      "category": "correctness",
+      "scope": "introduced-by-pr",
+      "difficulty": "medium",
+      "context_required": "diff-plus-related-files",
+      "tp_fp_justification": "The finding incorrectly claims `wsMultiaddr` contains `0.0.0.0` (libp2p expands the wildcard to actual interface IPs before `getMultiaddrs()` returns) and frames the issue as a container-to-container dial failure. The actual dialers are host browsers running the served React app, not containers. The real reachability concern (host browser gets a Docker-internal IP) is the same issue as Finding 1 but this finding misidentifies both the address format and the failure scenario.",
+      "severity_justification": "The underlying reachability concern is real but the specific claimed failure mode is wrong.",
+      "category_justification": "The finding makes incorrect factual claims about what address appears in relay-info.json and which component performs the dial.",
+      "producer": "ccr:gpt-5.5[ReasoningEffort=medium]",
+      "source": {
+        "type": "ccr",
+        "alignment": "generated"
+      }
+    },
+    {
+      "file": "docker-compose.yaml",
       "start_line": 79,
       "end_line": 82,
       "message": "This has the same issue as the browser-test service: it exports the raw `wsMultiaddr` from `relay-info.json`, which is based on the relay's `0.0.0.0` listen address and is not a dialable remote address from the wiki container. Rewrite it to the relay service DNS name or another reachable address before passing it to the app.",

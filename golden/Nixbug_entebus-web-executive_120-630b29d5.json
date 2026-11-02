@@ -348,6 +348,26 @@
       }
     },
     {
+      "file": "src/lib/components/company-components/LocationMapModal.svelte",
+      "start_line": 48,
+      "end_line": 56,
+      "message": "The `latitude` and `longitude` props are processed without validation. Invalid or non-numeric values could affect the map's rendering behavior or lead to runtime errors.",
+      "tp_fp": "fp",
+      "severity": "low",
+      "category": "reliability",
+      "scope": "introduced-by-pr",
+      "difficulty": "medium",
+      "context_required": "diff-plus-related-files",
+      "tp_fp_justification": "Same as finding 17 — latitude and longitude reaching LocationMapModal are already validated as numeric by parseWKTPoint (regex + isNaN check) in DynamicDetailSidebar before being set. The props are typed as number in TypeScript. The finding makes a generic 'validate inputs' claim without demonstrating a specific path where non-numeric values could reach this component.",
+      "severity_justification": "The upstream parseWKTPoint already ensures values are valid numbers before they reach this component. No concrete error scenario is demonstrated.",
+      "category_justification": "The finding concerns potential runtime errors from unvalidated numeric inputs.",
+      "producer": "llm_review:gpt-4o",
+      "source": {
+        "type": "llm_review",
+        "alignment": "generated"
+      }
+    },
+    {
       "file": "src/routes/company/+page.svelte",
       "start_line": 340,
       "end_line": 346,

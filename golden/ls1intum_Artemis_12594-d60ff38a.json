@@ -28,6 +28,26 @@
       }
     },
     {
+      "file": "src/main/java/de/tum/cit/aet/artemis/core/web/admin/AdminUserResource.java",
+      "start_line": 78,
+      "end_line": 81,
+      "message": "Same inaccuracy as UserResource.java: the PR replaced the L2-cache rationale with 'batched within a single transaction', but @BatchSize is per Hibernate session and this controller has no @Transactional. With open-in-view: false there is no shared session across repository calls within a request, so @BatchSize(20) does not batch authority loads in the typical single-user lookup. Every HTTP call that touches User.authorities now unconditionally hits the database. The comment misrepresents the performance behaviour and creates a false sense that the N+1 problem is resolved.",
+      "tp_fp": "tp",
+      "severity": "low",
+      "category": "documentation",
+      "scope": "introduced-by-pr",
+      "difficulty": "medium",
+      "context_required": "diff-plus-related-files",
+      "tp_fp_justification": "The same inaccurate comment from Finding 1 appears verbatim in AdminUserResource.java at lines 78-81. It says @BatchSize batches 'within a single transaction' when @BatchSize is session-scoped, not transaction-scoped. With open-in-view: false confirmed, there is no shared session across repository calls, making the comment misleading for single-user lookups.",
+      "severity_justification": "Same as Finding 1 — this is a comment inaccuracy introduced by the PR. No runtime behavior is changed by the comment; the N+1 issue and @BatchSize behavior pre-exist this PR.",
+      "category_justification": "The finding is about an inaccurate code comment using 'transaction' instead of 'session', overstating the mitigation provided by @BatchSize in this architecture.",
+      "producer": "llm_review:claude-sonnet-4.6",
+      "source": {
+        "type": "llm_review",
+        "alignment": "generated"
+      }
+    },
+    {
       "file": "src/main/java/de/tum/cit/aet/artemis/core/service/course/CourseResetService.java",
       "start_line": 493,
       "end_line": 493,
@@ -228,6 +248,26 @@
       }
     },
     {
+      "file": "src/main/java/de/tum/cit/aet/artemis/core/service/HazelcastConfiguration.java",
+      "start_line": 375,
+      "end_line": 377,
+      "message": "The removal of the JCache metrics collection functionality could potentially hinder monitoring efforts as ICache statistics will no longer be bound to Micrometer.",
+      "tp_fp": "fp",
+      "severity": "low",
+      "category": "reliability",
+      "scope": "introduced-by-pr",
+      "difficulty": "easy",
+      "context_required": "diff-plus-related-files",
+      "tp_fp_justification": "Duplicate of Finding 9. The javax.cache:cache-api and hibernate-jcache dependencies are completely removed from build.gradle, and no production code uses ICache or javax.cache. No ICache instances can exist at runtime, so there is nothing to bind metrics for.",
+      "severity_justification": "The concern is moot since ICache instances cannot exist without the removed dependencies.",
+      "category_justification": "The concern is about monitoring/observability — cache metrics not being bound to Micrometer.",
+      "producer": "llm_review:gpt-4o",
+      "source": {
+        "type": "llm_review",
+        "alignment": "generated"
+      }
+    },
+    {
       "file": "src/main/resources/config/application.yml",
       "start_line": 270,
       "end_line": 274,
@@ -288,6 +328,26 @@
       }
     },
     {
+      "file": "src/main/java/de/tum/cit/aet/artemis/communication/domain/Post.java",
+      "start_line": 36,
+      "end_line": 38,
+      "message": "The removal of the @Cache annotation from Post entities was not accompanied by an evaluation of whether alternatives, such as DTO-level caching, could maintain read optimization.",
+      "tp_fp": "fp",
+      "severity": "low",
+      "category": "performance",
+      "scope": "introduced-by-pr",
+      "difficulty": "easy",
+      "context_required": "diff-only",
+      "tp_fp_justification": "Generic boilerplate identical to Findings 12 and 16. No specific Post entity query pattern, hit rate, or measured performance regression is identified. The PR's documented policy explicitly states caching alternatives should only be added when there is a measured bottleneck. This finding could be copy-pasted onto any of the 116 annotation removals without changing a word.",
+      "severity_justification": "No concrete performance issue identified for Post entities specifically.",
+      "category_justification": "The concern is about potential performance degradation from cache removal without DTO-level replacement.",
+      "producer": "llm_review:gpt-4o",
+      "source": {
+        "type": "llm_review",
+        "alignment": "generated"
+      }
+    },
+    {
       "file": "src/main/java/de/tum/cit/aet/artemis/core/domain/User.java",
       "start_line": 162,
       "end_line": 164,
@@ -341,6 +401,26 @@
       "tp_fp_justification": "Generic boilerplate identical to Findings 5/6/7/14. No specific endpoint, query, or measured performance regression is identified for UserService operations. The PR's documented intent is to remove Hibernate L2 cache invalidation because it was producing correctness bugs, not performance gains. The finding cannot be verified or acted upon without specific evidence.",
       "severity_justification": "No concrete regression identified; entirely speculative.",
       "category_justification": "The concern is about performance regressions from removing cache invalidation.",
+      "producer": "llm_review:gpt-4o",
+      "source": {
+        "type": "llm_review",
+        "alignment": "generated"
+      }
+    },
+    {
+      "file": "src/main/java/de/tum/cit/aet/artemis/exam/domain/Exam.java",
+      "start_line": 144,
+      "end_line": 146,
+      "message": "The absence of caching mechanisms for the exerciseGroups association in Exam entities might result in degraded performance on operations that enumerate or filter these groups.",
+      "tp_fp": "fp",
+      "severity": "low",
+      "category": "performance",
+      "scope": "introduced-by-pr",
+      "difficulty": "easy",
+      "context_required": "diff-only",
+      "tp_fp_justification": "Generic boilerplate identical to Findings 12/16/17. No specific query pattern, hit rate, or measured performance regression for Exam.exerciseGroups is identified. This could be copy-pasted onto any of the 116 @Cache annotation removals in this PR without modification. The PR's documented policy requires measured evidence before adding caching.",
+      "severity_justification": "No concrete performance issue identified for this specific association.",
+      "category_justification": "The concern is about potential performance degradation from cache removal on Exam.exerciseGroups.",
       "producer": "llm_review:gpt-4o",
       "source": {
         "type": "llm_review",

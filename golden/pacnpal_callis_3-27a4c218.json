@@ -1030,6 +1030,26 @@
       }
     },
     {
+      "file": "api/templates/partials/key_list.html",
+      "start_line": 20,
+      "end_line": 21,
+      "message": "`last_used_at` is rendered in this refreshed key list, but no code updates that column during SSH key lookup or login; after HTMX updates this value will still always be `Never` even for keys that have been used.",
+      "tp_fp": "tp",
+      "severity": "low",
+      "category": "correctness",
+      "scope": "introduced-by-pr",
+      "difficulty": "easy",
+      "context_required": "diff-plus-related-files",
+      "tp_fp_justification": "Verified: same root cause as Finding 8 — last_used_at is never updated anywhere in the codebase. This template (partials/key_list.html line 21) renders the field the same way as user_detail.html, and will always show 'Never'. The claim is factually correct.",
+      "severity_justification": "Same as Finding 8 — misleading UI with no security or functional impact beyond inaccurate display.",
+      "category_justification": "Field displayed in UI is never populated, making the value permanently incorrect.",
+      "producer": "ccr:gpt-5.5[ReasoningEffort=medium]",
+      "source": {
+        "type": "ccr",
+        "alignment": "generated"
+      }
+    },
+    {
       "file": "api/templates/partials/ssh_config.html",
       "start_line": 9,
       "end_line": 13,

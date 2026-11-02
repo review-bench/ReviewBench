@@ -1244,6 +1244,26 @@
       }
     },
     {
+      "file": "deployments/kubernetes/base/pvc.yaml",
+      "start_line": 13,
+      "end_line": 17,
+      "message": "The new Kustomize deployments run two or more replicas but define the shared SQLite PVC as ReadWriteOnce. In production the pods are explicitly spread across nodes, so only one node can attach this claim and the remaining replicas will stay pending; use a RWX-capable volume or a per-replica storage model for multi-replica deployments.",
+      "tp_fp": "tp",
+      "severity": "high",
+      "category": "correctness",
+      "scope": "introduced-by-pr",
+      "difficulty": "medium",
+      "context_required": "diff-plus-related-files",
+      "tp_fp_justification": "Confirmed: base/pvc.yaml uses ReadWriteOnce, base/deployment.yaml uses preferredDuringSchedulingIgnoredDuringExecution anti-affinity + ScheduleAnyway topology spread with 2 replicas; production overlay patches to 3 replicas. On a typical multi-node cluster the soft anti-affinity will spread pods across nodes, and only one node can attach the RWO PVC. The finding slightly overstates the certainty ('explicitly spread' vs preferred), but the core RWO conflict with multi-replica deployments is real and the same as Findings 18/19.",
+      "severity_justification": "Multi-replica production deployments will have pods pending on the RWO PVC in any realistic multi-node cluster configuration, causing the deployment to never reach full capacity.",
+      "category_justification": "Incompatible combination of multi-replica deployment with ReadWriteOnce PVC and node-spreading scheduling preferences.",
+      "producer": "ccr:gpt-5.5[ReasoningEffort=medium]",
+      "source": {
+        "type": "ccr",
+        "alignment": "generated"
+      }
+    },
+    {
       "file": "deployments/helm/agent-monitor/values.yaml",
       "start_line": 155,
       "end_line": 158,

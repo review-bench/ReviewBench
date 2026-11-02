@@ -44,7 +44,7 @@ A diverse subset of the full set chosen to demonstrate the breadth of repos, lan
 #### [cmik/apilix#12](https://github.com/cmik/apilix/pull/12)
 - **Lang/size**: TypeScript · xl (>1500) · repo 1-10MB
 - **Title**: implement data storages
-- **TP findings**: 31 (high:9 med:10 low:12) — categories: accessibility,correctness,documentation,maintainability,performance,reliability,security
+- **TP findings**: 32 (high:10 med:10 low:12) — categories: accessibility,correctness,documentation,maintainability,performance,reliability,security
 - **Why included**: Multiple **high/security** findings: arbitrary `dataDir` taken from request body so any caller can `git init` anywhere, and a path-traversal guard missing the trailing separator (`/data/foo` matches `/data/foo-evil`). Classic well-explained sec review.
 - **Golden file**: `golden/cmik_apilix_12-0c34439a.json`
 
@@ -86,7 +86,7 @@ A diverse subset of the full set chosen to demonstrate the breadth of repos, lan
 #### [scotthamilton77/agents-config#1](https://github.com/scotthamilton77/agents-config/pull/1)
 - **Lang/size**: Shell · l (500-1500) · repo 10-100MB
 - **Title**: feat: multi-tool install support (Claude, Codex, Gemini)
-- **TP findings**: 23 (high:3 med:6 low:14) — categories: correctness,documentation,reliability
+- **TP findings**: 24 (high:3 med:6 low:15) — categories: correctness,documentation,reliability
 - **Why included**: Templates use Claude Code's `@filename` file-inclusion syntax inside `.codex/AGENTS.md` and `.gemini/GEMINI.md` — but Codex CLI and Gemini CLI don't support it; those references are treated as literal text. Cross-product ecosystem knowledge.
 - **Golden file**: `golden/scotthamilton77_agents-config_1-1fc78970.json`
 

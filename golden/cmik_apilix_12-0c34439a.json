@@ -568,6 +568,26 @@
       }
     },
     {
+      "file": "client/src/components/WorkspaceManagerModal.tsx",
+      "start_line": 67,
+      "end_line": 68,
+      "message": "This workspace switch path also bypasses a flush of the currently active workspace before replacing state. With the debounced persistence in `AppProvider`, recent edits can be lost when switching from the manager modal before the pending save fires.",
+      "tp_fp": "tp",
+      "severity": "high",
+      "category": "correctness",
+      "scope": "introduced-by-pr",
+      "difficulty": "medium",
+      "context_required": "diff-plus-related-files",
+      "tp_fp_justification": "Duplicate of Finding 11's core bug, verified in the same investigation. WorkspaceManagerModal.handleSwitch (lines 65-68) dispatches SWITCH_WORKSPACE without flushing the current workspace first, which cancels the debounced save timer and silently drops edits made within the last 300ms.",
+      "severity_justification": "Same silent data loss as Finding 11 — user edits within 300ms of switching workspaces via the manager modal are permanently lost with no warning.",
+      "category_justification": "Concrete data loss bug: SWITCH_WORKSPACE dispatch cancels pending debounced save for the current workspace, dropping unsaved edits.",
+      "producer": "ccr:gpt-5.5[ReasoningEffort=medium]",
+      "source": {
+        "type": "ccr",
+        "alignment": "generated"
+      }
+    },
+    {
       "file": "server/index.js",
       "start_line": 1033,
       "end_line": 1035,

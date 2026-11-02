@@ -557,6 +557,17 @@
       "context_required": "diff-plus-related-files"
     },
     {
+      "file": "client/src/components/WorkspaceManagerModal.tsx",
+      "start_line": 67,
+      "end_line": 68,
+      "severity": "high",
+      "category": "correctness",
+      "message": "This workspace switch path also bypasses a flush of the currently active workspace before replacing state. With the debounced persistence in `AppProvider`, recent edits can be lost when switching from the manager modal before the pending save fires.",
+      "scope": "introduced-by-pr",
+      "difficulty": "medium",
+      "context_required": "diff-plus-related-files"
+    },
+    {
       "file": "server/index.js",
       "start_line": 1033,
       "end_line": 1035,
@@ -1765,6 +1776,17 @@
       "severity": "low",
       "category": "documentation",
       "message": "The text requires a 10-minute timeout, but the concrete CLI commands shown here do not wrap the foreign agent invocation in any timeout mechanism. Agents following the copyable command can hang indefinitely despite the documented timeout behavior.",
+      "scope": "pre-existing",
+      "difficulty": "easy",
+      "context_required": "diff-only"
+    },
+    {
+      "file": "src/user/.agents/skills/ralf-it/SKILL.md",
+      "start_line": 147,
+      "end_line": 152,
+      "severity": "low",
+      "category": "documentation",
+      "message": "The reference commands do not include any timeout wrapper even though the next line says both invocations use a 10-minute timeout. This makes the reference unsafe to copy and can leave the workflow hanging on a stalled foreign CLI call.",
       "scope": "pre-existing",
       "difficulty": "easy",
       "context_required": "diff-only"

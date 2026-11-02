@@ -328,6 +328,26 @@
       }
     },
     {
+      "file": "clerk/README.md",
+      "start_line": 107,
+      "end_line": 110,
+      "message": "The markdown table headers are incorrectly cased (`Table name`, `Primary key`, `Foreign key`). They should be `Table Name`, `Primary Key`, `Foreign Key` to match the previous version and for consistency with other READMEs.",
+      "tp_fp": "fp",
+      "severity": "low",
+      "category": "documentation",
+      "scope": "introduced-by-pr",
+      "difficulty": "medium",
+      "context_required": "broader-project-context",
+      "tp_fp_justification": "Same as Finding 15: the README template explicitly prohibits Title Case for anything other than H1. Sentence case (`Table name`, `Primary key`, `Foreign key`) is the correct convention per the template. The finding's suggestion to revert to Title Case would violate the project's documented style rule.",
+      "severity_justification": "Pure formatting/style matter with no functional impact.",
+      "category_justification": "The concern is about capitalization convention in README table headers.",
+      "producer": "llm_review:gemini-2.5-pro",
+      "source": {
+        "type": "llm_review",
+        "alignment": "generated"
+      }
+    },
+    {
       "file": "docusign/README.md",
       "start_line": 15,
       "end_line": 15,
@@ -691,6 +711,66 @@
       "tp_fp_justification": "The project's own instructions file (.github/instructions/readme-markdown.instructions.md) and README template both specify `<connector-name>` as a flat, single-segment name with no path separators. All non-sub-implementation connectors use flat names. The four sub-implementation READMEs introduced by this PR are the only cases using a slash (e.g., `aws_athena/using_sqlalchemy`), deviating from the documented template. Whether the CLI actually handles slashes cannot be tested, but the deviation from the canonical template format is factual and the finding is well-grounded.",
       "severity_justification": "If the command doesn't work as documented, users following the README will get an error or unexpected behavior when trying to initialize a project from these connectors — a direct user-facing documentation failure.",
       "category_justification": "The issue is specifically about the accuracy and correctness of a documented CLI command in the README files.",
+      "producer": "ccr:claude-opus-4.7[ReasoningEffort=medium]",
+      "source": {
+        "type": "ccr",
+        "alignment": "generated"
+      }
+    },
+    {
+      "file": "aws_athena/using_boto3/README.md",
+      "start_line": 29,
+      "end_line": 29,
+      "message": "The `fivetran init --template aws_athena/using_boto3` command uses a path containing a slash. The `fivetran init` command expects a single template name, so this command as documented will likely fail. Same issue affects the sibling `aws_athena/using_sqlalchemy` and the two `apache_hive` sub-implementation READMEs.",
+      "tp_fp": "tp",
+      "severity": "medium",
+      "category": "documentation",
+      "scope": "introduced-by-pr",
+      "difficulty": "medium",
+      "context_required": "broader-project-context",
+      "tp_fp_justification": "Same issue as Finding 1: the project's instructions and template consistently use a flat `<connector-name>` with no slashes, and all non-sub-implementation connectors follow this pattern. The `aws_athena/using_boto3` README introduced by this PR uses `aws_athena/using_boto3` as the template argument, deviating from the canonical format with no evidence the CLI supports path-style names.",
+      "severity_justification": "Users following the README to initialize a project from this connector may encounter an error if the CLI does not support slash-separated paths, making the documented command potentially non-functional.",
+      "category_justification": "The finding concerns the accuracy of a documented CLI command in the README.",
+      "producer": "ccr:claude-opus-4.7[ReasoningEffort=medium]",
+      "source": {
+        "type": "ccr",
+        "alignment": "generated"
+      }
+    },
+    {
+      "file": "apache_hive/using_sqlalchemy/README.md",
+      "start_line": 22,
+      "end_line": 22,
+      "message": "The `fivetran init --template apache_hive/using_sqlalchemy` command uses a path containing a slash, which is not a valid template name for `fivetran init` (it expects a single template/connector name). Same issue in the sibling `apache_hive/using_pyhive` README and the `aws_athena` sub-implementation READMEs.",
+      "tp_fp": "tp",
+      "severity": "medium",
+      "category": "documentation",
+      "scope": "introduced-by-pr",
+      "difficulty": "medium",
+      "context_required": "broader-project-context",
+      "tp_fp_justification": "Same issue as Findings 1 and 2: the project's instructions and template consistently use a flat `<connector-name>` with no slashes, and all non-sub-implementation connectors follow this pattern. The `apache_hive/using_sqlalchemy` README introduced by this PR uses `apache_hive/using_sqlalchemy` as the template argument, deviating from the canonical format.",
+      "severity_justification": "Users following the README to initialize a project from this connector may encounter an error if the CLI does not support slash-separated paths.",
+      "category_justification": "The finding concerns the accuracy of a documented CLI command in the README.",
+      "producer": "ccr:claude-opus-4.7[ReasoningEffort=medium]",
+      "source": {
+        "type": "ccr",
+        "alignment": "generated"
+      }
+    },
+    {
+      "file": "apache_hive/using_pyhive/README.md",
+      "start_line": 22,
+      "end_line": 22,
+      "message": "The `fivetran init --template apache_hive/using_pyhive` command uses a path containing a slash, which is not a valid template name for `fivetran init`. See related comments on the `aws_athena` and `apache_hive/using_sqlalchemy` READMEs.",
+      "tp_fp": "tp",
+      "severity": "medium",
+      "category": "documentation",
+      "scope": "introduced-by-pr",
+      "difficulty": "medium",
+      "context_required": "broader-project-context",
+      "tp_fp_justification": "Same issue as Findings 1–3: the project's instructions and template consistently use a flat `<connector-name>` with no slashes. The `apache_hive/using_pyhive` README introduced by this PR uses `apache_hive/using_pyhive` as the template argument, deviating from the canonical format with no evidence the CLI supports path-style names.",
+      "severity_justification": "Users following the README to initialize a project from this connector may encounter an error if the CLI does not support slash-separated paths.",
+      "category_justification": "The finding concerns the accuracy of a documented CLI command in the README.",
       "producer": "ccr:claude-opus-4.7[ReasoningEffort=medium]",
       "source": {
         "type": "ccr",

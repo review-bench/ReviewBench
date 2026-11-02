@@ -88,6 +88,26 @@
       }
     },
     {
+      "file": "packages/components/src/test/common/ContentDataProvider.test.ts",
+      "start_line": 465,
+      "end_line": 480,
+      "message": "The memoization test for `getContent` correctly migrates the Chai chain to individual `expect(responses[0]).toEqual(responses[N])` calls, but the equivalent migration in tree/DataProvider.test.ts at line 253-256 is incomplete (drops `results[2] === results[0]`). This is an inconsistency that could mask a regression in tree node memoization behaviour where `{start:0, size:0}` paging should reuse the same cache as no-paging.",
+      "tp_fp": "tp",
+      "severity": "low",
+      "category": "testing",
+      "scope": "introduced-by-pr",
+      "difficulty": "medium",
+      "context_required": "diff-plus-related-files",
+      "tp_fp_justification": "Verified: ContentDataProvider.test.ts correctly migrated all chain assertions (responses[0] compared to responses[1], [2], [3] individually), while tree/DataProvider.test.ts only preserved results[2]===results[3] and dropped results[2]===results[0]. This is the same issue as Finding 2 — the assertion that {start:0,size:0} paging reuses the no-paging cache entry was dropped. The inconsistency between the two migrations is real and verifiable.",
+      "severity_justification": "The behavior is partially covered by toHaveBeenCalledTimes(3) in the tree test, but the object-identity check confirming results[2]===results[0] was lost, weakening the memoization test.",
+      "category_justification": "An assertion was dropped during migration, creating an inconsistency with an equivalent correctly-migrated test in the same codebase.",
+      "producer": "llm_review:claude-sonnet-4.6",
+      "source": {
+        "type": "llm_review",
+        "alignment": "generated"
+      }
+    },
+    {
       "file": "apps/full-stack-tests/src/components/properties/PropertyPaneDataProvider.test.ts",
       "start_line": 372,
       "end_line": 372,

@@ -568,6 +568,26 @@
       }
     },
     {
+      "file": "src/app/features/library/library.page.ts",
+      "start_line": 93,
+      "end_line": 98,
+      "message": "The implemented Library filters omit the required \"Downloaded\" filter from the linked issue and instead add \"Completed\". There is also no downloaded state in `HistoryEntry`, so downloaded episodes cannot be filtered as described.",
+      "tp_fp": "fp",
+      "severity": "low",
+      "category": "documentation",
+      "scope": "pre-existing",
+      "difficulty": "hard",
+      "context_required": "broader-project-context",
+      "tp_fp_justification": "Duplicate of Finding 7. The implementation facts are confirmed (no 'Downloaded' filter, no downloaded state in HistoryEntry), but the claim that the linked issue required a 'Downloaded' filter cannot be verified without accessing GitHub issue #39. Without the issue content being verifiable, this is an unverifiable claim.",
+      "severity_justification": "No runtime bug — the filters that are implemented (All/Unplayed/In Progress/Completed) work correctly. The concern is about spec conformance with an unverifiable issue requirement.",
+      "category_justification": "The finding is about a mismatch between implementation and alleged acceptance criteria in a GitHub issue.",
+      "producer": "ccr:gpt-5.5[ReasoningEffort=medium]",
+      "source": {
+        "type": "ccr",
+        "alignment": "generated"
+      }
+    },
+    {
       "file": "src/app/features/search/search.page.ts",
       "start_line": 67,
       "end_line": 70,

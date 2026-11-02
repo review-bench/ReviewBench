@@ -648,6 +648,26 @@
       }
     },
     {
+      "file": "src/user/.agents/skills/ralf-it/SKILL.md",
+      "start_line": 147,
+      "end_line": 152,
+      "message": "The reference commands do not include any timeout wrapper even though the next line says both invocations use a 10-minute timeout. This makes the reference unsafe to copy and can leave the workflow hanging on a stalled foreign CLI call.",
+      "tp_fp": "tp",
+      "severity": "low",
+      "category": "documentation",
+      "scope": "pre-existing",
+      "difficulty": "easy",
+      "context_required": "diff-only",
+      "tp_fp_justification": "Verified: lines 147-151 show a reference command table with no timeout wrapper on either CLI command, while line 152 explicitly states 'Both use a 10-minute timeout (600000ms)'. The same inconsistency as Finding 13 but in a different file.",
+      "severity_justification": "Same as Finding 13 — documentation inconsistency that could cause indefinite hangs when commands are followed literally, but limited to this skills/workflow file.",
+      "category_justification": "Inconsistency between the stated behavior and the copyable command examples within the same file.",
+      "producer": "ccr:gpt-5.5[ReasoningEffort=medium]",
+      "source": {
+        "type": "ccr",
+        "alignment": "generated"
+      }
+    },
+    {
       "file": "src/user/.agents/skills/optimize-agents-md/SKILL.md",
       "start_line": 3,
       "end_line": 3,

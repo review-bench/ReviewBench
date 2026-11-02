@@ -488,6 +488,26 @@
       }
     },
     {
+      "file": "src/Samples/AkavacheTodoWpf/Services/NotificationService.cs",
+      "start_line": 38,
+      "end_line": 42,
+      "message": "Replacing `RxApp.MainThreadScheduler` with `RxSchedulers.MainThreadScheduler` modifies scheduler behavior globally. This untested change can affect other parts of the application relying on the prior ReactiveUI scheduler.",
+      "tp_fp": "fp",
+      "severity": "low",
+      "category": "correctness",
+      "scope": "introduced-by-pr",
+      "difficulty": "easy",
+      "context_required": "broader-project-context",
+      "tp_fp_justification": "Same as Finding 22: RxSchedulers.MainThreadScheduler is the documented direct replacement for the deprecated RxApp.MainThreadScheduler in ReactiveUI 23.x. The concern about 'modifying scheduler behavior globally' is factually wrong — ObserveOn() only affects the specific observable chain. No RxApp. references remain in any samples, confirming complete migration. No specific incompatibility or behavioral difference is identified.",
+      "severity_justification": "Sample app only, required breaking change migration, no production library impact.",
+      "category_justification": "The finding raises a behavioral correctness concern about an API migration.",
+      "producer": "llm_review:gpt-4o",
+      "source": {
+        "type": "llm_review",
+        "alignment": "generated"
+      }
+    },
+    {
       "file": "src/src/AkavacheV11Reader/Program.cs",
       "start_line": 52,
       "end_line": 69,

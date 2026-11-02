@@ -728,6 +728,26 @@
       }
     },
     {
+      "file": "app/Jobs/PlanTaskStepsJob.php",
+      "start_line": 74,
+      "end_line": 76,
+      "message": "This check-then-insert retry guard is not atomic. If duplicate planner jobs run concurrently for the same task, both can read the same `$existingOrders` and create duplicate steps because the database does not enforce uniqueness on `(task_id, sequence_order)`. This should use a database-backed unique key with `upsert`/`firstOrCreate` semantics.",
+      "tp_fp": "tp",
+      "severity": "medium",
+      "category": "reliability",
+      "scope": "introduced-by-pr",
+      "difficulty": "medium",
+      "context_required": "diff-plus-related-files",
+      "tp_fp_justification": "Verified (same as Finding 7 from the job side): PlanTaskStepsJob lines 74-76 use pluck()->in_array()->create() with no database-level unique constraint on (task_id, sequence_order). Two concurrent job instances can both read the same empty existingOrders and insert duplicate step rows.",
+      "severity_justification": "Duplicate step rows would cause actions to execute twice, corrupt output compilation, and produce incorrect run logs. Concurrency exposure is real given tries=3 and backoff settings.",
+      "category_justification": "This is a concurrency/race condition in the idempotency guard for a queued job, affecting fault tolerance under concurrent or retry execution.",
+      "producer": "ccr:gpt-5.5[ReasoningEffort=medium]",
+      "source": {
+        "type": "ccr",
+        "alignment": "generated"
+      }
+    },
+    {
       "file": "docs/pipeline-api-testing.md",
       "start_line": 100,
       "end_line": 102,

@@ -288,6 +288,86 @@
       }
     },
     {
+      "file": "src/commands/apps/destinations/delete.ts",
+      "start_line": 49,
+      "end_line": 56,
+      "message": "The code does not handle the case where the user cancels the platform selection prompt. If `prompt` returns `undefined`, it is passed to `appDestinationsService.findAll`, which may lead to unexpected behavior or a crash. It would be safer to check if a platform was actually selected before proceeding.",
+      "tp_fp": "fp",
+      "severity": "low",
+      "category": "correctness",
+      "scope": "introduced-by-pr",
+      "difficulty": "medium",
+      "context_required": "diff-plus-related-files",
+      "tp_fp_justification": "Same as Finding 15: the custom `prompt` wrapper in utils/prompt.ts calls `process.exit(0)` when the cancel symbol is returned, so the prompt never returns undefined on cancellation. The premise that platform could be undefined after the prompt is factually incorrect.",
+      "severity_justification": "The claimed scenario cannot occur due to the cancel-handling in the prompt wrapper.",
+      "category_justification": "The finding makes a factual claim about possible invalid return values from a prompt.",
+      "producer": "llm_review:gemini-2.5-pro",
+      "source": {
+        "type": "llm_review",
+        "alignment": "generated"
+      }
+    },
+    {
+      "file": "src/commands/apps/destinations/get.ts",
+      "start_line": 45,
+      "end_line": 52,
+      "message": "The code does not handle the case where the user cancels the platform selection prompt. If `prompt` returns `undefined`, it is passed to `appDestinationsService.findAll`, which may lead to unexpected behavior or a crash. It would be safer to check if a platform was actually selected before proceeding.",
+      "tp_fp": "fp",
+      "severity": "low",
+      "category": "correctness",
+      "scope": "introduced-by-pr",
+      "difficulty": "medium",
+      "context_required": "diff-plus-related-files",
+      "tp_fp_justification": "Same as Findings 15 and 16: the custom `prompt` wrapper in utils/prompt.ts calls `process.exit(0)` when the cancel symbol is returned, so the prompt never returns undefined on cancellation. The premise that platform could be undefined after the prompt is factually incorrect.",
+      "severity_justification": "The claimed scenario cannot occur due to the cancel-handling in the prompt wrapper.",
+      "category_justification": "The finding makes a factual claim about possible invalid return values from a prompt.",
+      "producer": "llm_review:gemini-2.5-pro",
+      "source": {
+        "type": "llm_review",
+        "alignment": "generated"
+      }
+    },
+    {
+      "file": "src/commands/apps/certificates/get.ts",
+      "start_line": 48,
+      "end_line": 55,
+      "message": "The code does not handle the case where the user cancels the platform selection prompt. If `prompt` returns `undefined`, it is passed to `appCertificatesService.findAll`, which may lead to unexpected behavior or a crash. It would be safer to check if a platform was actually selected before proceeding.",
+      "tp_fp": "fp",
+      "severity": "low",
+      "category": "correctness",
+      "scope": "introduced-by-pr",
+      "difficulty": "medium",
+      "context_required": "diff-plus-related-files",
+      "tp_fp_justification": "Same as Findings 15, 16, and 17: the custom `prompt` wrapper in utils/prompt.ts calls `process.exit(0)` when the cancel symbol is returned, so the prompt never returns undefined on cancellation. The premise that platform could be undefined after the prompt is factually incorrect.",
+      "severity_justification": "The claimed scenario cannot occur due to the cancel-handling in the prompt wrapper.",
+      "category_justification": "The finding makes a factual claim about possible invalid return values from a prompt.",
+      "producer": "llm_review:gemini-2.5-pro",
+      "source": {
+        "type": "llm_review",
+        "alignment": "generated"
+      }
+    },
+    {
+      "file": "src/services/app-certificates.ts",
+      "start_line": 101,
+      "end_line": 121,
+      "message": "The create method in AppCertificatesService does not handle file upload errors explicitly. If the HTTP request fails due to issues like file size or network errors, the service will throw an unhandled exception.",
+      "tp_fp": "fp",
+      "severity": "low",
+      "category": "reliability",
+      "scope": "introduced-by-pr",
+      "difficulty": "easy",
+      "context_required": "diff-plus-related-files",
+      "tp_fp_justification": "Same as Finding 14: no service in the codebase wraps httpClient calls in try-catch at the service layer. This is a generic 'add try-catch to API calls' suggestion that applies equally to every httpClient call across all services in the project. It is boilerplate advice not specific to this method.",
+      "severity_justification": "Unhandled API errors surface as uncaught promise rejections, consistent with every other command in the codebase.",
+      "category_justification": "The finding concerns error handling for network/file upload operations.",
+      "producer": "llm_review:gpt-4o",
+      "source": {
+        "type": "llm_review",
+        "alignment": "generated"
+      }
+    },
+    {
       "file": "src/services/app-destinations.ts",
       "start_line": 26,
       "end_line": 28,
@@ -360,6 +440,26 @@
       "context_required": "diff-only",
       "tp_fp_justification": "Confirmed: when multiple certificates match the given name+platform, the code silently picks `certificates[0]` with no warning. For a destructive delete operation, this can delete an unintended resource. The same issue exists in destinations/delete.ts. The confirmation prompt doesn't help because the user isn't told which certificate is being selected.",
       "severity_justification": "Silent deletion of the wrong resource is a meaningful data integrity risk when multiple certificates share the same name and platform, which is a realistic scenario.",
+      "category_justification": "The logic silently selects an arbitrary resource when the lookup criteria are ambiguous, potentially deleting the wrong item.",
+      "producer": "llm_review:gpt-4o",
+      "source": {
+        "type": "llm_review",
+        "alignment": "generated"
+      }
+    },
+    {
+      "file": "src/commands/apps/destinations/delete.ts",
+      "start_line": 52,
+      "end_line": 54,
+      "message": "When filtering destinations by name and platform, only the first result is selected without informing users if multiple matches exist, which could lead to unintended deletion.",
+      "tp_fp": "tp",
+      "severity": "medium",
+      "category": "correctness",
+      "scope": "introduced-by-pr",
+      "difficulty": "easy",
+      "context_required": "diff-only",
+      "tp_fp_justification": "Same as Finding 23: confirmed in destinations/delete.ts lines 34-40, `destinations[0]` is taken silently when filtering by name+platform with no check for multiple matches and no warning to the user. For a destructive delete operation, this can delete an unintended resource when multiple destinations share the same name and platform.",
+      "severity_justification": "Silent deletion of the wrong resource is a meaningful data integrity risk when multiple destinations share the same name and platform, which is a realistic scenario.",
       "category_justification": "The logic silently selects an arbitrary resource when the lookup criteria are ambiguous, potentially deleting the wrong item.",
       "producer": "llm_review:gpt-4o",
       "source": {
@@ -581,6 +681,26 @@
       "tp_fp_justification": "Verified: AppDestinationDto includes appleAppPassword: string | null, and list.ts outputs the full destinations array via console.table/JSON.stringify with no field masking. If the API returns the password value (which the DTO typing allows for), it would be printed in plaintext to the terminal.",
       "severity_justification": "App-specific Apple passwords are credentials that unlock App Store Connect access. Printing them to terminal output (which may be logged in CI/CD systems) is a real credential exposure risk.",
       "category_justification": "Potential plaintext credential exposure in console output without masking or omission of sensitive fields.",
+      "producer": "ccr:gpt-5.5[ReasoningEffort=medium]",
+      "source": {
+        "type": "ccr",
+        "alignment": "generated"
+      }
+    },
+    {
+      "file": "src/commands/apps/destinations/get.ts",
+      "start_line": 73,
+      "end_line": 76,
+      "message": "This prints the full destination DTO directly. Because the DTO includes sensitive fields such as `appleAppPassword`, API key IDs, and uploaded key IDs, `get` can expose secrets or credential identifiers in terminal output; redact those fields before printing.",
+      "tp_fp": "tp",
+      "severity": "medium",
+      "category": "security",
+      "scope": "introduced-by-pr",
+      "difficulty": "medium",
+      "context_required": "diff-plus-related-files",
+      "tp_fp_justification": "Verified: get.ts lines 73-76 use console.table(destination) and JSON.stringify(destination) with no field masking. AppDestinationDto includes appleAppPassword: string | null. If the API returns the password value, it would be printed in plaintext. Same root issue as finding 11, applied to the get command.",
+      "severity_justification": "Same as finding 11 — app-specific Apple passwords printed to terminal output could be captured by CI/CD log systems.",
+      "category_justification": "Potential plaintext credential exposure in console output without masking sensitive DTO fields.",
       "producer": "ccr:gpt-5.5[ReasoningEffort=medium]",
       "source": {
         "type": "ccr",

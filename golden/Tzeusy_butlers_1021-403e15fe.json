@@ -228,6 +228,26 @@
       }
     },
     {
+      "file": "tests/daemon/test_notify_react.py",
+      "start_line": 82,
+      "end_line": 84,
+      "message": "This does not actually make `async with pool.acquire()` work because `mock_pool.acquire` is still an `AsyncMock`, so `pool.acquire()` returns a coroutine rather than an async context manager and the configured `return_value.__aenter__` is never used. `_ensure_owner_entity` uses `async with pool.acquire()` directly, so this setup still skips that path instead of exercising it.",
+      "tp_fp": "tp",
+      "severity": "low",
+      "category": "testing",
+      "scope": "introduced-by-pr",
+      "difficulty": "medium",
+      "context_required": "diff-plus-related-files",
+      "tp_fp_justification": "Same factually verified issue as Finding 1: `mock_pool` is an `AsyncMock`, so `mock_pool.acquire()` returns a coroutine, not an async context manager. The `return_value.__aenter__` is unreachable. The comment `# Support 'async with pool.acquire() as conn:' for _ensure_owner_entity` is misleading — the pattern doesn't work. Tests pass only because `_ensure_owner_entity` swallows all exceptions.",
+      "severity_justification": "Same as Finding 1 — tests pass due to silent exception swallowing, but the mock doesn't faithfully exercise `_ensure_owner_entity`.",
+      "category_justification": "Incorrect mock setup for the async context manager protocol in test infrastructure.",
+      "producer": "ccr:gpt-5.5[ReasoningEffort=medium]",
+      "source": {
+        "type": "ccr",
+        "alignment": "generated"
+      }
+    },
+    {
       "file": "tests/daemon/test_notify_contact_id.py",
       "start_line": 91,
       "end_line": 93,

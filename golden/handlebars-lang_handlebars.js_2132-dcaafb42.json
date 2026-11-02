@@ -268,6 +268,46 @@
       }
     },
     {
+      "file": "tests/bench/perf.mjs",
+      "start_line": 1,
+      "end_line": 1,
+      "message": "The file is missing a Node.js shebang (`#!/usr/bin/env node`). While it's executed with `node tests/bench/perf.mjs`, making it directly executable would be more conventional for a CLI tool.",
+      "tp_fp": "fp",
+      "severity": "low",
+      "category": "maintainability",
+      "scope": "introduced-by-pr",
+      "difficulty": "easy",
+      "context_required": "diff-only",
+      "tp_fp_justification": "Same as finding 13 — all three bench scripts consistently lack shebangs and are invoked via `node tests/bench/*.mjs` in npm scripts. Generic best-practice suggestion with no specific code issue; could be pasted verbatim onto any script file.",
+      "severity_justification": "No functional impact; the script works correctly as-is via npm run bench.",
+      "category_justification": "A style/convention suggestion about adding a shebang line.",
+      "producer": "llm_review:gemini-2.5-pro",
+      "source": {
+        "type": "llm_review",
+        "alignment": "generated"
+      }
+    },
+    {
+      "file": "tests/bench/size.mjs",
+      "start_line": 1,
+      "end_line": 1,
+      "message": "The file is missing a Node.js shebang (`#!/usr/bin/env node`). While it's executed with `node tests/bench/size.mjs`, making it directly executable would be more conventional for a CLI tool.",
+      "tp_fp": "fp",
+      "severity": "low",
+      "category": "maintainability",
+      "scope": "introduced-by-pr",
+      "difficulty": "easy",
+      "context_required": "diff-only",
+      "tp_fp_justification": "Identical to findings 13 and 14 — all three bench scripts consistently lack shebangs and are invoked via `node tests/bench/*.mjs` in npm scripts. Generic best-practice suggestion with no specific code issue; could be pasted verbatim onto any script file.",
+      "severity_justification": "No functional impact; the script works correctly as-is via npm run bench:size.",
+      "category_justification": "A style/convention suggestion about adding a shebang line.",
+      "producer": "llm_review:gemini-2.5-pro",
+      "source": {
+        "type": "llm_review",
+        "alignment": "generated"
+      }
+    },
+    {
       "file": "tests/bench/report.mjs",
       "start_line": 46,
       "end_line": 46,

@@ -208,6 +208,26 @@
       }
     },
     {
+      "file": "src/lib/components/Badge/Badge.test.tsx",
+      "start_line": 94,
+      "end_line": 94,
+      "message": "The test assertion `expect(screen.getByText(\"★\").parentElement).toHaveClass(\"icon\")` is brittle as it depends on the internal structure of `GlobalIconWrapper`. If the wrapping element changes from a `span`, this test will fail. Testing should focus on behavior rather than implementation details.",
+      "tp_fp": "tp",
+      "severity": "low",
+      "category": "testing",
+      "scope": "introduced-by-pr",
+      "difficulty": "easy",
+      "context_required": "diff-only",
+      "tp_fp_justification": "Verified: Badge test at line ~94 uses `getByText('★').parentElement).toHaveClass('icon')`, directly depending on GlobalIconWrapper rendering a span wrapper that receives the className. Same fragility pattern as the Accordion test — if GlobalIconWrapper's element type or class-passing changes, the test breaks.",
+      "severity_justification": "The test currently works correctly and the structure is stable. Minor test quality issue with no current impact.",
+      "category_justification": "Same as Finding 10: test fragility tied to internal DOM structure of GlobalIconWrapper rather than a semantically stable selector.",
+      "producer": "llm_review:gemini-2.5-pro",
+      "source": {
+        "type": "llm_review",
+        "alignment": "generated"
+      }
+    },
+    {
       "file": "src/lib/components/Breadcrumb/Breadcrumb.test.tsx",
       "start_line": 47,
       "end_line": 47,
@@ -680,6 +700,66 @@
       "context_required": "diff-only",
       "tp_fp_justification": "The grammar observation is technically valid but the phrase 'a custom icon uses <span>, <i> or <svg>' is understandable and causes no real confusion. The identical phrasing appears consistently across all five story files added in this PR (Accordion, Avatar, Badge, Breadcrumb, BusinessCard), so there is no inconsistency. This is a purely cosmetic sub-threshold nitpick in Storybook description text with no functional or reader-facing impact.",
       "severity_justification": "Storybook argType description text; no runtime, type, or behavioral impact whatsoever.",
+      "category_justification": "The finding concerns the wording of a Storybook argType description string — inline documentation.",
+      "producer": "ccr:gpt-5.5[ReasoningEffort=medium]",
+      "source": {
+        "type": "ccr",
+        "alignment": "generated"
+      }
+    },
+    {
+      "file": "src/lib/components/Breadcrumb/Breadcrumb.stories.tsx",
+      "start_line": 11,
+      "end_line": 11,
+      "message": "The description is grammatically unclear; use “using” instead of “uses” when describing custom icon elements.",
+      "tp_fp": "fp",
+      "severity": "low",
+      "category": "documentation",
+      "scope": "introduced-by-pr",
+      "difficulty": "easy",
+      "context_required": "diff-only",
+      "tp_fp_justification": "Identical to Finding 1/4 — the same phrase 'a custom icon uses <span>, <i> or <svg>' appears consistently across all five story files added in this PR. The wording is understandable, causes no reader-facing confusion, and is used uniformly, so there is no inconsistency. This is a purely cosmetic sub-threshold grammar nitpick in Storybook description text with no functional impact.",
+      "severity_justification": "Storybook argType description text only; no runtime, type, or behavioral impact.",
+      "category_justification": "The finding concerns the wording of a Storybook argType description string — inline documentation.",
+      "producer": "ccr:gpt-5.5[ReasoningEffort=medium]",
+      "source": {
+        "type": "ccr",
+        "alignment": "generated"
+      }
+    },
+    {
+      "file": "src/lib/components/Badge/Badge.stories.tsx",
+      "start_line": 21,
+      "end_line": 21,
+      "message": "The description is grammatically unclear; use “using” instead of “uses” when describing custom icon elements.",
+      "tp_fp": "fp",
+      "severity": "low",
+      "category": "documentation",
+      "scope": "introduced-by-pr",
+      "difficulty": "easy",
+      "context_required": "diff-only",
+      "tp_fp_justification": "Identical to Findings 1/4 and 2/4 — the phrase 'a custom icon uses <span>, <i> or <svg>' is used uniformly across all five story files in this PR. No inconsistency, no reader-facing confusion, and no functional impact. Sub-threshold cosmetic grammar nitpick.",
+      "severity_justification": "Storybook argType description text only; no runtime, type, or behavioral impact.",
+      "category_justification": "The finding concerns the wording of a Storybook argType description string — inline documentation.",
+      "producer": "ccr:gpt-5.5[ReasoningEffort=medium]",
+      "source": {
+        "type": "ccr",
+        "alignment": "generated"
+      }
+    },
+    {
+      "file": "src/lib/components/Avatar/Avatar.stories.tsx",
+      "start_line": 11,
+      "end_line": 11,
+      "message": "The description is grammatically unclear; use “using” instead of “uses” when describing custom icon elements.",
+      "tp_fp": "fp",
+      "severity": "low",
+      "category": "documentation",
+      "scope": "introduced-by-pr",
+      "difficulty": "easy",
+      "context_required": "diff-only",
+      "tp_fp_justification": "Identical to Findings 1–3 — the phrase 'a custom icon uses <span>, <i> or <svg>' is used uniformly across all five story files in this PR. No inconsistency, no reader-facing confusion, and no functional impact. Sub-threshold cosmetic grammar nitpick.",
+      "severity_justification": "Storybook argType description text only; no runtime, type, or behavioral impact.",
       "category_justification": "The finding concerns the wording of a Storybook argType description string — inline documentation.",
       "producer": "ccr:gpt-5.5[ReasoningEffort=medium]",
       "source": {
