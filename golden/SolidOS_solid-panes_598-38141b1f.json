@@ -484,26 +484,6 @@
       }
     },
     {
-      "file": "src/social/editProfileDetails.ts",
-      "start_line": 260,
-      "end_line": 265,
-      "message": "`readProfileLinkValues` preserves multiple existing links separated by newlines, but the dialog only displays the first one in a single `url` input. Saving the form deletes all existing statements for the field and re-inserts only this first value, so users can unintentionally lose additional homepage/weblog/workplace/school links without editing them.",
-      "tp_fp": "tp",
-      "severity": "medium",
-      "category": "correctness",
-      "scope": "pre-existing",
-      "difficulty": "medium",
-      "context_required": "diff-plus-related-files",
-      "tp_fp_justification": "Duplicate of Finding 1, already verified. `readProfileLinkValues` joins multiple values with '\\n', the dialog displays only `.split('\\n')[0]`, and save captures only the single input value. `saveProfileLinkValues` then deletes ALL existing statements and inserts only the one — silently dropping any additional URLs.",
-      "severity_justification": "Users with multiple values for a link predicate will silently lose all but the first when they open and save the edit dialog, a real data integrity issue for an edge case.",
-      "category_justification": "The load/save cycle is not symmetric for multi-valued predicates — a logic error that causes silent data loss.",
-      "producer": "ccr:gpt-5.5[ReasoningEffort=medium]",
-      "source": {
-        "type": "ccr",
-        "alignment": "generated"
-      }
-    },
-    {
       "file": "README.md",
       "start_line": 87,
       "end_line": 87,
@@ -777,26 +757,6 @@
       "tp_fp_justification": "Verified: `friendCount` is computed synchronously from `kb.each(s, knows)` and set once in `createHeaderSection`. `refreshSocialHeader` only accepts `HeaderControls` (no `stats`), and the `streamFriends()` async loop only calls `refreshFriendsList()`/`refreshMutualFriends()` — no path updates the header friend count after async loading. The count will stay stale if the initial snapshot had fewer entries than the fully-loaded profile.",
       "severity_justification": "Display-only inconsistency — the friend list itself shows the correct data after streaming, but the count in the header stats badge may remain wrong. Not a data integrity or security issue.",
       "category_justification": "UI state divergence — the header stat is computed once from a snapshot and not refreshed when the underlying data is updated asynchronously.",
-      "producer": "ccr:gpt-5.5[ReasoningEffort=medium]",
-      "source": {
-        "type": "ccr",
-        "alignment": "generated"
-      }
-    },
-    {
-      "file": "src/outline/manager.js",
-      "start_line": 583,
-      "end_line": 587,
-      "message": "This returns any existing `#OutlineView` without ensuring it is a table, but `GotoSubject` still appends `<TR>` children to the returned element. The new HTML shell uses a `<section id=\"OutlineView\">`, so rendering into that existing section creates invalid DOM and can break outline layout; create/find a table inside the section or validate the element before returning it.",
-      "tp_fp": "tp",
-      "severity": "medium",
-      "category": "correctness",
-      "scope": "introduced-by-pr",
-      "difficulty": "medium",
-      "context_required": "diff-plus-related-files",
-      "tp_fp_justification": "Duplicate of Finding 5, already verified. `getOrCreateContainer` at lines 585-587 returns any existing `#OutlineView` element unconditionally regardless of tag type. `GotoSubject` then appends `<TR>` elements to the returned element. The new HTML shell (test fixture and production-intent structure) uses `<section id='OutlineView'>`, making this a real invalid DOM issue.",
-      "severity_justification": "If a production HTML shell provides `<section id='OutlineView'>` (as the updated test fixture reflects), the outliner appends TR children directly to a section, producing invalid HTML that can break outline layout and rendering.",
-      "category_justification": "Logic error — the function assumes the existing element is a table but does not verify it, and the rest of the code appends table-specific children to whatever is returned.",
       "producer": "ccr:gpt-5.5[ReasoningEffort=medium]",
       "source": {
         "type": "ccr",

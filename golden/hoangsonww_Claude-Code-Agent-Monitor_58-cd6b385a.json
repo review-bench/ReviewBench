@@ -884,26 +884,6 @@
       }
     },
     {
-      "file": "deployments/terraform/providers/azure/main.tf",
-      "start_line": 329,
-      "end_line": 333,
-      "message": "This repeats the invalid environment_variables dynamic block from the blue container. The AzureRM container schema requires a single environment_variables map argument, so the green slot also fails Terraform validation/planning.",
-      "tp_fp": "tp",
-      "severity": "high",
-      "category": "correctness",
-      "scope": "introduced-by-pr",
-      "difficulty": "easy",
-      "context_required": "diff-plus-related-files",
-      "tp_fp_justification": "Confirmed in Finding 14 investigation: lines 329–333 contain the same invalid `dynamic \"environment_variables\"` block as lines 236–240. The grep output showed both occurrences explicitly. The azurerm provider requires `environment_variables` as a `map(string)` attribute (as correctly used at line 289 for the MCP sidecar), not as nested blocks. The green slot container group has the same invalid syntax and will fail terraform validate/plan.",
-      "severity_justification": "Same as Finding 14 — the green deployment slot also fails Terraform validation, meaning neither blue nor green Azure slots can be provisioned.",
-      "category_justification": "Same invalid dynamic block on a map attribute, repeated for the green deployment slot.",
-      "producer": "ccr:gpt-5.5[ReasoningEffort=medium]",
-      "source": {
-        "type": "ccr",
-        "alignment": "generated"
-      }
-    },
-    {
       "file": "deployments/terraform/providers/aws/main.tf",
       "start_line": 144,
       "end_line": 146,
@@ -1017,26 +997,6 @@
       "tp_fp_justification": "Confirmed: an `oci_file_storage_file_system` is provisioned but the container's `volumes` block uses `volume_type = \"EMPTYDIR\"` with `backing_store = \"EPHEMERAL_STORAGE\"` for `/app/data`. The code itself includes a comment acknowledging OCI Container Instances cannot mount NFS directly. The FSS is unused and the SQLite database is lost on container restart/replacement.",
       "severity_justification": "All session and event data stored in SQLite is lost every time the OCI container instance is replaced or restarted. This is a silent data loss issue for any production deployment on OCI using Container Instances.",
       "category_justification": "The persistent storage resource is provisioned but never connected to the container, resulting in ephemeral database storage contrary to the module's intent.",
-      "producer": "ccr:gpt-5.5[ReasoningEffort=medium]",
-      "source": {
-        "type": "ccr",
-        "alignment": "generated"
-      }
-    },
-    {
-      "file": "deployments/terraform/providers/oci/main.tf",
-      "start_line": 438,
-      "end_line": 442,
-      "message": "The green OCI slot also uses EMPTYDIR for /app/data instead of the FSS file system, so any database changes made while testing or after switching to green are not persistent and disappear on container replacement.",
-      "tp_fp": "tp",
-      "severity": "high",
-      "category": "correctness",
-      "scope": "introduced-by-pr",
-      "difficulty": "easy",
-      "context_required": "diff-plus-related-files",
-      "tp_fp_justification": "Confirmed in Finding 21 investigation: lines 438–440 of the green container instance definition use `volume_type = \"EMPTYDIR\"` with a NOTE comment acknowledging the FSS mounting limitation (same as the blue slot). The green slot also mounts /app/data to ephemeral storage, so SQLite data is lost on container replacement.",
-      "severity_justification": "Same data loss impact as Finding 21 — the green OCI slot also has an ephemeral database, meaning any data written while green is active disappears on restart or replacement.",
-      "category_justification": "Same issue as Finding 21 repeated for the green deployment slot.",
       "producer": "ccr:gpt-5.5[ReasoningEffort=medium]",
       "source": {
         "type": "ccr",
@@ -1277,26 +1237,6 @@
       "tp_fp_justification": "Confirmed: root main.tf instantiates modules/networking, modules/compute, modules/loadbalancer, modules/database — all exclusively AWS resources (aws_vpc, aws_ecs_cluster, aws_lb, etc.) with no conditional provider selection. The `cloud_provider` variable is validated to accept aws/gcp/azure/oci but the child modules are AWS-only. Setting cloud_provider to anything other than aws still plans AWS resources, making the interface misleading.",
       "severity_justification": "Users following the root module's documented interface who set cloud_provider=gcp/azure/oci will get unexpected AWS resource provisioning or provider auth failures. The public API is deceptive about multi-cloud capability.",
       "category_justification": "The root module's cloud_provider variable accepts non-AWS values but unconditionally deploys AWS-only child modules, creating a broken public interface.",
-      "producer": "ccr:gpt-5.5[ReasoningEffort=medium]",
-      "source": {
-        "type": "ccr",
-        "alignment": "generated"
-      }
-    },
-    {
-      "file": "deployments/kubernetes/base/pvc.yaml",
-      "start_line": 13,
-      "end_line": 17,
-      "message": "The new Kustomize deployments run two or more replicas but define the shared SQLite PVC as ReadWriteOnce. In production the pods are explicitly spread across nodes, so only one node can attach this claim and the remaining replicas will stay pending; use a RWX-capable volume or a per-replica storage model for multi-replica deployments.",
-      "tp_fp": "tp",
-      "severity": "high",
-      "category": "correctness",
-      "scope": "introduced-by-pr",
-      "difficulty": "medium",
-      "context_required": "diff-plus-related-files",
-      "tp_fp_justification": "Confirmed: base/pvc.yaml uses ReadWriteOnce, base/deployment.yaml uses preferredDuringSchedulingIgnoredDuringExecution anti-affinity + ScheduleAnyway topology spread with 2 replicas; production overlay patches to 3 replicas. On a typical multi-node cluster the soft anti-affinity will spread pods across nodes, and only one node can attach the RWO PVC. The finding slightly overstates the certainty ('explicitly spread' vs preferred), but the core RWO conflict with multi-replica deployments is real and the same as Findings 18/19.",
-      "severity_justification": "Multi-replica production deployments will have pods pending on the RWO PVC in any realistic multi-node cluster configuration, causing the deployment to never reach full capacity.",
-      "category_justification": "Incompatible combination of multi-replica deployment with ReadWriteOnce PVC and node-spreading scheduling preferences.",
       "producer": "ccr:gpt-5.5[ReasoningEffort=medium]",
       "source": {
         "type": "ccr",

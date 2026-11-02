@@ -206,26 +206,6 @@
         "type": "llm_review",
         "alignment": "generated"
       }
-    },
-    {
-      "file": "internal/config/load.go",
-      "start_line": 19,
-      "end_line": 21,
-      "message": "Repeated calls to `RejectYAMLAliases` may introduce performance issues, as it processes the YAML data twice (once for alias check and another for unmarshalling). The guard against aliases should ideally enable streamlining unmarshalling directly.",
-      "tp_fp": "fp",
-      "severity": "low",
-      "category": "performance",
-      "scope": "introduced-by-pr",
-      "difficulty": "easy",
-      "context_required": "diff-only",
-      "tp_fp_justification": "Substantively identical to Finding 4: the double-parse observation is factually correct but the performance impact is negligible for small YAML config files read once at CLI startup. The finding is generic — it identifies the pattern without demonstrating any measurable overhead — and could be applied verbatim to any double-parse pattern in any codebase.",
-      "severity_justification": "Config files are small and read once; double-parsing adds microseconds with no realistic user impact.",
-      "category_justification": "The finding is about redundant computation from parsing the same YAML bytes twice.",
-      "producer": "llm_review:gpt-4o",
-      "source": {
-        "type": "llm_review",
-        "alignment": "generated"
-      }
     }
   ]
 }

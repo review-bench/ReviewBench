@@ -128,26 +128,6 @@
       }
     },
     {
-      "file": "examples/omnikernel-module/src/omni-document.service.ts",
-      "start_line": 28,
-      "end_line": 42,
-      "message": "Same silent update failure as OmniCollectionService: mapEntityR2W on conditions adds 'kind = document' to the WHERE clause from the class initializer. If a document record's kind column in the DB does not equal 'document', updateEntity silently updates 0 rows but returns the entity without error, giving the caller a false success indication.",
-      "tp_fp": "tp",
-      "severity": "low",
-      "category": "correctness",
-      "scope": "introduced-by-pr",
-      "difficulty": "hard",
-      "context_required": "diff-plus-related-files",
-      "tp_fp_justification": "OmniDocumentEntity has 'kind: OmniDocumentKind = OmniDocumentKind.Document' as a class field initializer, identical to OmniCollectionEntity. mapEntityR2W(conditions) creates new OmniDocumentEntity() and the kind='document' default gets baked into the UPDATE WHERE clause, while validateConditions uses the raw conditions. Factually the same issue as Finding 6.",
-      "severity_justification": "Same as Finding 6: requires a document record with kind ≠ 'document' in the DB, which normalizeDocumentInput prevents under normal service-layer writes. The precondition is unusual in an example module.",
-      "category_justification": "Same logic inconsistency between validateConditions and the UPDATE WHERE clause caused by the class field initializer being absorbed into mapEntityR2W conditions.",
-      "producer": "llm_review:claude-sonnet-4.6",
-      "source": {
-        "type": "llm_review",
-        "alignment": "generated"
-      }
-    },
-    {
       "file": "examples/omnikernel-module/src/omni-record.resolver.ts",
       "start_line": 11,
       "end_line": 27,

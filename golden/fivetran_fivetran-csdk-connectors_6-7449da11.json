@@ -328,26 +328,6 @@
       }
     },
     {
-      "file": "clerk/README.md",
-      "start_line": 107,
-      "end_line": 110,
-      "message": "The markdown table headers are incorrectly cased (`Table name`, `Primary key`, `Foreign key`). They should be `Table Name`, `Primary Key`, `Foreign Key` to match the previous version and for consistency with other READMEs.",
-      "tp_fp": "fp",
-      "severity": "low",
-      "category": "documentation",
-      "scope": "introduced-by-pr",
-      "difficulty": "medium",
-      "context_required": "broader-project-context",
-      "tp_fp_justification": "Same as Finding 15: the README template explicitly prohibits Title Case for anything other than H1. Sentence case (`Table name`, `Primary key`, `Foreign key`) is the correct convention per the template. The finding's suggestion to revert to Title Case would violate the project's documented style rule.",
-      "severity_justification": "Pure formatting/style matter with no functional impact.",
-      "category_justification": "The concern is about capitalization convention in README table headers.",
-      "producer": "llm_review:gemini-2.5-pro",
-      "source": {
-        "type": "llm_review",
-        "alignment": "generated"
-      }
-    },
-    {
       "file": "docusign/README.md",
       "start_line": 15,
       "end_line": 15,
@@ -568,32 +548,6 @@
       }
     },
     {
-      "file": "aws_dynamo_db_authentication/README.md",
-      "start_line": 82,
-      "end_line": 82,
-      "message": "```suggestion\r\n- `aws_dynamodb_parallel_scan.get_paginator()`\r\n```",
-      "tp_fp": "fp",
-      "severity": "low",
-      "category": "documentation",
-      "scope": "pre-existing",
-      "difficulty": "easy",
-      "context_required": "diff-only",
-      "tp_fp_justification": "Identical to Finding 21: same file (aws_dynamo_db_authentication/README.md), same line (82), same suggestion. The content already matches the suggestion at the current SHA — the PR already applied this fix.",
-      "severity_justification": "No change needed; the suggested content is already present.",
-      "category_justification": "The concern is about a malformed code reference in README documentation.",
-      "producer": "human_review",
-      "source": {
-        "type": "review_comment",
-        "author": "fivetran-JenasVimal",
-        "url": "https://github.com/fivetran/fivetran_csdk_connectors/pull/6#discussion_r3050781828",
-        "created_at": "2026-04-08T10:40:24Z",
-        "alignment": "code_changed",
-        "original_commit": "d1872d5509dea12959129a2a15eeeadc22a70948",
-        "original_start_line": 82,
-        "original_end_line": 82
-      }
-    },
-    {
       "file": "couchbase_magma/README.md",
       "start_line": 42,
       "end_line": 47,
@@ -724,84 +678,6 @@
       }
     },
     {
-      "file": "documentdb/README.md",
-      "start_line": 159,
-      "end_line": 161,
-      "message": "```suggestion\r\n  \"_id\": ObjectId(\"...\"),\r\n  \"created_at\": ISODate(\"2023-01-01T00:00:00Z\"),\r\n  \"updated_at\": ISODate(\"2023-01-01T00:00:00Z\"),\r\n```",
-      "tp_fp": "fp",
-      "severity": "low",
-      "category": "documentation",
-      "scope": "pre-existing",
-      "difficulty": "easy",
-      "context_required": "diff-only",
-      "tp_fp_justification": "Identical to Finding 22: same file (documentdb/README.md), same lines (159–161), same suggestion. Already verified that lines 159–161 match the suggestion exactly at the current SHA.",
-      "severity_justification": "No change needed; the suggested content is already present.",
-      "category_justification": "The finding references README code example content.",
-      "producer": "human_review",
-      "source": {
-        "type": "review_comment",
-        "author": "fivetran-JenasVimal",
-        "url": "https://github.com/fivetran/fivetran_csdk_connectors/pull/6#discussion_r3051403216",
-        "created_at": "2026-04-08T12:47:14Z",
-        "alignment": "code_changed",
-        "original_commit": "a601be9d14dd783a8efdf15b9e173ce6884f03db",
-        "original_start_line": 159,
-        "original_end_line": 161
-      }
-    },
-    {
-      "file": "gnews/README.md",
-      "start_line": 67,
-      "end_line": 67,
-      "message": "```suggestion\r\n- Upserts: Each record is written via `op.upsert(...)` to `news_stories`.\r\n```",
-      "tp_fp": "fp",
-      "severity": "low",
-      "category": "documentation",
-      "scope": "pre-existing",
-      "difficulty": "easy",
-      "context_required": "diff-only",
-      "tp_fp_justification": "Identical to Finding 24: same file (gnews/README.md), same line (67), same suggestion. Already verified that line 67 matches the suggestion exactly at the current SHA.",
-      "severity_justification": "No change needed; the suggested content is already present.",
-      "category_justification": "The finding references README prose content.",
-      "producer": "human_review",
-      "source": {
-        "type": "review_comment",
-        "author": "fivetran-JenasVimal",
-        "url": "https://github.com/fivetran/fivetran_csdk_connectors/pull/6#discussion_r3051450795",
-        "created_at": "2026-04-08T12:55:48Z",
-        "alignment": "code_changed",
-        "original_commit": "82d869aa9fdb82e29b9f424556ce1dfb60a14c37",
-        "original_start_line": 67,
-        "original_end_line": 67
-      }
-    },
-    {
-      "file": "gnews/README.md",
-      "start_line": 81,
-      "end_line": 81,
-      "message": "```suggestion\r\nThe connector creates the `news_stories` table.\r\n```",
-      "tp_fp": "fp",
-      "severity": "low",
-      "category": "documentation",
-      "scope": "pre-existing",
-      "difficulty": "easy",
-      "context_required": "diff-only",
-      "tp_fp_justification": "Identical to Finding 25: same file (gnews/README.md), same line (81), same suggestion. Already verified that line 81 matches the suggestion exactly at the current SHA.",
-      "severity_justification": "No change needed; the suggested content is already present.",
-      "category_justification": "The finding references README prose content.",
-      "producer": "human_review",
-      "source": {
-        "type": "review_comment",
-        "author": "fivetran-JenasVimal",
-        "url": "https://github.com/fivetran/fivetran_csdk_connectors/pull/6#discussion_r3051453821",
-        "created_at": "2026-04-08T12:56:22Z",
-        "alignment": "code_changed",
-        "original_commit": "82d869aa9fdb82e29b9f424556ce1dfb60a14c37",
-        "original_start_line": 81,
-        "original_end_line": 81
-      }
-    },
-    {
       "file": "aws_athena/using_sqlalchemy/README.md",
       "start_line": 29,
       "end_line": 29,
@@ -815,66 +691,6 @@
       "tp_fp_justification": "The project's own instructions file (.github/instructions/readme-markdown.instructions.md) and README template both specify `<connector-name>` as a flat, single-segment name with no path separators. All non-sub-implementation connectors use flat names. The four sub-implementation READMEs introduced by this PR are the only cases using a slash (e.g., `aws_athena/using_sqlalchemy`), deviating from the documented template. Whether the CLI actually handles slashes cannot be tested, but the deviation from the canonical template format is factual and the finding is well-grounded.",
       "severity_justification": "If the command doesn't work as documented, users following the README will get an error or unexpected behavior when trying to initialize a project from these connectors — a direct user-facing documentation failure.",
       "category_justification": "The issue is specifically about the accuracy and correctness of a documented CLI command in the README files.",
-      "producer": "ccr:claude-opus-4.7[ReasoningEffort=medium]",
-      "source": {
-        "type": "ccr",
-        "alignment": "generated"
-      }
-    },
-    {
-      "file": "aws_athena/using_boto3/README.md",
-      "start_line": 29,
-      "end_line": 29,
-      "message": "The `fivetran init --template aws_athena/using_boto3` command uses a path containing a slash. The `fivetran init` command expects a single template name, so this command as documented will likely fail. Same issue affects the sibling `aws_athena/using_sqlalchemy` and the two `apache_hive` sub-implementation READMEs.",
-      "tp_fp": "tp",
-      "severity": "medium",
-      "category": "documentation",
-      "scope": "introduced-by-pr",
-      "difficulty": "medium",
-      "context_required": "broader-project-context",
-      "tp_fp_justification": "Same issue as Finding 1: the project's instructions and template consistently use a flat `<connector-name>` with no slashes, and all non-sub-implementation connectors follow this pattern. The `aws_athena/using_boto3` README introduced by this PR uses `aws_athena/using_boto3` as the template argument, deviating from the canonical format with no evidence the CLI supports path-style names.",
-      "severity_justification": "Users following the README to initialize a project from this connector may encounter an error if the CLI does not support slash-separated paths, making the documented command potentially non-functional.",
-      "category_justification": "The finding concerns the accuracy of a documented CLI command in the README.",
-      "producer": "ccr:claude-opus-4.7[ReasoningEffort=medium]",
-      "source": {
-        "type": "ccr",
-        "alignment": "generated"
-      }
-    },
-    {
-      "file": "apache_hive/using_sqlalchemy/README.md",
-      "start_line": 22,
-      "end_line": 22,
-      "message": "The `fivetran init --template apache_hive/using_sqlalchemy` command uses a path containing a slash, which is not a valid template name for `fivetran init` (it expects a single template/connector name). Same issue in the sibling `apache_hive/using_pyhive` README and the `aws_athena` sub-implementation READMEs.",
-      "tp_fp": "tp",
-      "severity": "medium",
-      "category": "documentation",
-      "scope": "introduced-by-pr",
-      "difficulty": "medium",
-      "context_required": "broader-project-context",
-      "tp_fp_justification": "Same issue as Findings 1 and 2: the project's instructions and template consistently use a flat `<connector-name>` with no slashes, and all non-sub-implementation connectors follow this pattern. The `apache_hive/using_sqlalchemy` README introduced by this PR uses `apache_hive/using_sqlalchemy` as the template argument, deviating from the canonical format.",
-      "severity_justification": "Users following the README to initialize a project from this connector may encounter an error if the CLI does not support slash-separated paths.",
-      "category_justification": "The finding concerns the accuracy of a documented CLI command in the README.",
-      "producer": "ccr:claude-opus-4.7[ReasoningEffort=medium]",
-      "source": {
-        "type": "ccr",
-        "alignment": "generated"
-      }
-    },
-    {
-      "file": "apache_hive/using_pyhive/README.md",
-      "start_line": 22,
-      "end_line": 22,
-      "message": "The `fivetran init --template apache_hive/using_pyhive` command uses a path containing a slash, which is not a valid template name for `fivetran init`. See related comments on the `aws_athena` and `apache_hive/using_sqlalchemy` READMEs.",
-      "tp_fp": "tp",
-      "severity": "medium",
-      "category": "documentation",
-      "scope": "introduced-by-pr",
-      "difficulty": "medium",
-      "context_required": "broader-project-context",
-      "tp_fp_justification": "Same issue as Findings 1–3: the project's instructions and template consistently use a flat `<connector-name>` with no slashes. The `apache_hive/using_pyhive` README introduced by this PR uses `apache_hive/using_pyhive` as the template argument, deviating from the canonical format with no evidence the CLI supports path-style names.",
-      "severity_justification": "Users following the README to initialize a project from this connector may encounter an error if the CLI does not support slash-separated paths.",
-      "category_justification": "The finding concerns the accuracy of a documented CLI command in the README.",
       "producer": "ccr:claude-opus-4.7[ReasoningEffort=medium]",
       "source": {
         "type": "ccr",

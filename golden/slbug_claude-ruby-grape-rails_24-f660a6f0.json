@@ -531,46 +531,6 @@
     },
     {
       "file": "package.json",
-      "start_line": 28,
-      "end_line": 28,
-      "message": "The npm behavioral eval script exits successfully even when behavioral checks fail, because the scorer's `--all` path only prints JSON and this script does not apply any threshold or parse failed assertions. As a result, `npm run eval:behavioral` will not catch routing regressions despite being documented as a test command.",
-      "tp_fp": "tp",
-      "severity": "low",
-      "category": "testing",
-      "scope": "introduced-by-pr",
-      "difficulty": "easy",
-      "context_required": "diff-only",
-      "tp_fp_justification": "Confirmed: `npm run eval:behavioral` runs `scorer --all --behavioral --pretty` with no `--fail-under`, so it always exits 0 regardless of behavioral assertion failures. This is the same root issue as Finding 8, applied to the npm script surface.",
-      "severity_justification": "Same as Finding 8 — the behavioral dimension is explicitly designed as optional and informational (non-deterministic LLM-based, not in CI gate). Duplicate of Finding 8 at the npm invocation layer.",
-      "category_justification": "npm script documented as a test command that cannot actually catch routing regressions due to missing failure threshold.",
-      "producer": "ccr:gpt-5.5[ReasoningEffort=medium]",
-      "source": {
-        "type": "ccr",
-        "alignment": "generated"
-      }
-    },
-    {
-      "file": "Makefile",
-      "start_line": 74,
-      "end_line": 76,
-      "message": "The fresh behavioral target also only prints the behavioral score report and does not enforce the behavioral thresholds, so a fresh run with low accuracy/precision/recall still exits 0 unless the scorer itself crashes.",
-      "tp_fp": "tp",
-      "severity": "low",
-      "category": "testing",
-      "scope": "introduced-by-pr",
-      "difficulty": "easy",
-      "context_required": "diff-only",
-      "tp_fp_justification": "Confirmed: `eval-behavioral-fresh` runs `python3 -m lab.eval.scorer --all --behavioral --pretty` with no --fail-under, so it always exits 0 regardless of behavioral assertion failures. Identical root cause to Findings 8 and 9, just at the fresh-run Makefile target.",
-      "severity_justification": "Same as Findings 8/9 — behavioral dimension is intentionally optional and informational, not a CI gate. This is a third instance of the same pattern.",
-      "category_justification": "Test target that cannot enforce quality thresholds due to missing failure mechanism.",
-      "producer": "ccr:gpt-5.5[ReasoningEffort=medium]",
-      "source": {
-        "type": "ccr",
-        "alignment": "generated"
-      }
-    },
-    {
-      "file": "package.json",
       "start_line": 30,
       "end_line": 30,
       "message": "The fresh npm behavioral eval has the same gating gap as the cache-only script: after rerunning Haiku, it invokes `scorer --all --behavioral` without any threshold enforcement, so failed behavioral assertions do not make the command fail.",
@@ -583,86 +543,6 @@
       "tp_fp_justification": "Confirmed: `npm run eval:behavioral:fresh` (package.json line 30) runs `scorer --all --behavioral --pretty` with no --fail-under, always exits 0. Fourth instance of the same pattern as Findings 8-10.",
       "severity_justification": "Same reasoning as Findings 8-10 — behavioral dimension is intentionally optional/informational, not a CI gate. This is a fourth duplicate of the same pattern.",
       "category_justification": "Test command that cannot enforce quality thresholds due to missing failure mechanism.",
-      "producer": "ccr:gpt-5.5[ReasoningEffort=medium]",
-      "source": {
-        "type": "ccr",
-        "alignment": "generated"
-      }
-    },
-    {
-      "file": "package.json",
-      "start_line": 29,
-      "end_line": 29,
-      "message": "The verbose cache-only behavioral script also lacks any threshold enforcement after printing the scorer JSON, so failed behavioral assertions still result in a successful npm command.",
-      "tp_fp": "tp",
-      "severity": "low",
-      "category": "testing",
-      "scope": "introduced-by-pr",
-      "difficulty": "easy",
-      "context_required": "diff-only",
-      "tp_fp_justification": "Confirmed: `npm run eval:behavioral:verbose` (package.json line 29) runs `scorer --all --behavioral --pretty` with no --fail-under. Fifth instance of the same pattern as Findings 8-11.",
-      "severity_justification": "Same as Findings 8-11 — behavioral dimension is intentionally optional/informational. Fifth duplicate of the same no-threshold pattern.",
-      "category_justification": "Verbose test command that cannot enforce quality thresholds due to missing failure mechanism.",
-      "producer": "ccr:gpt-5.5[ReasoningEffort=medium]",
-      "source": {
-        "type": "ccr",
-        "alignment": "generated"
-      }
-    },
-    {
-      "file": "package.json",
-      "start_line": 31,
-      "end_line": 31,
-      "message": "The verbose fresh behavioral script reruns Haiku but still does not fail when the resulting behavioral assertions fail, because the following scorer invocation only prints JSON.",
-      "tp_fp": "tp",
-      "severity": "low",
-      "category": "testing",
-      "scope": "introduced-by-pr",
-      "difficulty": "easy",
-      "context_required": "diff-only",
-      "tp_fp_justification": "Confirmed: `npm run eval:behavioral:fresh:verbose` (package.json line 31) runs `scorer --all --behavioral --pretty` with no --fail-under. Sixth instance of the same pattern as Findings 8-12.",
-      "severity_justification": "Same as Findings 8-12 — behavioral dimension intentionally optional/informational. Sixth duplicate of the same no-threshold pattern.",
-      "category_justification": "Test command that cannot enforce quality thresholds due to missing failure mechanism.",
-      "producer": "ccr:gpt-5.5[ReasoningEffort=medium]",
-      "source": {
-        "type": "ccr",
-        "alignment": "generated"
-      }
-    },
-    {
-      "file": "Makefile",
-      "start_line": 70,
-      "end_line": 72,
-      "message": "The verbose cache-only target has the same issue as `eval-behavioral`: it produces a report but does not fail when behavioral thresholds are missed, so regressions are easy to miss in automated use.",
-      "tp_fp": "tp",
-      "severity": "low",
-      "category": "testing",
-      "scope": "introduced-by-pr",
-      "difficulty": "easy",
-      "context_required": "diff-only",
-      "tp_fp_justification": "Confirmed: `eval-behavioral-verbose` runs `scorer --all --behavioral --pretty` with no --fail-under. Seventh instance of the same pattern as Findings 8-13.",
-      "severity_justification": "Same as Findings 8-13 — behavioral dimension intentionally optional/informational. Seventh duplicate of the same no-threshold pattern.",
-      "category_justification": "Test target that cannot enforce quality thresholds due to missing failure mechanism.",
-      "producer": "ccr:gpt-5.5[ReasoningEffort=medium]",
-      "source": {
-        "type": "ccr",
-        "alignment": "generated"
-      }
-    },
-    {
-      "file": "Makefile",
-      "start_line": 78,
-      "end_line": 80,
-      "message": "The verbose fresh target also does not enforce the behavioral scores it just generated; low accuracy/precision/recall still exits successfully after printing the JSON report.",
-      "tp_fp": "tp",
-      "severity": "low",
-      "category": "testing",
-      "scope": "introduced-by-pr",
-      "difficulty": "easy",
-      "context_required": "diff-only",
-      "tp_fp_justification": "Confirmed: `eval-behavioral-fresh-verbose` runs `scorer --all --behavioral --pretty` with no --fail-under. Eighth instance of the same pattern as Findings 8-14.",
-      "severity_justification": "Same as Findings 8-14 — behavioral dimension intentionally optional/informational. Eighth duplicate of the same no-threshold pattern.",
-      "category_justification": "Test target that cannot enforce quality thresholds due to missing failure mechanism.",
       "producer": "ccr:gpt-5.5[ReasoningEffort=medium]",
       "source": {
         "type": "ccr",

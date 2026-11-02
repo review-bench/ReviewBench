@@ -48,26 +48,6 @@
       }
     },
     {
-      "file": "src/index.ts",
-      "start_line": 124,
-      "end_line": 124,
-      "message": "RuleBrandStyleManualRequest is re-exported from the public entry point despite being @deprecated from the moment it was introduced in this PR. Exporting a deprecated type with no prior usage creates unnecessary permanent API surface. See also src/types/api.ts:955-957.",
-      "tp_fp": "tp",
-      "severity": "low",
-      "category": "api-architecture",
-      "scope": "introduced-by-pr",
-      "difficulty": "easy",
-      "context_required": "diff-plus-related-files",
-      "tp_fp_justification": "Factually correct: line 124 of src/index.ts re-exports RuleBrandStyleManualRequest which was @deprecated from the moment it was introduced in this PR (confirmed via git history — version stayed 0.2.0, type was never published non-deprecated). This is the same issue as Finding 2 viewed from the public entry point.",
-      "severity_justification": "Same as Finding 2 — no runtime impact, but adds permanent public API surface that must be maintained per the project's own backward-compat rules.",
-      "category_justification": "Concerns the public API contract via src/index.ts, the single public entry point for the SDK.",
-      "producer": "llm_review:claude-sonnet-4.6",
-      "source": {
-        "type": "llm_review",
-        "alignment": "generated"
-      }
-    },
-    {
       "file": "src/types/api.ts",
       "start_line": 916,
       "end_line": 923,
@@ -401,26 +381,6 @@
       "tp_fp_justification": "Verified: `requestV3` calls `this.log('Response V3:', data)` dumping the full parsed body when debug is enabled. The new API key methods (`listApiKeys`, `createApiKey`, `updateApiKey`) all use `requestV3`, so the `key` field will appear in logs. `getAccount` explicitly avoids this by using `fetchV3` directly and logging a redacted message — a pattern the codebase already established for sensitive responses.",
       "severity_justification": "Requires `debug: true` to trigger (opt-in, defaults to false), but debug logs routinely end up in log aggregators and monitoring systems. Leaking API key values — which are credentials — is a meaningful security risk when debug mode is active.",
       "category_justification": "Credential leak: plaintext API key secrets can appear in application logs via the debug logging path.",
-      "producer": "ccr:gpt-5.5[ReasoningEffort=medium]",
-      "source": {
-        "type": "ccr",
-        "alignment": "generated"
-      }
-    },
-    {
-      "file": "src/client.ts",
-      "start_line": 1825,
-      "end_line": 1829,
-      "message": "`createApiKey()` returns the newly generated secret key, but routing it through `requestV3` means the full response is logged whenever client debug mode is enabled. This can expose the new API key in logs; use a non-logging/redacted path for this response.",
-      "tp_fp": "tp",
-      "severity": "medium",
-      "category": "security",
-      "scope": "introduced-by-pr",
-      "difficulty": "medium",
-      "context_required": "diff-plus-related-files",
-      "tp_fp_justification": "Same mechanism as Finding 1, verified: `requestV3` calls `this.log('Response V3:', data)` which dumps the full parsed body including the `key` field. `createApiKey` uses `requestV3`, so the newly generated secret key will appear in debug logs. The `getAccount` precedent confirms the codebase recognizes this pattern as a security issue requiring a redacted logging path.",
-      "severity_justification": "Same as Finding 1 — requires opt-in `debug: true` but `createApiKey` is specifically the moment a new secret is generated and returned, making this the highest-risk moment for a credential to leak into logs.",
-      "category_justification": "Credential leak: a newly generated secret API key value is logged in plaintext when debug mode is active.",
       "producer": "ccr:gpt-5.5[ReasoningEffort=medium]",
       "source": {
         "type": "ccr",

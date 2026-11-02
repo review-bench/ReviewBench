@@ -348,26 +348,6 @@
       }
     },
     {
-      "file": "src/lib/components/company-components/LocationMapModal.svelte",
-      "start_line": 48,
-      "end_line": 56,
-      "message": "The `latitude` and `longitude` props are processed without validation. Invalid or non-numeric values could affect the map's rendering behavior or lead to runtime errors.",
-      "tp_fp": "fp",
-      "severity": "low",
-      "category": "reliability",
-      "scope": "introduced-by-pr",
-      "difficulty": "medium",
-      "context_required": "diff-plus-related-files",
-      "tp_fp_justification": "Same as finding 17 — latitude and longitude reaching LocationMapModal are already validated as numeric by parseWKTPoint (regex + isNaN check) in DynamicDetailSidebar before being set. The props are typed as number in TypeScript. The finding makes a generic 'validate inputs' claim without demonstrating a specific path where non-numeric values could reach this component.",
-      "severity_justification": "The upstream parseWKTPoint already ensures values are valid numbers before they reach this component. No concrete error scenario is demonstrated.",
-      "category_justification": "The finding concerns potential runtime errors from unvalidated numeric inputs.",
-      "producer": "llm_review:gpt-4o",
-      "source": {
-        "type": "llm_review",
-        "alignment": "generated"
-      }
-    },
-    {
       "file": "src/routes/company/+page.svelte",
       "start_line": 340,
       "end_line": 346,
@@ -561,26 +541,6 @@
       "tp_fp_justification": "Verified: `CreationForm.handleSubmit()` runs `schema.safeParse(formData)` on the full `companySchema`. The form fields were trimmed to exclude `ownerName`, so it will be absent from `formData`, triggering the required `cleanString` min(2) validation failure. The error can never be cleared by the user since the field isn't rendered, blocking form submission entirely.",
       "severity_justification": "The add-company modal is completely broken — it will never successfully submit because validation always fails on a field the user cannot see or fill in.",
       "category_justification": "Logic error: the schema and form fields are out of sync, causing an unresolvable validation failure on every submission attempt.",
-      "producer": "ccr:gpt-5.5[ReasoningEffort=medium]",
-      "source": {
-        "type": "ccr",
-        "alignment": "generated"
-      }
-    },
-    {
-      "file": "src/lib/configs/company-detail.config.ts",
-      "start_line": 129,
-      "end_line": 134,
-      "message": "This validation payload omits `ownerName`, while `companySchema` still requires it. As a result, saving any company detail edit will fail validation even when all visible fields are filled, and the error is dropped because `ownerName` is no longer in the detail config.",
-      "tp_fp": "tp",
-      "severity": "high",
-      "category": "correctness",
-      "scope": "introduced-by-pr",
-      "difficulty": "easy",
-      "context_required": "diff-plus-related-files",
-      "tp_fp_justification": "Identical to Finding 1 — already verified: `prepareForValidation` in `company-detail.config.ts` only supplies `name`, `address`, `location`, `type`, while `companySchema` still requires `ownerName` via `cleanString().min(2)`. This will cause every company edit save to fail validation.",
-      "severity_justification": "Company editing is completely broken — saving will always fail because the required `ownerName` field is never supplied to validation.",
-      "category_justification": "Logic error: schema and data preparation are out of sync, causing broken validation on every save attempt.",
       "producer": "ccr:gpt-5.5[ReasoningEffort=medium]",
       "source": {
         "type": "ccr",

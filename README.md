@@ -87,19 +87,19 @@ PHP, Ruby, Shell, and Swift.
 
 | Severity | Findings | Share |
 |---|---:|---:|
-| High | 36 | 10.2% |
-| Medium | 134 | 38.1% |
-| Low | 182 | 51.7% |
-| **Total** | **352** | **100%** |
+| High | 34 | 10.0% |
+| Medium | 128 | 37.6% |
+| Low | 178 | 52.4% |
+| **Total** | **340** | **100%** |
 
 #### Finding Categories
 
 | Category | Findings | Category | Findings |
 |---|---:|---|---:|
-| Correctness | 133 | Reliability | 58 |
-| Maintainability | 44 | Testing | 35 |
-| Security | 27 | Documentation | 21 |
-| Performance | 12 | API architecture | 12 |
+| Correctness | 126 | Reliability | 56 |
+| Maintainability | 43 | Testing | 35 |
+| Security | 27 | Documentation | 20 |
+| Performance | 11 | API architecture | 12 |
 | Accessibility | 10 |  |  |
 
 ### Full Set Distribution
@@ -132,11 +132,11 @@ findings labeled TP.
 
 | Source type | Test set TPs | Test set share | Full set TPs | Full set share |
 |---|---:|---:|---:|---:|
-| LLM review agents (`llm_review`) | 194 | 55.1% | 1,391 | 53.0% |
-| `ccr` | 153 | 43.5% | 1,185 | 45.2% |
-| Human review comments (`review_comment`) | 4 | 1.1% | 39 | 1.5% |
+| LLM review agents (`llm_review`) | 194 | 57.1% | 1,376 | 54.4% |
+| `ccr` | 142 | 41.8% | 1,109 | 43.8% |
+| Human review comments (`review_comment`) | 3 | 0.9% | 38 | 1.5% |
 | Deterministic tools (`tool`) | 1 | 0.3% | 8 | 0.3% |
-| **Total** | **352** | **100%** | **2,623** | **100%** |
+| **Total** | **340** | **100%** | **2,531** | **100%** |
 
 See [Golden Set Composition by Producer](docs/METHODOLOGY.md#55-golden-set-composition-by-producer)
 for per-producer counts, TP rates, and high- and medium-severity shares.

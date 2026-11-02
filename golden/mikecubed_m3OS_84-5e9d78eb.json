@@ -406,26 +406,6 @@
         "type": "ccr",
         "alignment": "generated"
       }
-    },
-    {
-      "file": "kernel/src/arch/x86_64/interrupts.rs",
-      "start_line": 527,
-      "end_line": 528,
-      "message": "This userspace GPF branch kills the offending process and returns, so user code can intentionally trigger it in a loop. Dumping every trace ring on each such fault can flood serial output and stall the system; full trace dumps should be limited to kernel-fatal paths or rate-limited for user faults.",
-      "tp_fp": "tp",
-      "severity": "low",
-      "category": "reliability",
-      "scope": "introduced-by-pr",
-      "difficulty": "easy",
-      "context_required": "diff-only",
-      "tp_fp_justification": "Verified: lines 527-528 are in the ring-3 GPF path that stores FAULT_KILL_PID and returns (recoverable — same trampoline pattern as the page fault handler). dump_trace_rings() is called before the return, meaning each recoverable userspace GPF triggers a full multi-core trace dump to serial. The finding is factually correct, though it is structurally identical to Finding 3 applied to the GPF handler instead of the page fault handler.",
-      "severity_justification": "Same reasoning as Finding 3: real concern in a production kernel but minimal practical impact in this toy OS with no real threat model. The duplication across two handlers makes it a slightly more systemic pattern but doesn't change the impact level.",
-      "category_justification": "Performance/availability concern: heavy diagnostic dump on each recoverable userspace fault can flood serial output, identical in nature to Finding 3.",
-      "producer": "ccr:gpt-5.5[ReasoningEffort=medium]",
-      "source": {
-        "type": "ccr",
-        "alignment": "generated"
-      }
     }
   ]
 }

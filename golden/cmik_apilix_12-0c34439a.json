@@ -508,26 +508,6 @@
       }
     },
     {
-      "file": "client/src/utils/sync/s3Adapter.ts",
-      "start_line": 27,
-      "end_line": 31,
-      "message": "The S3 adapter calls `electronAPI.getPresignedUrl`, but the preload bridge and Electron main process do not expose or handle any `getPresignedUrl` IPC method. As a result, every S3 push/pull/timestamp operation will throw before reaching S3.",
-      "tp_fp": "tp",
-      "severity": "high",
-      "category": "correctness",
-      "scope": "introduced-by-pr",
-      "difficulty": "medium",
-      "context_required": "diff-plus-related-files",
-      "tp_fp_justification": "Duplicate of Finding 2 — already verified. s3Adapter.ts calls api.getPresignedUrl() at line 29, electron/preload.js does not expose getPresignedUrl in its contextBridge.exposeInMainWorld call, and electron/main.js has no matching IPC handler. Every S3 operation throws unconditionally.",
-      "severity_justification": "S3 sync is fully non-functional in both browser and Electron modes — all three operations (push, pull, timestamp) throw before reaching S3. It is documented as a supported Electron-only feature.",
-      "category_justification": "Missing IPC wiring causes all S3 sync operations to throw unconditionally, making the feature entirely broken.",
-      "producer": "ccr:gpt-5.5[ReasoningEffort=medium]",
-      "source": {
-        "type": "ccr",
-        "alignment": "generated"
-      }
-    },
-    {
       "file": "client/src/components/WorkspaceManagerModal.tsx",
       "start_line": 227,
       "end_line": 228,
@@ -581,46 +561,6 @@
       "tp_fp_justification": "Verified: handleSwitch dispatches SWITCH_WORKSPACE without flushing the current workspace first. The debounced effect's cleanup cancels the pending 300ms save timer when state changes. After switching, the new timer writes the new workspace's data — the old workspace's unsaved changes are dropped. The same bug exists in WorkspaceManagerModal.handleSwitch.",
       "severity_justification": "Silent data loss of user edits is a high-severity issue. Any edit made within 300ms of a workspace switch is permanently lost with no warning. This is the primary workflow action (workspace switching) and the loss is silent.",
       "category_justification": "The workspace switch operation has a concrete bug that silently discards user data due to interaction between the immediate dispatch and the debounced persistence mechanism.",
-      "producer": "ccr:gpt-5.5[ReasoningEffort=medium]",
-      "source": {
-        "type": "ccr",
-        "alignment": "generated"
-      }
-    },
-    {
-      "file": "client/src/components/WorkspaceManagerModal.tsx",
-      "start_line": 67,
-      "end_line": 68,
-      "message": "This workspace switch path also bypasses a flush of the currently active workspace before replacing state. With the debounced persistence in `AppProvider`, recent edits can be lost when switching from the manager modal before the pending save fires.",
-      "tp_fp": "tp",
-      "severity": "high",
-      "category": "correctness",
-      "scope": "introduced-by-pr",
-      "difficulty": "medium",
-      "context_required": "diff-plus-related-files",
-      "tp_fp_justification": "Duplicate of Finding 11's core bug, verified in the same investigation. WorkspaceManagerModal.handleSwitch (lines 65-68) dispatches SWITCH_WORKSPACE without flushing the current workspace first, which cancels the debounced save timer and silently drops edits made within the last 300ms.",
-      "severity_justification": "Same silent data loss as Finding 11 — user edits within 300ms of switching workspaces via the manager modal are permanently lost with no warning.",
-      "category_justification": "Concrete data loss bug: SWITCH_WORKSPACE dispatch cancels pending debounced save for the current workspace, dropping unsaved edits.",
-      "producer": "ccr:gpt-5.5[ReasoningEffort=medium]",
-      "source": {
-        "type": "ccr",
-        "alignment": "generated"
-      }
-    },
-    {
-      "file": "client/src/utils/snapshotEngine.ts",
-      "start_line": 43,
-      "end_line": 44,
-      "message": "This only removes old entries from the history index; the snapshot files that were sliced off remain on disk. The documented 50-snapshot cap will not cap disk usage, and auto-save can keep accumulating orphaned `snapshots/*.json` files indefinitely.",
-      "tp_fp": "tp",
-      "severity": "medium",
-      "category": "reliability",
-      "scope": "introduced-by-pr",
-      "difficulty": "easy",
-      "context_required": "diff-only",
-      "tp_fp_justification": "Duplicate of Finding 3 — already verified. snapshotEngine.ts slices the history index to MAX_SNAPSHOTS but never calls StorageDriver.deleteFile for the evicted snapshot files. Orphaned snapshot JSON files accumulate on disk indefinitely.",
-      "severity_justification": "Same as Finding 3: disk space leaks indefinitely in Electron mode with normal usage. The documented 50-snapshot cap only applies to the index, not actual storage consumption.",
-      "category_justification": "Unbounded disk growth from orphaned snapshot files is an operational resource management issue.",
       "producer": "ccr:gpt-5.5[ReasoningEffort=medium]",
       "source": {
         "type": "ccr",
@@ -741,46 +681,6 @@
       "tp_fp_justification": "Verified: all three git sync routes assign encodeURIComponent(value) to URL.username/password. The URL setter already percent-encodes per the userinfo percent-encode set, so the % from encodeURIComponent's output gets re-encoded, producing double-encoding. Credentials with @, :, %, or spaces would fail authentication.",
       "severity_justification": "Authentication fails silently for credentials containing reserved characters. While common GitHub/GitLab PATs typically use only alphanumerics, enterprise tokens, passwords, or tokens with special chars would break git sync entirely with a cryptic error.",
       "category_justification": "Double percent-encoding of URL credentials is a concrete logic bug that causes authentication failures for a subset of valid credential values.",
-      "producer": "ccr:gpt-5.5[ReasoningEffort=medium]",
-      "source": {
-        "type": "ccr",
-        "alignment": "generated"
-      }
-    },
-    {
-      "file": "server/index.js",
-      "start_line": 1091,
-      "end_line": 1093,
-      "message": "`URL.username`/`password` already encode assigned values. Encoding before assignment double-encodes credentials with reserved characters, causing authenticated pulls to fail for valid tokens/passwords containing those characters.",
-      "tp_fp": "tp",
-      "severity": "medium",
-      "category": "correctness",
-      "scope": "pre-existing",
-      "difficulty": "medium",
-      "context_required": "diff-plus-related-files",
-      "tp_fp_justification": "Duplicate of Finding 19 — same double-encoding bug in the git pull route (lines 1090-1093). Already verified: url.username = encodeURIComponent(config.username) and url.password = encodeURIComponent(config.token) cause double percent-encoding. Credentials with reserved characters fail authentication.",
-      "severity_justification": "Same as Finding 19: authentication silently fails for valid credentials containing %, @, :, or spaces. Common PATs are unaffected but the bug is real for other credential types.",
-      "category_justification": "Double percent-encoding of URL credentials causes authentication failures for credentials containing reserved characters.",
-      "producer": "ccr:gpt-5.5[ReasoningEffort=medium]",
-      "source": {
-        "type": "ccr",
-        "alignment": "generated"
-      }
-    },
-    {
-      "file": "server/index.js",
-      "start_line": 1125,
-      "end_line": 1127,
-      "message": "`URL.username`/`password` already encode assigned values. Encoding before assignment double-encodes credentials with reserved characters, so timestamp fetches can fail authentication for valid credentials.",
-      "tp_fp": "tp",
-      "severity": "medium",
-      "category": "correctness",
-      "scope": "pre-existing",
-      "difficulty": "medium",
-      "context_required": "diff-plus-related-files",
-      "tp_fp_justification": "Duplicate of Findings 19 and 20 — same double-encoding bug in the git timestamp route (lines 1125-1127), confirmed by direct inspection. url.username = encodeURIComponent(config.username) and url.password = encodeURIComponent(config.token) double-encode credentials with reserved characters.",
-      "severity_justification": "Same as Findings 19/20: authentication fails silently for credentials containing reserved characters like %, @, :. Common alphanumeric PATs are unaffected.",
-      "category_justification": "Double percent-encoding of URL credentials causes authentication failures for credentials with reserved characters, same root cause as Findings 19 and 20.",
       "producer": "ccr:gpt-5.5[ReasoningEffort=medium]",
       "source": {
         "type": "ccr",

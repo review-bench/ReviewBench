@@ -168,26 +168,6 @@
       }
     },
     {
-      "file": "ui/user/src/lib/components/admin/McpServerGitSync.svelte",
-      "start_line": 156,
-      "end_line": 170,
-      "message": "When editing a URL and the user leaves the token field empty (no new token entered), the frontend detects the URL was renamed and remaps the sourceURLCredentials key from oldUrl to newUrl with value '*'. However, the backend's `case \"*\":` handler only preserves a token if existingCred.Env[newUrl] already has a value — which it won't since newUrl is new. The token is silently lost. There is no server-side support for credential key transfer on URL rename; the user must re-enter the token after renaming a URL.",
-      "tp_fp": "tp",
-      "severity": "medium",
-      "category": "correctness",
-      "scope": "introduced-by-pr",
-      "difficulty": "hard",
-      "context_required": "diff-plus-related-files",
-      "tp_fp_justification": "This is the same bug as Finding 2, verified against the same code paths: frontend sends {newURL: '*'} (McpServerGitSync.svelte lines 163-170), backend looks up existingCred.Env[newURL] which is empty since the token was stored under oldURL, token silently dropped. The description is factually correct.",
-      "severity_justification": "Causes silent token loss when an admin renames a private repo URL, requiring manual re-entry of the token before sync works again.",
-      "category_justification": "Logic error in credential transfer on URL rename — the '*' sentinel doesn't actually transfer the token from old key to new key.",
-      "producer": "llm_review:claude-sonnet-4.6",
-      "source": {
-        "type": "llm_review",
-        "alignment": "generated"
-      }
-    },
-    {
       "file": "pkg/api/handlers/credentials.go",
       "start_line": 39,
       "end_line": 39,

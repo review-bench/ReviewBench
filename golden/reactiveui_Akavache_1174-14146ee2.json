@@ -468,26 +468,6 @@
       }
     },
     {
-      "file": "src/Akavache.Sqlite3/AkavacheBuilderExtensions.cs",
-      "start_line": 126,
-      "end_line": 129,
-      "message": "Exposing a method to reset the SQLite provider for tests without conditional compilation risks accidental invocation in production, which can cause undefined behavior.",
-      "tp_fp": "fp",
-      "severity": "low",
-      "category": "maintainability",
-      "scope": "introduced-by-pr",
-      "difficulty": "easy",
-      "context_required": "diff-plus-related-files",
-      "tp_fp_justification": "Identical to Finding 20. The method is `internal static` and InternalsVisibleTo only lists Akavache.Tests and Akavache.Settings.Tests. NuGet consumers cannot access internal members, so 'accidental invocation in production' is factually impossible. The internal+InternalsVisibleTo pattern is the standard .NET idiom for test-accessible hooks.",
-      "severity_justification": "The access is already properly restricted to named test assemblies only.",
-      "category_justification": "The finding raises an encapsulation concern about test hooks in production code.",
-      "producer": "llm_review:gpt-4o",
-      "source": {
-        "type": "llm_review",
-        "alignment": "generated"
-      }
-    },
-    {
       "file": "src/Akavache.Tests/Helpers/TestHttpServer.cs",
       "start_line": 73,
       "end_line": 77,
@@ -501,26 +481,6 @@
       "tp_fp_justification": "This is a minor error message verbosity suggestion for an essentially-impossible failure path in test infrastructure. The exception already includes the key context (number of attempts). The finding is a generic 'include more context in exceptions' suggestion that could be applied to any retry loop — it doesn't identify a concrete debugging scenario that would be impacted.",
       "severity_justification": "Test infrastructure only, near-impossible failure mode, cosmetic improvement at best.",
       "category_justification": "Concerns error message quality and debuggability.",
-      "producer": "llm_review:gpt-4o",
-      "source": {
-        "type": "llm_review",
-        "alignment": "generated"
-      }
-    },
-    {
-      "file": "src/Samples/AkavacheTodoWpf/Services/NotificationService.cs",
-      "start_line": 38,
-      "end_line": 42,
-      "message": "Replacing `RxApp.MainThreadScheduler` with `RxSchedulers.MainThreadScheduler` modifies scheduler behavior globally. This untested change can affect other parts of the application relying on the prior ReactiveUI scheduler.",
-      "tp_fp": "fp",
-      "severity": "low",
-      "category": "correctness",
-      "scope": "introduced-by-pr",
-      "difficulty": "easy",
-      "context_required": "broader-project-context",
-      "tp_fp_justification": "Same as Finding 22: RxSchedulers.MainThreadScheduler is the documented direct replacement for the deprecated RxApp.MainThreadScheduler in ReactiveUI 23.x. The concern about 'modifying scheduler behavior globally' is factually wrong — ObserveOn() only affects the specific observable chain. No RxApp. references remain in any samples, confirming complete migration. No specific incompatibility or behavioral difference is identified.",
-      "severity_justification": "Sample app only, required breaking change migration, no production library impact.",
-      "category_justification": "The finding raises a behavioral correctness concern about an API migration.",
       "producer": "llm_review:gpt-4o",
       "source": {
         "type": "llm_review",

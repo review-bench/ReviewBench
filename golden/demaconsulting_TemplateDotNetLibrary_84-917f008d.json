@@ -28,26 +28,6 @@
       }
     },
     {
-      "file": "lint.sh",
-      "start_line": 63,
-      "end_line": 64,
-      "message": "`dotnet versionmark --lint` has no precedent in this repository. The CI workflow only uses `dotnet versionmark --validate`, `--capture`, and `--publish`. If `--lint` is not a valid versionmark flag, every lint.sh run will set `lint_error=1` for the versionmark step regardless of actual configuration validity. See also lint.bat line 70 for the same issue.",
-      "tp_fp": "tp",
-      "severity": "medium",
-      "category": "reliability",
-      "scope": "introduced-by-pr",
-      "difficulty": "medium",
-      "context_required": "diff-plus-related-files",
-      "tp_fp_justification": "Duplicate of Finding 1 — same `dotnet versionmark --lint` call introduced by this PR, same evidence: the flag is not used anywhere else in the repo (CI workflow uses --capture, --publish, and no-arg self-validation only), and no documentation of a --lint mode for versionmark exists. The finding's minor inaccuracy about '--validate' doesn't affect the core correctness of the claim.",
-      "severity_justification": "Same as Finding 1: if the flag is unsupported, the lint script permanently sets lint_error=1 on every run, producing false failures.",
-      "category_justification": "Script command that may always fail, breaking the lint toolchain.",
-      "producer": "llm_review:claude-sonnet-4.6",
-      "source": {
-        "type": "llm_review",
-        "alignment": "generated"
-      }
-    },
-    {
       "file": ".github/standards/csharp-language.md",
       "start_line": 1,
       "end_line": 47,
@@ -128,26 +108,6 @@
       }
     },
     {
-      "file": "lint.bat",
-      "start_line": 41,
-      "end_line": 41,
-      "message": "`set PUPPETEER_SKIP_DOWNLOAD=true` prevents Chromium download during `npm install`. Since `package.json` includes `@mermaid-js/mermaid-cli` and `mermaid-filter`, any subsequent use of mermaid from these node_modules (e.g., Pandoc docs generation) will fail because Chromium was not installed. Unlike lint.sh where `export` is scoped to the process, in batch `setlocal` scopes the variable to the script, so it won't leak — but the incomplete node_modules installation persists on disk and affects later mermaid invocations.",
-      "tp_fp": "tp",
-      "severity": "low",
-      "category": "reliability",
-      "scope": "introduced-by-pr",
-      "difficulty": "medium",
-      "context_required": "diff-plus-related-files",
-      "tp_fp_justification": "Duplicate of Finding 6's core concern on lint.bat. The factual claims are correct: setlocal scopes the variable to the script, but node_modules without Chromium persists on disk. The finding's technical nuance about setlocal vs export is accurate but not meaningfully different in impact between the two scripts.",
-      "severity_justification": "Same as Finding 6: CI uses its own npm install without this flag; local mermaid usage is an unusual workflow. The edge-case risk is real but narrow.",
-      "category_justification": "Tool dependency setup that could break mermaid rendering in certain local workflows.",
-      "producer": "llm_review:claude-sonnet-4.6",
-      "source": {
-        "type": "llm_review",
-        "alignment": "generated"
-      }
-    },
-    {
       "file": ".github/standards/csharp-language.md",
       "start_line": 23,
       "end_line": 23,
@@ -221,26 +181,6 @@
       "tp_fp_justification": "No package-lock.json exists in the repository, so npm ci would fail. The CI workflow also uses npm install consistently. The recommendation is both inapplicable and generic boilerplate that ignores the actual project state.",
       "severity_justification": "The suggestion would break the script if applied, but the finding itself is just an incorrect generic best-practice note.",
       "category_justification": "The finding is about tooling/build script efficiency, framed as a best practice.",
-      "producer": "llm_review:gemini-2.5-pro",
-      "source": {
-        "type": "llm_review",
-        "alignment": "generated"
-      }
-    },
-    {
-      "file": "lint.sh",
-      "start_line": 38,
-      "end_line": 38,
-      "message": "The command `npm install --silent` is used to install dependencies. For CI environments, `npm ci` is the recommended best practice as it is typically faster and ensures reproducible builds by strictly using the `package-lock.json` file.",
-      "tp_fp": "fp",
-      "severity": "low",
-      "category": "maintainability",
-      "scope": "pre-existing",
-      "difficulty": "easy",
-      "context_required": "diff-plus-related-files",
-      "tp_fp_justification": "Duplicate of Finding 11 on lint.sh. No package-lock.json exists in the repo, making npm ci inapplicable (it would fail). The finding is generic boilerplate advice that ignores the actual project state.",
-      "severity_justification": "Same as Finding 11 — the suggestion would break the script if applied.",
-      "category_justification": "Generic tooling/build script best-practice suggestion.",
       "producer": "llm_review:gemini-2.5-pro",
       "source": {
         "type": "llm_review",

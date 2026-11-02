@@ -356,22 +356,22 @@ None of these source types is labeled as an inferred author action
 
 | Source type | Findings | TPs | TP rate | Share of TPs | Share of high+medium TPs |
 |---|---:|---:|---:|---:|---:|
-| `llm_review` | 2960 | 1391 | 47.0% | 53.0% | 47.2% |
-| `ccr` | 1335 | 1185 | 88.8% | 45.2% | 51.4% |
-| `review_comment` | 191 | 39 | 20.4% | 1.5% | 1.1% |
-| `tool` | 146 | 8 | 5.5% | 0.3% | 0.3% |
-| **Total** | **4632** | **2623** | **56.6%** | **100.0%** | **100.0%** |
+| `llm_review` | 2917 | 1376 | 47.2% | 54.4% | 48.8% |
+| `ccr` | 1241 | 1109 | 89.4% | 43.8% | 49.8% |
+| `review_comment` | 186 | 38 | 20.4% | 1.5% | 1.1% |
+| `tool` | 133 | 8 | 6.0% | 0.3% | 0.3% |
+| **Total** | **4477** | **2531** | **56.5%** | **100.0%** | **100.0%** |
 
 | Producer | Findings | TPs | TP rate | Share of TPs | Share of high+medium TPs |
 |---|---:|---:|---:|---:|---:|
-| `llm_review:claude-sonnet-4.6` | 1474 | 1206 | 81.8% | 46.0% | 45.4% |
-| `ccr:gpt-5.5[ReasoningEffort=medium]` | 1065 | 957 | 89.9% | 36.5% | 44.9% |
-| `ccr:claude-opus-4.7[ReasoningEffort=medium]` | 270 | 228 | 84.4% | 8.7% | 6.5% |
-| `llm_review:gemini-2.5-pro` | 705 | 149 | 21.1% | 5.7% | 1.4% |
-| `human_review` | 191 | 39 | 20.4% | 1.5% | 1.1% |
-| `llm_review:gpt-4o` | 781 | 36 | 4.6% | 1.4% | 0.4% |
-| `deterministic_tool:semgrep` | 146 | 8 | 5.5% | 0.3% | 0.3% |
-| **Total** | **4632** | **2623** | **56.6%** | **100.0%** | **100.0%** |
+| `llm_review:claude-sonnet-4.6` | 1458 | 1193 | 81.8% | 47.1% | 47.1% |
+| `ccr:gpt-5.5[ReasoningEffort=medium]` | 975 | 885 | 90.8% | 35.0% | 43.4% |
+| `ccr:claude-opus-4.7[ReasoningEffort=medium]` | 266 | 224 | 84.2% | 8.9% | 6.4% |
+| `llm_review:gemini-2.5-pro` | 690 | 148 | 21.4% | 5.8% | 1.5% |
+| `human_review` | 186 | 38 | 20.4% | 1.5% | 1.1% |
+| `llm_review:gpt-4o` | 769 | 35 | 4.6% | 1.4% | 0.3% |
+| `deterministic_tool:semgrep` | 133 | 8 | 6.0% | 0.3% | 0.3% |
+| **Total** | **4477** | **2531** | **56.5%** | **100.0%** | **100.0%** |
 
 Findings without a producer: 0. Findings without a source type: 0.
 
@@ -379,22 +379,22 @@ Findings without a producer: 0. Findings without a source type: 0.
 
 | Source type | Findings | TPs | TP rate | Share of TPs | Share of high+medium TPs |
 |---|---:|---:|---:|---:|---:|
-| `llm_review` | 364 | 194 | 53.3% | 55.1% | 57.1% |
-| `ccr` | 159 | 153 | 96.2% | 43.5% | 41.2% |
-| `review_comment` | 25 | 4 | 16.0% | 1.1% | 1.8% |
+| `llm_review` | 364 | 194 | 53.3% | 57.1% | 59.9% |
+| `ccr` | 148 | 142 | 95.9% | 41.8% | 38.9% |
+| `review_comment` | 24 | 3 | 12.5% | 0.9% | 1.2% |
 | `tool` | 17 | 1 | 5.9% | 0.3% | 0.0% |
-| **Total** | **565** | **352** | **62.3%** | **100.0%** | **100.0%** |
+| **Total** | **553** | **340** | **61.5%** | **100.0%** | **100.0%** |
 
 | Producer | Findings | TPs | TP rate | Share of TPs | Share of high+medium TPs |
 |---|---:|---:|---:|---:|---:|
-| `llm_review:claude-sonnet-4.6` | 185 | 159 | 85.9% | 45.2% | 55.3% |
-| `ccr:gpt-5.5[ReasoningEffort=medium]` | 118 | 113 | 95.8% | 32.1% | 33.5% |
-| `ccr:claude-opus-4.7[ReasoningEffort=medium]` | 41 | 40 | 97.6% | 11.4% | 7.6% |
-| `llm_review:gemini-2.5-pro` | 85 | 28 | 32.9% | 8.0% | 1.8% |
-| `llm_review:gpt-4o` | 94 | 7 | 7.4% | 2.0% | 0.0% |
-| `human_review` | 25 | 4 | 16.0% | 1.1% | 1.8% |
+| `llm_review:claude-sonnet-4.6` | 185 | 159 | 85.9% | 46.8% | 58.0% |
+| `ccr:gpt-5.5[ReasoningEffort=medium]` | 107 | 102 | 95.3% | 30.0% | 30.9% |
+| `ccr:claude-opus-4.7[ReasoningEffort=medium]` | 41 | 40 | 97.6% | 11.8% | 8.0% |
+| `llm_review:gemini-2.5-pro` | 85 | 28 | 32.9% | 8.2% | 1.9% |
+| `llm_review:gpt-4o` | 94 | 7 | 7.4% | 2.1% | 0.0% |
+| `human_review` | 24 | 3 | 12.5% | 0.9% | 1.2% |
 | `deterministic_tool:semgrep` | 17 | 1 | 5.9% | 0.3% | 0.0% |
-| **Total** | **565** | **352** | **62.3%** | **100.0%** | **100.0%** |
+| **Total** | **553** | **340** | **61.5%** | **100.0%** | **100.0%** |
 
 Findings without a producer: 0. Findings without a source type: 0.
 

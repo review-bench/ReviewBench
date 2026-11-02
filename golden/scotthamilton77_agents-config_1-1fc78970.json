@@ -449,26 +449,6 @@
     },
     {
       "file": "src/user/.agents/AGENT-PERSONA.md.template",
-      "start_line": 20,
-      "end_line": 20,
-      "message": "The persona tag is malformed: it opens as `<your_persona>` but closes as `</your-persona>`. Consumers that rely on XML-style section boundaries may fail to recognize the persona block correctly.",
-      "tp_fp": "tp",
-      "severity": "low",
-      "category": "correctness",
-      "scope": "pre-existing",
-      "difficulty": "easy",
-      "context_required": "diff-only",
-      "tp_fp_justification": "Verified in the file: the opening tag `<your_persona>` (underscore) and closing tag `</your-persona>` (hyphen) are mismatched, exactly as claimed. This is the same factual issue as Finding 1.",
-      "severity_justification": "Same as Finding 1 — LLM tools are generally tolerant of loose markup so behavioral impact is minimal, but the mismatch is a real structural error.",
-      "category_justification": "Mismatched structural tags in a template file consumed by AI tools is a correctness issue.",
-      "producer": "ccr:gpt-5.5[ReasoningEffort=medium]",
-      "source": {
-        "type": "ccr",
-        "alignment": "generated"
-      }
-    },
-    {
-      "file": "src/user/.agents/AGENT-PERSONA.md.template",
       "start_line": 3,
       "end_line": 3,
       "message": "Correct the typo in the role description: this should be “principal software architect,” not “principle software architect.”",
@@ -661,26 +641,6 @@
       "tp_fp_justification": "Verified: line 103 documents a 10-minute timeout requirement but both CLI commands shown lack any timeout wrapper (e.g. `timeout 600 codex exec ...`). An agent following the copyable commands will invoke the foreign CLI with no enforced timeout, directly contradicting the stated behavior.",
       "severity_justification": "Agents or users following the examples could experience an indefinitely hanging session, but this is a documentation-consistency issue in a skills file rather than production code. The actual harm depends on how long the foreign CLI takes.",
       "category_justification": "The inconsistency is between the documented requirement and the example commands provided, making it a documentation/instruction accuracy issue.",
-      "producer": "ccr:gpt-5.5[ReasoningEffort=medium]",
-      "source": {
-        "type": "ccr",
-        "alignment": "generated"
-      }
-    },
-    {
-      "file": "src/user/.agents/skills/ralf-it/SKILL.md",
-      "start_line": 147,
-      "end_line": 152,
-      "message": "The reference commands do not include any timeout wrapper even though the next line says both invocations use a 10-minute timeout. This makes the reference unsafe to copy and can leave the workflow hanging on a stalled foreign CLI call.",
-      "tp_fp": "tp",
-      "severity": "low",
-      "category": "documentation",
-      "scope": "pre-existing",
-      "difficulty": "easy",
-      "context_required": "diff-only",
-      "tp_fp_justification": "Verified: lines 147-151 show a reference command table with no timeout wrapper on either CLI command, while line 152 explicitly states 'Both use a 10-minute timeout (600000ms)'. The same inconsistency as Finding 13 but in a different file.",
-      "severity_justification": "Same as Finding 13 — documentation inconsistency that could cause indefinite hangs when commands are followed literally, but limited to this skills/workflow file.",
-      "category_justification": "Inconsistency between the stated behavior and the copyable command examples within the same file.",
       "producer": "ccr:gpt-5.5[ReasoningEffort=medium]",
       "source": {
         "type": "ccr",

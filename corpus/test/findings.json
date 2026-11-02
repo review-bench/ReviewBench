@@ -524,17 +524,6 @@
       "context_required": "diff-plus-related-files"
     },
     {
-      "file": "client/src/utils/sync/s3Adapter.ts",
-      "start_line": 27,
-      "end_line": 31,
-      "severity": "high",
-      "category": "correctness",
-      "message": "The S3 adapter calls `electronAPI.getPresignedUrl`, but the preload bridge and Electron main process do not expose or handle any `getPresignedUrl` IPC method. As a result, every S3 push/pull/timestamp operation will throw before reaching S3.",
-      "scope": "introduced-by-pr",
-      "difficulty": "medium",
-      "context_required": "diff-plus-related-files"
-    },
-    {
       "file": "client/src/components/WorkspaceManagerModal.tsx",
       "start_line": 227,
       "end_line": 228,
@@ -566,28 +555,6 @@
       "scope": "introduced-by-pr",
       "difficulty": "medium",
       "context_required": "diff-plus-related-files"
-    },
-    {
-      "file": "client/src/components/WorkspaceManagerModal.tsx",
-      "start_line": 67,
-      "end_line": 68,
-      "severity": "high",
-      "category": "correctness",
-      "message": "This workspace switch path also bypasses a flush of the currently active workspace before replacing state. With the debounced persistence in `AppProvider`, recent edits can be lost when switching from the manager modal before the pending save fires.",
-      "scope": "introduced-by-pr",
-      "difficulty": "medium",
-      "context_required": "diff-plus-related-files"
-    },
-    {
-      "file": "client/src/utils/snapshotEngine.ts",
-      "start_line": 43,
-      "end_line": 44,
-      "severity": "medium",
-      "category": "reliability",
-      "message": "This only removes old entries from the history index; the snapshot files that were sliced off remain on disk. The documented 50-snapshot cap will not cap disk usage, and auto-save can keep accumulating orphaned `snapshots/*.json` files indefinitely.",
-      "scope": "introduced-by-pr",
-      "difficulty": "easy",
-      "context_required": "diff-only"
     },
     {
       "file": "server/index.js",
@@ -651,28 +618,6 @@
       "severity": "medium",
       "category": "correctness",
       "message": "`URL.username` and `URL.password` setters perform their own percent-encoding, so passing `encodeURIComponent(...)` here double-encodes credentials that contain reserved characters such as `%`, `@`, or `:`. Those tokens/passwords will fail authentication when pushed.",
-      "scope": "pre-existing",
-      "difficulty": "medium",
-      "context_required": "diff-plus-related-files"
-    },
-    {
-      "file": "server/index.js",
-      "start_line": 1091,
-      "end_line": 1093,
-      "severity": "medium",
-      "category": "correctness",
-      "message": "`URL.username`/`password` already encode assigned values. Encoding before assignment double-encodes credentials with reserved characters, causing authenticated pulls to fail for valid tokens/passwords containing those characters.",
-      "scope": "pre-existing",
-      "difficulty": "medium",
-      "context_required": "diff-plus-related-files"
-    },
-    {
-      "file": "server/index.js",
-      "start_line": 1125,
-      "end_line": 1127,
-      "severity": "medium",
-      "category": "correctness",
-      "message": "`URL.username`/`password` already encode assigned values. Encoding before assignment double-encodes credentials with reserved characters, so timestamp fetches can fail authentication for valid credentials.",
       "scope": "pre-existing",
       "difficulty": "medium",
       "context_required": "diff-plus-related-files"
@@ -1067,17 +1012,6 @@
       "context_required": "diff-plus-related-files"
     },
     {
-      "file": "fortran_to_rust/benchmarker.py",
-      "start_line": 183,
-      "end_line": 186,
-      "severity": "medium",
-      "category": "correctness",
-      "message": "The Rust benchmark never calls the converted function; it only black-boxes an input array. The reported Rust timing therefore measures loop/black_box overhead rather than conversion performance, so the speedup in the report is misleading.",
-      "scope": "introduced-by-pr",
-      "difficulty": "easy",
-      "context_required": "diff-only"
-    },
-    {
       "file": "fortran_to_rust/parser.py",
       "start_line": 94,
       "end_line": 99,
@@ -1131,17 +1065,6 @@
       "scope": "introduced-by-pr",
       "difficulty": "medium",
       "context_required": "diff-plus-related-files"
-    },
-    {
-      "file": "fortran_to_rust/strategies/hybrid.py",
-      "start_line": 302,
-      "end_line": 309,
-      "severity": "medium",
-      "category": "correctness",
-      "message": "The direct fallback has the same by-value scalar mapping, so routines that return values through scalar arguments cannot be represented correctly. This affects BLAS routines like `DROTG`/`DROTMG`, where real scalar arguments are outputs and need mutable reference semantics.",
-      "scope": "introduced-by-pr",
-      "difficulty": "easy",
-      "context_required": "diff-only"
     },
     {
       "file": "fortran_to_rust/fetcher.py",
@@ -1502,17 +1425,6 @@
       "context_required": "diff-plus-related-files"
     },
     {
-      "file": "internal/admin/api.go",
-      "start_line": 340,
-      "end_line": 340,
-      "severity": "medium",
-      "category": "performance",
-      "message": "rather than doing this, I'll just always query `limit+1`, removing one from the entries when returning to the UI and this will be len(entries) > limit, avoids slow total query and prevents one postgres",
-      "scope": "introduced-by-pr",
-      "difficulty": "easy",
-      "context_required": "diff-only"
-    },
-    {
       "file": "web/src/components/AuditTrail.tsx",
       "start_line": 113,
       "end_line": 113,
@@ -1749,17 +1661,6 @@
     },
     {
       "file": "src/user/.agents/AGENT-PERSONA.md.template",
-      "start_line": 20,
-      "end_line": 20,
-      "severity": "low",
-      "category": "correctness",
-      "message": "The persona tag is malformed: it opens as `<your_persona>` but closes as `</your-persona>`. Consumers that rely on XML-style section boundaries may fail to recognize the persona block correctly.",
-      "scope": "pre-existing",
-      "difficulty": "easy",
-      "context_required": "diff-only"
-    },
-    {
-      "file": "src/user/.agents/AGENT-PERSONA.md.template",
       "start_line": 3,
       "end_line": 3,
       "severity": "low",
@@ -1864,17 +1765,6 @@
       "severity": "low",
       "category": "documentation",
       "message": "The text requires a 10-minute timeout, but the concrete CLI commands shown here do not wrap the foreign agent invocation in any timeout mechanism. Agents following the copyable command can hang indefinitely despite the documented timeout behavior.",
-      "scope": "pre-existing",
-      "difficulty": "easy",
-      "context_required": "diff-only"
-    },
-    {
-      "file": "src/user/.agents/skills/ralf-it/SKILL.md",
-      "start_line": 147,
-      "end_line": 152,
-      "severity": "low",
-      "category": "documentation",
-      "message": "The reference commands do not include any timeout wrapper even though the next line says both invocations use a 10-minute timeout. This makes the reference unsafe to copy and can leave the workflow hanging on a stalled foreign CLI call.",
       "scope": "pre-existing",
       "difficulty": "easy",
       "context_required": "diff-only"
@@ -2001,17 +1891,6 @@
       "scope": "introduced-by-pr",
       "difficulty": "medium",
       "context_required": "diff-plus-related-files"
-    },
-    {
-      "file": "src/main/kotlin/uk/oshawk/jadx/collaboration/Plugin.kt",
-      "start_line": 50,
-      "end_line": 54,
-      "severity": "low",
-      "category": "reliability",
-      "message": "These shortcut handlers also create non-daemon threads via `kotlin.concurrent.thread`, so a blocked pull/push triggered from the keyboard can prevent JVM shutdown. Use a daemon executor thread or ensure the worker is shut down with the plugin lifecycle.",
-      "scope": "introduced-by-pr",
-      "difficulty": "medium",
-      "context_required": "diff-only"
     }
   ],
   "AY2526S2-CS2103T-W14-3_tp_152-e0a9ce03": [
@@ -2769,17 +2648,6 @@
       "message": "This notification is only observed by `PaletteTabBar`, which exists only while `ColorHistoryDrawer` is mounted. If the drawer is hidden (the default), choosing “New palette” from this menu posts to no active receiver, so nothing opens and no palette can be created from the menu.",
       "scope": "introduced-by-pr",
       "difficulty": "medium",
-      "context_required": "diff-plus-related-files"
-    },
-    {
-      "file": "Pika/Services/Exporter.swift",
-      "start_line": 1,
-      "end_line": 1,
-      "severity": "low",
-      "category": "maintainability",
-      "message": "`Defaults` is imported but not used anywhere in this file. Remove the unused import to keep dependencies clear and avoid lint/compiler warnings in stricter configurations.",
-      "scope": "introduced-by-pr",
-      "difficulty": "easy",
       "context_required": "diff-plus-related-files"
     }
   ],

@@ -774,26 +774,6 @@
       }
     },
     {
-      "file": "services/gilbert-r2/README.md",
-      "start_line": 92,
-      "end_line": 93,
-      "message": "This usage example has the same async ordering issue: `gilbert.compile()` returns a Promise, so `.pipeTo()` must be called after awaiting the stream. As written, the documented upload code fails before it reaches R2.",
-      "tp_fp": "tp",
-      "severity": "medium",
-      "category": "documentation",
-      "scope": "introduced-by-pr",
-      "difficulty": "easy",
-      "context_required": "diff-only",
-      "tp_fp_justification": "Same issue as Finding 14, verified at line 92 of gilbert-r2/README.md: `await gilbert.compile().pipeTo(` calls .pipeTo() on the Promise returned by the async compile(), not on the resolved ReadableStream. This is the same runtime TypeError as the line 42 instance.",
-      "severity_justification": "Same severity as Finding 14 — any user following this usage example will get an immediate TypeError. However this is a duplicate of Finding 14 covering the second occurrence of the same bug in the same file.",
-      "category_justification": "Incorrect code example in README that produces a runtime error when followed.",
-      "producer": "ccr:gpt-5.5[ReasoningEffort=medium]",
-      "source": {
-        "type": "ccr",
-        "alignment": "generated"
-      }
-    },
-    {
       "file": "docs/how-to/deploy-to-cloudflare.md",
       "start_line": 68,
       "end_line": 68,

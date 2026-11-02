@@ -188,26 +188,6 @@
       }
     },
     {
-      "file": "src/commands/apps/certificates/create.ts",
-      "start_line": 150,
-      "end_line": 150,
-      "message": "The command crashes if the certificate `file` does not exist because `fs.readFileSync` is not wrapped in a `try...catch` block. This will produce an unhandled exception rather than a graceful error message for the user.",
-      "tp_fp": "fp",
-      "severity": "low",
-      "category": "reliability",
-      "scope": "introduced-by-pr",
-      "difficulty": "easy",
-      "context_required": "diff-only",
-      "tp_fp_justification": "Duplicate of Finding 9's reasoning: this is a generic best-practice suggestion ('wrap file reads in try-catch') applicable to any CLI codebase. The raw Node.js ENOENT error is still informative to the user. No silent failure or data corruption occurs. The finding is a sub-threshold UX suggestion, not a meaningful defect.",
-      "severity_justification": "The unhandled exception produces a visible and reasonably informative Node.js error; no silent failure or data corruption occurs.",
-      "category_justification": "Error handling for file system operations.",
-      "producer": "llm_review:gemini-2.5-pro",
-      "source": {
-        "type": "llm_review",
-        "alignment": "generated"
-      }
-    },
-    {
       "file": "src/commands/apps/destinations/create.ts",
       "start_line": 182,
       "end_line": 182,
@@ -308,86 +288,6 @@
       }
     },
     {
-      "file": "src/commands/apps/destinations/delete.ts",
-      "start_line": 49,
-      "end_line": 56,
-      "message": "The code does not handle the case where the user cancels the platform selection prompt. If `prompt` returns `undefined`, it is passed to `appDestinationsService.findAll`, which may lead to unexpected behavior or a crash. It would be safer to check if a platform was actually selected before proceeding.",
-      "tp_fp": "fp",
-      "severity": "low",
-      "category": "correctness",
-      "scope": "introduced-by-pr",
-      "difficulty": "medium",
-      "context_required": "diff-plus-related-files",
-      "tp_fp_justification": "Same as Finding 15: the custom `prompt` wrapper in utils/prompt.ts calls `process.exit(0)` when the cancel symbol is returned, so the prompt never returns undefined on cancellation. The premise that platform could be undefined after the prompt is factually incorrect.",
-      "severity_justification": "The claimed scenario cannot occur due to the cancel-handling in the prompt wrapper.",
-      "category_justification": "The finding makes a factual claim about possible invalid return values from a prompt.",
-      "producer": "llm_review:gemini-2.5-pro",
-      "source": {
-        "type": "llm_review",
-        "alignment": "generated"
-      }
-    },
-    {
-      "file": "src/commands/apps/destinations/get.ts",
-      "start_line": 45,
-      "end_line": 52,
-      "message": "The code does not handle the case where the user cancels the platform selection prompt. If `prompt` returns `undefined`, it is passed to `appDestinationsService.findAll`, which may lead to unexpected behavior or a crash. It would be safer to check if a platform was actually selected before proceeding.",
-      "tp_fp": "fp",
-      "severity": "low",
-      "category": "correctness",
-      "scope": "introduced-by-pr",
-      "difficulty": "medium",
-      "context_required": "diff-plus-related-files",
-      "tp_fp_justification": "Same as Findings 15 and 16: the custom `prompt` wrapper in utils/prompt.ts calls `process.exit(0)` when the cancel symbol is returned, so the prompt never returns undefined on cancellation. The premise that platform could be undefined after the prompt is factually incorrect.",
-      "severity_justification": "The claimed scenario cannot occur due to the cancel-handling in the prompt wrapper.",
-      "category_justification": "The finding makes a factual claim about possible invalid return values from a prompt.",
-      "producer": "llm_review:gemini-2.5-pro",
-      "source": {
-        "type": "llm_review",
-        "alignment": "generated"
-      }
-    },
-    {
-      "file": "src/commands/apps/certificates/get.ts",
-      "start_line": 48,
-      "end_line": 55,
-      "message": "The code does not handle the case where the user cancels the platform selection prompt. If `prompt` returns `undefined`, it is passed to `appCertificatesService.findAll`, which may lead to unexpected behavior or a crash. It would be safer to check if a platform was actually selected before proceeding.",
-      "tp_fp": "fp",
-      "severity": "low",
-      "category": "correctness",
-      "scope": "introduced-by-pr",
-      "difficulty": "medium",
-      "context_required": "diff-plus-related-files",
-      "tp_fp_justification": "Same as Findings 15, 16, and 17: the custom `prompt` wrapper in utils/prompt.ts calls `process.exit(0)` when the cancel symbol is returned, so the prompt never returns undefined on cancellation. The premise that platform could be undefined after the prompt is factually incorrect.",
-      "severity_justification": "The claimed scenario cannot occur due to the cancel-handling in the prompt wrapper.",
-      "category_justification": "The finding makes a factual claim about possible invalid return values from a prompt.",
-      "producer": "llm_review:gemini-2.5-pro",
-      "source": {
-        "type": "llm_review",
-        "alignment": "generated"
-      }
-    },
-    {
-      "file": "src/services/app-certificates.ts",
-      "start_line": 101,
-      "end_line": 121,
-      "message": "The create method in AppCertificatesService does not handle file upload errors explicitly. If the HTTP request fails due to issues like file size or network errors, the service will throw an unhandled exception.",
-      "tp_fp": "fp",
-      "severity": "low",
-      "category": "reliability",
-      "scope": "introduced-by-pr",
-      "difficulty": "easy",
-      "context_required": "diff-plus-related-files",
-      "tp_fp_justification": "Same as Finding 14: no service in the codebase wraps httpClient calls in try-catch at the service layer. This is a generic 'add try-catch to API calls' suggestion that applies equally to every httpClient call across all services in the project. It is boilerplate advice not specific to this method.",
-      "severity_justification": "Unhandled API errors surface as uncaught promise rejections, consistent with every other command in the codebase.",
-      "category_justification": "The finding concerns error handling for network/file upload operations.",
-      "producer": "llm_review:gpt-4o",
-      "source": {
-        "type": "llm_review",
-        "alignment": "generated"
-      }
-    },
-    {
       "file": "src/services/app-destinations.ts",
       "start_line": 26,
       "end_line": 28,
@@ -460,26 +360,6 @@
       "context_required": "diff-only",
       "tp_fp_justification": "Confirmed: when multiple certificates match the given name+platform, the code silently picks `certificates[0]` with no warning. For a destructive delete operation, this can delete an unintended resource. The same issue exists in destinations/delete.ts. The confirmation prompt doesn't help because the user isn't told which certificate is being selected.",
       "severity_justification": "Silent deletion of the wrong resource is a meaningful data integrity risk when multiple certificates share the same name and platform, which is a realistic scenario.",
-      "category_justification": "The logic silently selects an arbitrary resource when the lookup criteria are ambiguous, potentially deleting the wrong item.",
-      "producer": "llm_review:gpt-4o",
-      "source": {
-        "type": "llm_review",
-        "alignment": "generated"
-      }
-    },
-    {
-      "file": "src/commands/apps/destinations/delete.ts",
-      "start_line": 52,
-      "end_line": 54,
-      "message": "When filtering destinations by name and platform, only the first result is selected without informing users if multiple matches exist, which could lead to unintended deletion.",
-      "tp_fp": "tp",
-      "severity": "medium",
-      "category": "correctness",
-      "scope": "introduced-by-pr",
-      "difficulty": "easy",
-      "context_required": "diff-only",
-      "tp_fp_justification": "Same as Finding 23: confirmed in destinations/delete.ts lines 34-40, `destinations[0]` is taken silently when filtering by name+platform with no check for multiple matches and no warning to the user. For a destructive delete operation, this can delete an unintended resource when multiple destinations share the same name and platform.",
-      "severity_justification": "Silent deletion of the wrong resource is a meaningful data integrity risk when multiple destinations share the same name and platform, which is a realistic scenario.",
       "category_justification": "The logic silently selects an arbitrary resource when the lookup criteria are ambiguous, potentially deleting the wrong item.",
       "producer": "llm_review:gpt-4o",
       "source": {
@@ -708,26 +588,6 @@
       }
     },
     {
-      "file": "src/commands/apps/destinations/get.ts",
-      "start_line": 73,
-      "end_line": 76,
-      "message": "This prints the full destination DTO directly. Because the DTO includes sensitive fields such as `appleAppPassword`, API key IDs, and uploaded key IDs, `get` can expose secrets or credential identifiers in terminal output; redact those fields before printing.",
-      "tp_fp": "tp",
-      "severity": "medium",
-      "category": "security",
-      "scope": "introduced-by-pr",
-      "difficulty": "medium",
-      "context_required": "diff-plus-related-files",
-      "tp_fp_justification": "Verified: get.ts lines 73-76 use console.table(destination) and JSON.stringify(destination) with no field masking. AppDestinationDto includes appleAppPassword: string | null. If the API returns the password value, it would be printed in plaintext. Same root issue as finding 11, applied to the get command.",
-      "severity_justification": "Same as finding 11 — app-specific Apple passwords printed to terminal output could be captured by CI/CD log systems.",
-      "category_justification": "Potential plaintext credential exposure in console output without masking sensitive DTO fields.",
-      "producer": "ccr:gpt-5.5[ReasoningEffort=medium]",
-      "source": {
-        "type": "ccr",
-        "alignment": "generated"
-      }
-    },
-    {
       "file": "src/commands/apps/destinations/create.ts",
       "start_line": 296,
       "end_line": 296,
@@ -741,46 +601,6 @@
       "tp_fp_justification": "Verified: line 296 prompts for the App-specific password with { type: 'text' }, displaying input in plaintext. The project has @clack/prompts 0.7.0 as a dependency (via consola 3.3.0) which supports a password/masked prompt type. The same issue exists in certificates/create.ts for certificate and key password prompts.",
       "severity_justification": "Passwords visible in the terminal while typing can be shoulder-surfed or captured in screen recordings. This is a real credential exposure risk for a security-sensitive credential.",
       "category_justification": "A password credential is collected via a plaintext input rather than a masked prompt, exposing it in the terminal.",
-      "producer": "ccr:gpt-5.5[ReasoningEffort=medium]",
-      "source": {
-        "type": "ccr",
-        "alignment": "generated"
-      }
-    },
-    {
-      "file": "src/commands/apps/destinations/create.ts",
-      "start_line": 232,
-      "end_line": 235,
-      "message": "The Apple API key file is uploaded before the command validates/collects the remaining API-key fields (`appleApiKeyId` and `appleIssuerId`). If either value is missing or the user cancels afterward, the command exits after creating an app Apple API key resource, and this PR does not add any delete/cleanup path for that resource, leaving an orphaned uploaded secret.",
-      "tp_fp": "tp",
-      "severity": "medium",
-      "category": "reliability",
-      "scope": "introduced-by-pr",
-      "difficulty": "medium",
-      "context_required": "diff-plus-related-files",
-      "tp_fp_justification": "Verified: same issue as finding 1. The Apple API key is uploaded via appAppleApiKeysService.create at ~line 236 before appleApiKeyId and appleIssuerId are collected. No AppAppleApiKeysService delete method exists in the service or types. The finding is factually correct and adds the observation that no cleanup path exists.",
-      "severity_justification": "Same as finding 1 — orphaned uploaded credentials on the backend with no self-service cleanup, compounded by the fact that this is a security credential (API key file).",
-      "category_justification": "Resource lifecycle management issue — uploaded secret files can be orphaned with no rollback or cleanup mechanism.",
-      "producer": "ccr:gpt-5.5[ReasoningEffort=medium]",
-      "source": {
-        "type": "ccr",
-        "alignment": "generated"
-      }
-    },
-    {
-      "file": "src/commands/apps/destinations/create.ts",
-      "start_line": 179,
-      "end_line": 183,
-      "message": "The destination is created only after uploading the Google service account key. If the destination create request later fails, the key resource has already been created and this PR does not provide any cleanup/delete path for it, leaving an uploaded credential that is not attached to a destination.",
-      "tp_fp": "tp",
-      "severity": "medium",
-      "category": "reliability",
-      "scope": "introduced-by-pr",
-      "difficulty": "medium",
-      "context_required": "diff-plus-related-files",
-      "tp_fp_justification": "Verified: same issue as finding 2. Google service account key is uploaded at ~line 182 before appDestinationsService.create at ~line 318. No AppGoogleServiceAccountKeysService delete method exists. If destination creation fails, the uploaded key is orphaned with no cleanup path.",
-      "severity_justification": "Orphaned service account key credentials on the backend with no self-service cleanup, compounded by the fact it is a security credential.",
-      "category_justification": "Resource lifecycle management issue — uploaded credential files can be orphaned with no rollback mechanism when the subsequent create call fails.",
       "producer": "ccr:gpt-5.5[ReasoningEffort=medium]",
       "source": {
         "type": "ccr",
@@ -841,26 +661,6 @@
       "tp_fp_justification": "Verified: the create payload at lines 318-335 includes all Apple and Android fields regardless of platform. In non-interactive mode, if a user passes --apple-id with --platform android, appleId is populated from options and forwarded to the API. In interactive mode this can't happen since the Android flow never collects Apple fields. The concern is real but requires deliberate misuse of CLI flags.",
       "severity_justification": "Only exploitable in non-interactive mode with deliberately wrong flag combinations. Interactive mode is unaffected. The API likely validates platform/field consistency server-side, so this is primarily a client-side defense-in-depth issue.",
       "category_justification": "Platform-inapplicable credential fields are not filtered from the create payload, allowing semantically wrong data to be sent to the API.",
-      "producer": "ccr:gpt-5.5[ReasoningEffort=medium]",
-      "source": {
-        "type": "ccr",
-        "alignment": "generated"
-      }
-    },
-    {
-      "file": "src/commands/apps/destinations/create.ts",
-      "start_line": 329,
-      "end_line": 333,
-      "message": "Android-specific fields are forwarded even when creating an iOS destination. Passing a stray Android option with `--platform ios` will send unrelated configuration to the API; build the payload from only the fields that apply to the selected platform.",
-      "tp_fp": "tp",
-      "severity": "low",
-      "category": "correctness",
-      "scope": "introduced-by-pr",
-      "difficulty": "easy",
-      "context_required": "diff-only",
-      "tp_fp_justification": "Verified: same payload construction as finding 18. Lines 329-333 pass androidPackageName, androidBuildArtifactType, androidReleaseStatus, appGoogleServiceAccountKeyId, and googlePlayTrack regardless of platform. With --platform ios --android-package-name com.example, the Android field would be forwarded. In interactive mode the iOS path never collects Android fields so they remain undefined and are omitted by JSON.stringify; the issue only arises in non-interactive mode with deliberately wrong flags.",
-      "severity_justification": "Same as finding 18 — only exploitable with deliberate misuse of flags in non-interactive mode. Interactive mode is unaffected. The API likely validates server-side.",
-      "category_justification": "Platform-inapplicable fields are not filtered from the create payload, mirroring the issue identified in finding 18 for the opposite platform.",
       "producer": "ccr:gpt-5.5[ReasoningEffort=medium]",
       "source": {
         "type": "ccr",

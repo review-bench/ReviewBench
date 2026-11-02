@@ -450,26 +450,6 @@
       }
     },
     {
-      "file": "django_smart_ratelimit/backends/database.py",
-      "start_line": 116,
-      "end_line": 123,
-      "message": "DatabaseBackend has extensive existing tests, but none exercise `token_bucket_check` or `token_bucket_info`, so the new `data` persistence path is unprotected. Add coverage for creating the bucket metadata, consuming across multiple calls, and reading info from the persisted `RateLimitCounter.data` value.",
-      "tp_fp": "tp",
-      "severity": "medium",
-      "category": "testing",
-      "scope": "introduced-by-pr",
-      "difficulty": "easy",
-      "context_required": "diff-plus-related-files",
-      "tp_fp_justification": "Verified: test_database_backend.py contains no token_bucket_check or token_bucket_info tests. The finding correctly identifies that the new data persistence path introduced by this PR has no automated test coverage. The specific test scenarios suggested (create bucket, consume across calls, read from persisted RateLimitCounter.data) are concrete and actionable.",
-      "severity_justification": "Same as Finding 1: a regression in the exact code path that was buggy could go undetected. The database backend token bucket behavior is the central purpose of this PR.",
-      "category_justification": "The finding is specifically about missing test coverage for the new persistence behavior in DatabaseBackend.",
-      "producer": "ccr:gpt-5.5[ReasoningEffort=medium]",
-      "source": {
-        "type": "ccr",
-        "alignment": "generated"
-      }
-    },
-    {
       "file": "CHECKLIST_database_backend_fix.md",
       "start_line": 14,
       "end_line": 14,
@@ -503,26 +483,6 @@
       "tp_fp_justification": "Verified: line 76 comments that showmigrations verifies the data column exists in the table, but showmigrations only reads Django's migration records table (django_migrations), not the actual database schema. A user with schema drift or faked migrations would see migrations as applied while the column is absent. The finding's technical claim is accurate.",
       "severity_justification": "This is a misleading comment in documentation, not a code defect. It could cause confusion when troubleshooting, but the actual risk of harm is limited — the migrate command on the previous line would have already applied the schema change correctly in normal circumstances.",
       "category_justification": "The finding concerns an inaccurate inline comment in documentation/installation instructions that misrepresents what a command verifies.",
-      "producer": "ccr:gpt-5.5[ReasoningEffort=medium]",
-      "source": {
-        "type": "ccr",
-        "alignment": "generated"
-      }
-    },
-    {
-      "file": "docs/installation.md",
-      "start_line": 266,
-      "end_line": 267,
-      "message": "`showmigrations` does not inspect database columns, so this troubleshooting step does not actually ensure that `RateLimitCounter.data` exists. It should either check the schema directly or describe this as verifying that the app migrations are applied.",
-      "tp_fp": "tp",
-      "severity": "low",
-      "category": "documentation",
-      "scope": "introduced-by-pr",
-      "difficulty": "easy",
-      "context_required": "diff-only",
-      "tp_fp_justification": "Verified: line 264 comment says 'Ensure the RateLimitCounter table has the data column (required for token bucket)' but showmigrations only queries Django's django_migrations table, not the actual database schema. This is the same inaccuracy as Finding 5 but at a different location in the file (troubleshooting section vs installation section).",
-      "severity_justification": "Same as Finding 5: misleading documentation comment with limited practical harm, as the migrate command earlier in the flow handles the actual schema change. The troubleshooting context makes it slightly more harmful — a user debugging schema drift could be falsely reassured.",
-      "category_justification": "The finding is about an inaccurate inline comment in documentation that misrepresents what showmigrations verifies.",
       "producer": "ccr:gpt-5.5[ReasoningEffort=medium]",
       "source": {
         "type": "ccr",

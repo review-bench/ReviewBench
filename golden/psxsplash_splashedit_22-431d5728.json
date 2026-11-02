@@ -648,26 +648,6 @@
       }
     },
     {
-      "file": "Editor/Timeline/PSXTimelineWindow.cs",
-      "start_line": 503,
-      "end_line": 513,
-      "message": "The timeline context menu only creates keyframes, and the old cutscene inspector has been reduced to an “Open in Timeline” button. There is no replacement path to add audio events, even though the lane can display and edit existing ones, so users cannot create new cutscene audio events from the new editor.",
-      "tp_fp": "tp",
-      "severity": "high",
-      "category": "correctness",
-      "scope": "introduced-by-pr",
-      "difficulty": "easy",
-      "context_required": "diff-only",
-      "tp_fp_justification": "Verified (confirmed while investigating Finding 5): no code path in PSXTimelineWindow, its context menus, ShowAddTrackMenu, or PSXTimelineKeyframeInspector allows creating new audio events. The timeline context menu only adds keyframes. The old PSXCutsceneEditor with its '+ Add Audio Event' button has been replaced by a read-only summary. The finding is factually correct.",
-      "severity_justification": "Same as Finding 5: creating audio events was a core editing operation in the old inspector and is now completely inaccessible, making cutscene audio authoring broken for new clips.",
-      "category_justification": "A required editing operation (adding audio events) is missing from the new editor, representing a functional regression.",
-      "producer": "ccr:gpt-5.5[ReasoningEffort=medium]",
-      "source": {
-        "type": "ccr",
-        "alignment": "generated"
-      }
-    },
-    {
       "file": "Editor/Timeline/PSXTimelineDrawer.cs",
       "start_line": 200,
       "end_line": 203,

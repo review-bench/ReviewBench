@@ -389,26 +389,6 @@
     },
     {
       "file": "frontend/src/pages/QaOverviewPage.tsx",
-      "start_line": 542,
-      "end_line": 543,
-      "message": "These gradient stop colors have the same invalid `hsl(var(--primary))` form while `--primary` is already a full OKLCH color in `frontend/src/index.css`, so the gradient fill can be ignored by the browser instead of using the theme color.",
-      "tp_fp": "tp",
-      "severity": "low",
-      "category": "correctness",
-      "scope": "pre-existing",
-      "difficulty": "medium",
-      "context_required": "diff-plus-related-files",
-      "tp_fp_justification": "Factually correct: lines 542-543 use `hsl(var(--primary))` in SVG gradient stops while `--primary` is defined as `oklch(...)` in index.css, producing technically invalid CSS. However, the identical pattern (`stopColor=\"hsl(var(--primary))\"`) is pre-existing in CostChart.tsx lines 93/98, making this an established codebase pattern rather than a new defect introduced by this PR.",
-      "severity_justification": "Same as Finding 4 — technically invalid CSS but the same pattern is widely used in existing chart components without reported breakage. Impact (if any) would be subtle gradient fill rendering differences.",
-      "category_justification": "Invalid CSS color function nesting — same root cause as Finding 4, just in SVG gradient stop elements.",
-      "producer": "ccr:gpt-5.5[ReasoningEffort=medium]",
-      "source": {
-        "type": "ccr",
-        "alignment": "generated"
-      }
-    },
-    {
-      "file": "frontend/src/pages/QaOverviewPage.tsx",
       "start_line": 579,
       "end_line": 583,
       "message": "These chart color constants wrap OKLCH theme variables in `hsl(...)` (see `frontend/src/index.css` where `--chart-*` is defined as `oklch(...)`). The resulting SVG fill values are invalid CSS colors, so the source breakdown bars may not render with the intended palette.",
