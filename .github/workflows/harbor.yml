@@ -37,7 +37,7 @@ jobs:
       - uses: actions/setup-node@v7
         with:
           node-version: "22"
-      - uses: actions/setup-python@v6
+      - uses: actions/setup-python@v7
         with:
           python-version: "3.12"
       - run: npm ci --no-audit --no-fund
@@ -81,7 +81,7 @@ jobs:
       - uses: actions/setup-node@v7
         with:
           node-version: "22"
-      - uses: actions/setup-python@v6
+      - uses: actions/setup-python@v7
         with:
           python-version: "3.12"
       - run: npm ci --no-audit --no-fund
@@ -159,7 +159,7 @@ jobs:
           PY
       - name: Archive smoke evidence
         if: always()
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: harbor-docker-smoke
           path: |

@@ -675,6 +675,8 @@ is the arithmetic mean of the corresponding scores from the three runs.
 The three component run scores are retained so the published average can
 be audited and run-to-run variance can be inspected.
 
+The leaderboard lists configurations: an agent plus its configuration labels, each scored by its newest approved final run. Each view shows every agent's three highest-ranked configurations for that view's filters, score family and review preference; by default, that is overall grounded F1. A configuration with no results for a filter is left out of that view.
+
 ## 8. Threats to Validity
 
 The methodology has several known limitations that consumers of the

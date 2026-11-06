@@ -1,8 +1,9 @@
 {
   "name": "deepseek-harness-reviewer",
   "display_name": "DeepSeek Harness Reviewer",
-  "image": "ghcr.io/fangkangmi/deepseek-reviewer@sha256:0ee7bb6ea3cbb6ae2b8f15a07e9f5081f2677ad23fd0bfea2ec118eb696ccc9e",
+  "image": "ghcr.io/fangkangmi/deepseek-reviewer@sha256:2c4ac947253112dbdfb82ee4f77e79c94e1cdfc06f7003e6fff0b0b7373834f7",
   "image_visibility": "public",
+  "pr_timeout_seconds": 2400,
   "configuration": [
     {
       "key": "model",

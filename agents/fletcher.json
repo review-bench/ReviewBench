@@ -1,0 +1,38 @@
+{
+  "name": "fletcher",
+  "display_name": "Fletcher",
+  "image": "ghcr.io/shahparshva72/fletcher-reviewbench@sha256:e82b2e06b44cfd7524998dc785a9a4f8bfd743eed703eaf0fa90ac4c27ae5547",
+  "image_visibility": "private",
+  "configuration": [
+    {
+      "key": "model",
+      "value": "gemini-3.8-flash"
+    },
+    {
+      "key": "provider",
+      "value": "vertex_express"
+    },
+    {
+      "key": "strategy",
+      "value": "specialists"
+    },
+    {
+      "key": "context",
+      "value": "related"
+    }
+  ],
+  "secrets": {
+    "env": [
+      "GEMINI_API_KEY",
+      "GHCR_PULL_TOKEN"
+    ]
+  },
+  "model_api_url": "https://aiplatform.googleapis.com",
+  "contacts": [
+    "shahparshva72"
+  ],
+  "provider": "Fletcher",
+  "egress": [
+    "aiplatform.googleapis.com"
+  ]
+}

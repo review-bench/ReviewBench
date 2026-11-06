@@ -1,0 +1,34 @@
+{
+  "name": "ocr",
+  "display_name": "OCR",
+  "image": "ghcr.io/airport233/ocr-reviewbench@sha256:0d45fd59fda191143ae18889809a4eb447a9cf1ed74a6459310c2abcc734d6a1",
+  "image_visibility": "public",
+  "configuration": [
+    {
+      "key": "model",
+      "value": "ocr-max"
+    },
+    {
+      "key": "protocol",
+      "value": "openai"
+    },
+    {
+      "key": "concurrency",
+      "value": "8"
+    }
+  ],
+  "secrets": {
+    "env": [
+      "OCR_API_KEY"
+    ]
+  },
+  "model_api_url": "https://dashscope.aliyuncs.com/compatible-mode/v1",
+  "pr_timeout_seconds": 3600,
+  "contacts": [
+    "airport233"
+  ],
+  "provider": "OCR",
+  "egress": [
+    "dashscope.aliyuncs.com"
+  ]
+}
