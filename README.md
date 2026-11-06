@@ -206,6 +206,7 @@ git clone https://github.com/review-bench/ReviewBench && cd ReviewBench
 scripts/try-agent.sh my-reviewer:dev --pr 0 -e MY_API_KEY      # one pull request
 scripts/try-agent.sh my-reviewer:dev -e MY_API_KEY             # all 25
 scripts/try-agent.sh my-reviewer:dev --set full -e MY_API_KEY  # the full set, all 219
+scripts/try-agent.sh my-reviewer:dev --set full --resume -e MY_API_KEY  # continue an interrupted run
 ```
 
 `-e NAME` passes that variable from your shell into the container under the
