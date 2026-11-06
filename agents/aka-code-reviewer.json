@@ -1,0 +1,28 @@
+{
+  "name": "aka-code-reviewer",
+  "display_name": "aka-code-reviewer",
+  "image": "ghcr.io/ddurgoji2341/aka-code-reviewer@sha256:ccc0475a659f298ed3581d1ed3dd694824b00ecdc23e4ed7b3186b4516536d14",
+  "image_visibility": "private",
+  "configuration": [
+    {
+      "key": "model",
+      "value": "claude-sonnet-5.5"
+    }
+  ],
+  "secrets": {
+    "env": [
+      "GH_TOKEN",
+      "GHCR_PULL_TOKEN"
+    ]
+  },
+  "model_api_url": "https://api.github.com",
+  "egress": [
+    "api.githubcopilot.com",
+    "api.github.com"
+  ],
+  "pr_timeout_seconds": 3600,
+  "contacts": [
+    "ddurgoji"
+  ],
+  "provider": "aka-code-reviewer"
+}
