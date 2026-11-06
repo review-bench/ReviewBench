@@ -228,26 +228,6 @@
       }
     },
     {
-      "file": "templates/hooks/dev-team-implementer-guard.js",
-      "start_line": 82,
-      "end_line": 85,
-      "message": "This lookup uses the orchestrator process's current git branch, not the branch/PR owned by the target implementer. In parallel mode the task skill says Drucker tracks one branch per implementing agent in conversation context, so the lead may be on `main` or another feature branch when sending this shutdown request; the guard then allows on `main` or checks the wrong branch and fails to enforce the intended target agent's review state.",
-      "tp_fp": "tp",
-      "severity": "high",
-      "category": "correctness",
-      "scope": "introduced-by-pr",
-      "difficulty": "hard",
-      "context_required": "broader-project-context",
-      "tp_fp_justification": "Confirmed duplicate of Finding 1 in substance, but independently verifiable: lines 82-87 use `execFileSync('git', ['symbolic-ref', '--short', 'HEAD'])` without a `cwd` override, so it reads the orchestrator's branch. dev-team-process.md confirms implementing agents run in separate worktrees. The guard checks the wrong branch.",
-      "severity_justification": "Same as Finding 1 — the hook is entirely ineffective in the primary production scenario (orchestrator on main, implementers in worktrees). The guard provides no protection.",
-      "category_justification": "The branch resolution logic uses the wrong working directory, causing the guard to check the orchestrator's branch instead of the implementer's branch, defeating its purpose.",
-      "producer": "ccr:gpt-5.5[ReasoningEffort=medium]",
-      "source": {
-        "type": "ccr",
-        "alignment": "generated"
-      }
-    },
-    {
       "file": "tests/unit/hooks.test.js",
       "start_line": 2864,
       "end_line": 2865,

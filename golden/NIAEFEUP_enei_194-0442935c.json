@@ -476,26 +476,6 @@
       }
     },
     {
-      "file": "apps/website/inertia/pages/events/show/page.tsx",
-      "start_line": 313,
-      "end_line": 315,
-      "message": "This interactive QR icon is rendered as a bare SVG with only a mouse `onClick`, so it is not keyboard-focusable and has no accessible name for assistive technologies. Use an actual button (or equivalent keyboard and ARIA handling) for the scanner trigger.",
-      "tp_fp": "tp",
-      "severity": "low",
-      "category": "accessibility",
-      "scope": "introduced-by-pr",
-      "difficulty": "easy",
-      "context_required": "diff-only",
-      "tp_fp_justification": "Same issue as Finding 1, verified against the file: QrCode Lucide icon has a bare onClick with no Button wrapper, no tabIndex, no role, and no aria-label, making it inaccessible to keyboard users and assistive technologies.",
-      "severity_justification": "Real accessibility gap but limited to staff users in a specific UI element; non-blocking for core functionality.",
-      "category_justification": "The finding is specifically about keyboard focusability and ARIA/assistive technology exposure.",
-      "producer": "ccr:gpt-5.5[ReasoningEffort=medium]",
-      "source": {
-        "type": "ccr",
-        "alignment": "generated"
-      }
-    },
-    {
       "file": "apps/website/inertia/components/events/event_check_in_dialog.tsx",
       "start_line": 28,
       "end_line": 30,

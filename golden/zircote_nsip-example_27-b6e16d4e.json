@@ -315,26 +315,6 @@
     },
     {
       "file": "reports/2026-04-15-lambing-event/report.md",
-      "start_line": 170,
-      "end_line": 170,
-      "message": "This repeats the overstatement that the 0% COI confirms no shared ancestry between the farm lines, but the pedigree shown in this same report includes Hound River Farm ancestry on both sides. It would be more accurate to state that no shared individual ancestors were identified in the available pedigree data.",
-      "tp_fp": "tp",
-      "severity": "low",
-      "category": "correctness",
-      "scope": "introduced-by-pr",
-      "difficulty": "easy",
-      "context_required": "diff-only",
-      "tp_fp_justification": "Line 170 repeats the same inaccuracy as line 96: claiming 0% COI 'confirms no shared ancestry between Beyond Blessed Farm genetics and the NC State University line.' The pedigree section of the same document shows Hound River Farm animals in both lineages (NWT063 in dam line, NWT012/NWT082 in sire line). The COI reflects no shared individual ancestors, not 'no shared ancestry' between the farm lines broadly.",
-      "severity_justification": "Same as Finding 2 — the 0% COI figure is likely correct (different individual animals), making this a prose overstatement rather than a numerical error. Low impact on actual breeding decisions.",
-      "category_justification": "Factually incorrect claim about pedigree separation, contradicted by data within the same document.",
-      "producer": "ccr:gpt-5.5[ReasoningEffort=medium]",
-      "source": {
-        "type": "ccr",
-        "alignment": "generated"
-      }
-    },
-    {
-      "file": "reports/2026-04-15-lambing-event/report.md",
       "start_line": 144,
       "end_line": 144,
       "message": "This identifies USD318 as the dam's maternal grandsire, but the displayed pedigree shows USD318 under the dam's sire FLE382, making USD318 the paternal grandsire; the maternal grandsire is NWT063 on line 128. This lineage description should be corrected.",
@@ -387,26 +367,6 @@
       "tp_fp_justification": "The sire EBV table directly above line 84 lists NLB accuracy at 55%, but line 84 states the accuracy range is '68–81%'. The actual range is 55–81%. Line 84 omits the lowest value, overstating the reliability floor for NCS310's EBVs.",
       "severity_justification": "The misstatement is minor — it affects one trait's accuracy (NLB at 55%) and the table above shows the correct values. No breeding calculations are wrong, but the summary note is factually incorrect.",
       "category_justification": "The accuracy note states a range (68–81%) that is contradicted by data in the table immediately above it in the same section.",
-      "producer": "ccr:gpt-5.5[ReasoningEffort=medium]",
-      "source": {
-        "type": "ccr",
-        "alignment": "generated"
-      }
-    },
-    {
-      "file": "reports/2026-04-15-lambing-event/report.md",
-      "start_line": 174,
-      "end_line": 174,
-      "message": "The stated 68–81% accuracy range omits the sire's NLB accuracy, which the EBV table lists as 55%. This overstates the reliability of the full genetic contribution unless the statement is limited to the growth/BWT traits.",
-      "tp_fp": "tp",
-      "severity": "low",
-      "category": "correctness",
-      "scope": "introduced-by-pr",
-      "difficulty": "easy",
-      "context_required": "diff-only",
-      "tp_fp_justification": "Line 174 repeats the same inaccurate 68–81% accuracy range as line 84. The sire EBV table lists NLB accuracy at 55%, so the correct range is 55–81%. This is a second instance of the same factual error in the same document.",
-      "severity_justification": "Same as Finding 6 — the table shows the correct value, no calculations are affected, but the summary claim overstates the accuracy floor for the sire's full genetic contribution.",
-      "category_justification": "Repeats a factually incorrect accuracy range that omits the sire's lowest-accuracy trait (NLB at 55%), contradicting the EBV table elsewhere in the document.",
       "producer": "ccr:gpt-5.5[ReasoningEffort=medium]",
       "source": {
         "type": "ccr",

@@ -449,26 +449,6 @@
     },
     {
       "file": "src/user/.agents/AGENT-PERSONA.md.template",
-      "start_line": 20,
-      "end_line": 20,
-      "message": "The persona tag is malformed: it opens as `<your_persona>` but closes as `</your-persona>`. Consumers that rely on XML-style section boundaries may fail to recognize the persona block correctly.",
-      "tp_fp": "tp",
-      "severity": "low",
-      "category": "correctness",
-      "scope": "pre-existing",
-      "difficulty": "easy",
-      "context_required": "diff-only",
-      "tp_fp_justification": "Verified in the file: the opening tag `<your_persona>` (underscore) and closing tag `</your-persona>` (hyphen) are mismatched, exactly as claimed. This is the same factual issue as Finding 1.",
-      "severity_justification": "Same as Finding 1 — LLM tools are generally tolerant of loose markup so behavioral impact is minimal, but the mismatch is a real structural error.",
-      "category_justification": "Mismatched structural tags in a template file consumed by AI tools is a correctness issue.",
-      "producer": "ccr:gpt-5.5[ReasoningEffort=medium]",
-      "source": {
-        "type": "ccr",
-        "alignment": "generated"
-      }
-    },
-    {
-      "file": "src/user/.agents/AGENT-PERSONA.md.template",
       "start_line": 3,
       "end_line": 3,
       "message": "Correct the typo in the role description: this should be “principal software architect,” not “principle software architect.”",

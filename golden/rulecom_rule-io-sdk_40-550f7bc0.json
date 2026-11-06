@@ -409,26 +409,6 @@
     },
     {
       "file": "src/client.ts",
-      "start_line": 1825,
-      "end_line": 1829,
-      "message": "`createApiKey()` returns the newly generated secret key, but routing it through `requestV3` means the full response is logged whenever client debug mode is enabled. This can expose the new API key in logs; use a non-logging/redacted path for this response.",
-      "tp_fp": "tp",
-      "severity": "medium",
-      "category": "security",
-      "scope": "introduced-by-pr",
-      "difficulty": "medium",
-      "context_required": "diff-plus-related-files",
-      "tp_fp_justification": "Same mechanism as Finding 1, verified: `requestV3` calls `this.log('Response V3:', data)` which dumps the full parsed body including the `key` field. `createApiKey` uses `requestV3`, so the newly generated secret key will appear in debug logs. The `getAccount` precedent confirms the codebase recognizes this pattern as a security issue requiring a redacted logging path.",
-      "severity_justification": "Same as Finding 1 — requires opt-in `debug: true` but `createApiKey` is specifically the moment a new secret is generated and returned, making this the highest-risk moment for a credential to leak into logs.",
-      "category_justification": "Credential leak: a newly generated secret API key value is logged in plaintext when debug mode is active.",
-      "producer": "ccr:gpt-5.5[ReasoningEffort=medium]",
-      "source": {
-        "type": "ccr",
-        "alignment": "generated"
-      }
-    },
-    {
-      "file": "src/client.ts",
       "start_line": 1821,
       "end_line": 1822,
       "message": "The example encourages printing the generated API key to stdout. Because this value is a secret credential, examples should avoid logging it directly to reduce the chance of leaking keys into terminal history or centralized logs.",

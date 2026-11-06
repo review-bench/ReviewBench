@@ -568,26 +568,6 @@
       }
     },
     {
-      "file": "src/lib/configs/company-detail.config.ts",
-      "start_line": 129,
-      "end_line": 134,
-      "message": "This validation payload omits `ownerName`, while `companySchema` still requires it. As a result, saving any company detail edit will fail validation even when all visible fields are filled, and the error is dropped because `ownerName` is no longer in the detail config.",
-      "tp_fp": "tp",
-      "severity": "high",
-      "category": "correctness",
-      "scope": "introduced-by-pr",
-      "difficulty": "easy",
-      "context_required": "diff-plus-related-files",
-      "tp_fp_justification": "Identical to Finding 1 — already verified: `prepareForValidation` in `company-detail.config.ts` only supplies `name`, `address`, `location`, `type`, while `companySchema` still requires `ownerName` via `cleanString().min(2)`. This will cause every company edit save to fail validation.",
-      "severity_justification": "Company editing is completely broken — saving will always fail because the required `ownerName` field is never supplied to validation.",
-      "category_justification": "Logic error: schema and data preparation are out of sync, causing broken validation on every save attempt.",
-      "producer": "ccr:gpt-5.5[ReasoningEffort=medium]",
-      "source": {
-        "type": "ccr",
-        "alignment": "generated"
-      }
-    },
-    {
       "file": "src/lib/components/company-components/LocationMapModal.svelte",
       "start_line": 61,
       "end_line": 62,

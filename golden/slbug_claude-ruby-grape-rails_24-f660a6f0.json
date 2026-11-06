@@ -550,26 +550,6 @@
       }
     },
     {
-      "file": "Makefile",
-      "start_line": 74,
-      "end_line": 76,
-      "message": "The fresh behavioral target also only prints the behavioral score report and does not enforce the behavioral thresholds, so a fresh run with low accuracy/precision/recall still exits 0 unless the scorer itself crashes.",
-      "tp_fp": "tp",
-      "severity": "low",
-      "category": "testing",
-      "scope": "introduced-by-pr",
-      "difficulty": "easy",
-      "context_required": "diff-only",
-      "tp_fp_justification": "Confirmed: `eval-behavioral-fresh` runs `python3 -m lab.eval.scorer --all --behavioral --pretty` with no --fail-under, so it always exits 0 regardless of behavioral assertion failures. Identical root cause to Findings 8 and 9, just at the fresh-run Makefile target.",
-      "severity_justification": "Same as Findings 8/9 — behavioral dimension is intentionally optional and informational, not a CI gate. This is a third instance of the same pattern.",
-      "category_justification": "Test target that cannot enforce quality thresholds due to missing failure mechanism.",
-      "producer": "ccr:gpt-5.5[ReasoningEffort=medium]",
-      "source": {
-        "type": "ccr",
-        "alignment": "generated"
-      }
-    },
-    {
       "file": "package.json",
       "start_line": 30,
       "end_line": 30,
@@ -623,46 +603,6 @@
       "tp_fp_justification": "Confirmed: `npm run eval:behavioral:fresh:verbose` (package.json line 31) runs `scorer --all --behavioral --pretty` with no --fail-under. Sixth instance of the same pattern as Findings 8-12.",
       "severity_justification": "Same as Findings 8-12 — behavioral dimension intentionally optional/informational. Sixth duplicate of the same no-threshold pattern.",
       "category_justification": "Test command that cannot enforce quality thresholds due to missing failure mechanism.",
-      "producer": "ccr:gpt-5.5[ReasoningEffort=medium]",
-      "source": {
-        "type": "ccr",
-        "alignment": "generated"
-      }
-    },
-    {
-      "file": "Makefile",
-      "start_line": 70,
-      "end_line": 72,
-      "message": "The verbose cache-only target has the same issue as `eval-behavioral`: it produces a report but does not fail when behavioral thresholds are missed, so regressions are easy to miss in automated use.",
-      "tp_fp": "tp",
-      "severity": "low",
-      "category": "testing",
-      "scope": "introduced-by-pr",
-      "difficulty": "easy",
-      "context_required": "diff-only",
-      "tp_fp_justification": "Confirmed: `eval-behavioral-verbose` runs `scorer --all --behavioral --pretty` with no --fail-under. Seventh instance of the same pattern as Findings 8-13.",
-      "severity_justification": "Same as Findings 8-13 — behavioral dimension intentionally optional/informational. Seventh duplicate of the same no-threshold pattern.",
-      "category_justification": "Test target that cannot enforce quality thresholds due to missing failure mechanism.",
-      "producer": "ccr:gpt-5.5[ReasoningEffort=medium]",
-      "source": {
-        "type": "ccr",
-        "alignment": "generated"
-      }
-    },
-    {
-      "file": "Makefile",
-      "start_line": 78,
-      "end_line": 80,
-      "message": "The verbose fresh target also does not enforce the behavioral scores it just generated; low accuracy/precision/recall still exits successfully after printing the JSON report.",
-      "tp_fp": "tp",
-      "severity": "low",
-      "category": "testing",
-      "scope": "introduced-by-pr",
-      "difficulty": "easy",
-      "context_required": "diff-only",
-      "tp_fp_justification": "Confirmed: `eval-behavioral-fresh-verbose` runs `scorer --all --behavioral --pretty` with no --fail-under. Eighth instance of the same pattern as Findings 8-14.",
-      "severity_justification": "Same as Findings 8-14 — behavioral dimension intentionally optional/informational. Eighth duplicate of the same no-threshold pattern.",
-      "category_justification": "Test target that cannot enforce quality thresholds due to missing failure mechanism.",
       "producer": "ccr:gpt-5.5[ReasoningEffort=medium]",
       "source": {
         "type": "ccr",

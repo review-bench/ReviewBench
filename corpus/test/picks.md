@@ -44,7 +44,7 @@ A diverse subset of the full set chosen to demonstrate the breadth of repos, lan
 #### [cmik/apilix#12](https://github.com/cmik/apilix/pull/12)
 - **Lang/size**: TypeScript · xl (>1500) · repo 1-10MB
 - **Title**: implement data storages
-- **TP findings**: 36 (high:11 med:13 low:12) — categories: accessibility,correctness,documentation,maintainability,performance,reliability,security
+- **TP findings**: 32 (high:10 med:10 low:12) — categories: accessibility,correctness,documentation,maintainability,performance,reliability,security
 - **Why included**: Multiple **high/security** findings: arbitrary `dataDir` taken from request body so any caller can `git init` anywhere, and a path-traversal guard missing the trailing separator (`/data/foo` matches `/data/foo-evil`). Classic well-explained sec review.
 - **Golden file**: `golden/cmik_apilix_12-0c34439a.json`
 
@@ -58,7 +58,7 @@ A diverse subset of the full set chosen to demonstrate the breadth of repos, lan
 #### [DisciplinedSoftware/Codebase-Conversion#1](https://github.com/DisciplinedSoftware/Codebase-Conversion/pull/1)
 - **Lang/size**: Python · xl (>1500) · repo <1MB
 - **Title**: Fortran-to-Rust conversion pipeline with devcontainer
-- **TP findings**: 31 (high:2 med:15 low:14) — categories: correctness,documentation,maintainability,reliability,security
+- **TP findings**: 29 (high:2 med:13 low:14) — categories: correctness,documentation,maintainability,reliability,security
 - **Why included**: Fortran→Rust pipeline filters out lines starting with `/*` to remove f2c headers — but f2c also emits the function prototype as `/* Subroutine */ int dgemm_(...)`, which gets stripped, breaking every conversion. Reviewer actually understood the data.
 - **Golden file**: `golden/DisciplinedSoftware_Codebase-Conversion_1-4b46d68c.json`
 
@@ -72,7 +72,7 @@ A diverse subset of the full set chosen to demonstrate the breadth of repos, lan
 #### [brexhq/CrabTrap#15](https://github.com/brexhq/CrabTrap/pull/15)
 - **Lang/size**: Go · m (200-500) · repo 1-10MB
 - **Title**: fix: lighten audit log list responses
-- **TP findings**: 16 (high:1 med:6 low:9) — categories: correctness,maintainability,performance,reliability,testing
+- **TP findings**: 15 (high:1 med:5 low:9) — categories: correctness,maintainability,performance,reliability,testing
 - **Why included**: `query` method creates `context.Background()` and ignores the request context — sibling method `Count` does it correctly. Cancellation/deadline propagation broken. Classic Go context pitfall, well demonstrated.
 - **Golden file**: `golden/brexhq_CrabTrap_15-5ef0884c.json`
 
@@ -86,14 +86,14 @@ A diverse subset of the full set chosen to demonstrate the breadth of repos, lan
 #### [scotthamilton77/agents-config#1](https://github.com/scotthamilton77/agents-config/pull/1)
 - **Lang/size**: Shell · l (500-1500) · repo 10-100MB
 - **Title**: feat: multi-tool install support (Claude, Codex, Gemini)
-- **TP findings**: 25 (high:3 med:6 low:16) — categories: correctness,documentation,reliability
+- **TP findings**: 24 (high:3 med:6 low:15) — categories: correctness,documentation,reliability
 - **Why included**: Templates use Claude Code's `@filename` file-inclusion syntax inside `.codex/AGENTS.md` and `.gemini/GEMINI.md` — but Codex CLI and Gemini CLI don't support it; those references are treated as literal text. Cross-product ecosystem knowledge.
 - **Golden file**: `golden/scotthamilton77_agents-config_1-1fc78970.json`
 
 #### [ardevd/jadx-collaboration#3](https://github.com/ardevd/jadx-collaboration/pull/3)
 - **Lang/size**: Kotlin · s (50-200) · repo <1MB
 - **Title**: perf: serialize pull/push on a shared background executor; guard invokeAndWait e
-- **TP findings**: 9 (high:4 med:1 low:4) — categories: correctness,reliability,testing
+- **TP findings**: 8 (high:4 med:1 low:3) — categories: correctness,reliability,testing
 - **Why included**: PR description promises 'shared single-thread executor to serialize pull/push' — actual code still uses `kotlin.concurrent.thread` for all four entry points, spawning unconstrained threads. Reviewer caught that **the PR doesn't do what it says it does**.
 - **Golden file**: `golden/ardevd_jadx-collaboration_3-853179dc.json`
 
@@ -137,7 +137,7 @@ A diverse subset of the full set chosen to demonstrate the breadth of repos, lan
 #### [superhighfives/pika#200](https://github.com/superhighfives/pika/pull/200)
 - **Lang/size**: Swift · xl (>1500) · repo 1-10MB
 - **Title**: Persistent named palettes with tabbed drawer, export, and UX polish
-- **TP findings**: 19 (high:0 med:8 low:11) — categories: correctness,maintainability,performance,reliability,testing
+- **TP findings**: 18 (high:0 med:8 low:10) — categories: correctness,maintainability,performance,reliability,testing
 - **Why included**: `swap()` calls `pushUndo()` unconditionally before checking `activePaletteIndex`; `deletePalette` doesn't decrement `activePaletteIndex` when removing a palette below the active one (only the out-of-range case is clamped). Index-bookkeeping correctness, in Swift.
 - **Golden file**: `golden/superhighfives_pika_200-b227aff0.json`
 

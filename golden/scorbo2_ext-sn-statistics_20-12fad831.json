@@ -508,26 +508,6 @@
       }
     },
     {
-      "file": "src/main/java/ca/corbett/snotes/extensions/statistics/StatisticsDialog.java",
-      "start_line": 437,
-      "end_line": 440,
-      "message": "After parsing, this code does not check whether any actual search terms remain. Inputs such as only commas/whitespace can produce an empty wordSet, and StatisticsUtil.findWords treats an empty set as a general top-word search, so the user would see unrelated top-word results instead of a validation error or zero matches.",
-      "tp_fp": "tp",
-      "severity": "medium",
-      "category": "correctness",
-      "scope": "introduced-by-pr",
-      "difficulty": "medium",
-      "context_required": "diff-plus-related-files",
-      "tp_fp_justification": "Identical to Finding 1: verified that setAllowBlank(false) only guards against a completely empty field; comma/whitespace input like ',,,' passes isFormValid() but TagList.fromRawString produces an empty tag list → empty wordSet → findWords treats it as general top-N search, showing global top-25 words instead of an error.",
-      "severity_justification": "Same impact as Finding 1: misleading results shown to user (global top-25 words) when they provide input that yields no valid search terms.",
-      "category_justification": "Incorrect output produced — top-N global results returned instead of a validation error or empty result when no valid search terms were parsed.",
-      "producer": "ccr:gpt-5.5[ReasoningEffort=medium]",
-      "source": {
-        "type": "ccr",
-        "alignment": "generated"
-      }
-    },
-    {
       "file": ".github/copilot-instructions.md",
       "start_line": 31,
       "end_line": 31,

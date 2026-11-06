@@ -309,26 +309,6 @@
     },
     {
       "file": "docs/api-ref.md",
-      "start_line": 1648,
-      "end_line": 1648,
-      "message": "In `datasources.update_tags`, the parameter is named `item`. It should be `datasource_item` for clarity and consistency with other methods.",
-      "tp_fp": "fp",
-      "severity": "low",
-      "category": "maintainability",
-      "scope": "introduced-by-pr",
-      "difficulty": "easy",
-      "context_required": "diff-only",
-      "tp_fp_justification": "Identical to findings 13 and 15. The parameter name `item` is the actual Python parameter name shown in the method signature code block, and it is a consistent local convention used across add_tags, delete_tags, update_tags, and schedule_extract_refresh. Renaming it in the docs would create inconsistency with the implementation.",
-      "severity_justification": "Minor naming style issue with no runtime impact.",
-      "category_justification": "The finding is about parameter naming style.",
-      "producer": "llm_review:gemini-2.5-pro",
-      "source": {
-        "type": "llm_review",
-        "alignment": "generated"
-      }
-    },
-    {
-      "file": "docs/api-ref.md",
       "start_line": 1177,
       "end_line": 1181,
       "message": "The datasources.create_extract method specifies an optional 'encrypt' parameter, but does not mention potential exceptions or errors that may occur (e.g., invalid datasource item or server errors). Proper error handling instructions should be documented for robust usage.",

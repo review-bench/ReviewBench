@@ -468,26 +468,6 @@
       }
     },
     {
-      "file": "services/nginx/nginx.conf.template",
-      "start_line": 68,
-      "end_line": 74,
-      "message": "These WebSocket proxy locations do not set a longer `proxy_read_timeout`, so Nginx will use its default idle upstream read timeout (commonly 60s). Idle chat/game sockets can be closed by the proxy even though the backend/client still consider them healthy, causing periodic disconnect/reconnect cycles; add an explicit WebSocket-appropriate timeout or heartbeat strategy.",
-      "tp_fp": "tp",
-      "severity": "medium",
-      "category": "reliability",
-      "scope": "introduced-by-pr",
-      "difficulty": "medium",
-      "context_required": "diff-plus-related-files",
-      "tp_fp_justification": "Same factual claim as finding 2 but applied to the /api/game/ location block (lines 68–74). Verified: no `proxy_read_timeout` is set in that block or at any higher scope in the file. The 60s default applies equally to game WebSocket connections, which are arguably even more latency-sensitive than chat.",
-      "severity_justification": "Same impact as finding 2: idle game sockets (e.g., between moves) will be silently dropped by nginx after 60s, causing reconnect churn during live gameplay.",
-      "category_justification": "Connection lifecycle management concern under a reverse proxy — same as finding 2.",
-      "producer": "ccr:gpt-5.5[ReasoningEffort=medium]",
-      "source": {
-        "type": "ccr",
-        "alignment": "generated"
-      }
-    },
-    {
       "file": "src/frontend/src/utils/wsClient.js",
       "start_line": 32,
       "end_line": 33,
