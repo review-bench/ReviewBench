@@ -1,0 +1,27 @@
+{
+  "name": "rectifier-by-i-mbi-k",
+  "display_name": "Rectifier by İMBİK",
+  "image": "ghcr.io/imbik-ai/rectifier-reviewbench@sha256:f52ad210b36fa71308eb3e71e0962d72fca815d3b808f79b91f333741e7920da",
+  "image_visibility": "private",
+  "secrets": {
+    "env": [
+      "RECTIFIER_MODEL_TOKEN",
+      "CONTEXT7_API_KEY",
+      "GHCR_PULL_TOKEN"
+    ]
+  },
+  "model_api_url": "https://decanter.imbik.ai/v1",
+  "egress": [
+    "context7.com",
+    "pypi.org",
+    "files.pythonhosted.org",
+    "registry.npmjs.org",
+    "static.crates.io",
+    "decanter.imbik.ai"
+  ],
+  "pr_timeout_seconds": 3600,
+  "contacts": [
+    "cpchen"
+  ],
+  "provider": "Rectifier by İMBİK"
+}
