@@ -201,6 +201,13 @@ async function matchChunk(
     if (msg.role === "user") break;
   }
 
+  // Report the provider's error (rejected key, rate limit) rather than the
+  // parse failure it would otherwise cause.
+  const lastMsg = messages[messages.length - 1] as any;
+  if (lastMsg?.role === "assistant" && lastMsg.errorMessage) {
+    throw new Error(`Model error: ${lastMsg.errorMessage}`);
+  }
+
   const localCorrespondences = parseMatcherResponse(
     responseText,
     candidates.length,
