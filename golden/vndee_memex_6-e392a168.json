@@ -88,26 +88,6 @@
       }
     },
     {
-      "file": "internal/graph/graph.go",
-      "start_line": 423,
-      "end_line": 436,
-      "message": "The personalization vector normalization uses len(personal) as the count of valid seeds, but because the `neighbors[s]` guard is always true (see dead guard finding), len(personal) equals the count of all distinct seeds including those not present in the graph. If callers pass k seeds of which m have no graph edges, the weight assigned to each connected seed is 1/(m+connected) instead of the correct 1/connected. In a KB where many entities have no relations (common early in ingestion), this can significantly suppress the personalization signal for the seeds that do drive graph traversal.",
-      "tp_fp": "tp",
-      "severity": "low",
-      "category": "correctness",
-      "scope": "introduced-by-pr",
-      "difficulty": "medium",
-      "context_required": "diff-only",
-      "tp_fp_justification": "Factually correct and independently verifiable: the dead guard means all seeds (including graph-isolated ones) inflate len(personal), making seedWeight 1/(all seeds) instead of 1/(seeds with connections). Isolated seeds become rank sinks. The ingestion-scenario framing adds context but the core correctness claim is the same as Finding 2's second half — both are valid on their own merits.",
-      "severity_justification": "The dilution effect requires a meaningful fraction of seeds to have no graph edges. In a mature KB this is rare. During early ingestion it's more likely but search results during that phase are inherently sparse anyway. The effect degrades PPR quality but doesn't cause incorrect behavior or data loss.",
-      "category_justification": "Isolated seeds act as rank sinks that absorb personalization weight without contributing to traversal, producing PPR scores that deviate from the intended personalization toward graph-connected seeds.",
-      "producer": "llm_review:claude-sonnet-4.6",
-      "source": {
-        "type": "llm_review",
-        "alignment": "generated"
-      }
-    },
-    {
       "file": "internal/search/graph.go",
       "start_line": 116,
       "end_line": 119,

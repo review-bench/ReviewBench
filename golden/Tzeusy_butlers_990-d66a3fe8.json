@@ -368,26 +368,6 @@
       }
     },
     {
-      "file": "frontend/src/pages/DashboardPage.tsx",
-      "start_line": 60,
-      "end_line": 61,
-      "message": "This badge labels `stats_24h.dispatched_investigations` as \"active\", but the QA summary endpoint computes this as the number of investigations dispatched in the last 24 hours, not currently active investigations. This will overstate active work after those investigations have completed; either relabel it as a 24h/dispatched count or source an actual active-attempt count.",
-      "tp_fp": "fp",
-      "severity": "low",
-      "category": "maintainability",
-      "scope": "introduced-by-pr",
-      "difficulty": "easy",
-      "context_required": "diff-only",
-      "tp_fp_justification": "This is a duplicate of Finding 1, which already identified the same issue at the same lines (60-62 of DashboardPage.tsx) with the same substance: stats_24h.dispatched_investigations being labeled 'active' when it's a 24h dispatch count. The finding is factually correct but is a duplicate — deduplication note in instructions says to evaluate independently, but this is the exact same finding restated.",
-      "severity_justification": "Same as Finding 1 — a misleading badge label with no functional breakage.",
-      "category_justification": "UI label accuracy issue.",
-      "producer": "ccr:gpt-5.5[ReasoningEffort=medium]",
-      "source": {
-        "type": "ccr",
-        "alignment": "generated"
-      }
-    },
-    {
       "file": "frontend/src/pages/QaPatrolDetailPage.tsx",
       "start_line": 47,
       "end_line": 51,
@@ -400,26 +380,6 @@
       "context_required": "diff-only",
       "tp_fp_justification": "This is a duplicate of Finding 2, which already identified the same DRY violation — SeverityBadge, SourceTypeBadge, PatrolStatusBadge, formatTs, and formatDuration are all duplicated across QaOverviewPage.tsx, QaPatrolDetailPage.tsx, and QaInvestigationDetailPage.tsx. This finding restates the same issue with narrower scope (just SeverityBadge), but the substance is identical to Finding 2.",
       "severity_justification": "Same as Finding 2 — contained duplication in new files with no current behavioral impact.",
-      "category_justification": "DRY violation across new QA page files.",
-      "producer": "ccr:gpt-5.5[ReasoningEffort=medium]",
-      "source": {
-        "type": "ccr",
-        "alignment": "generated"
-      }
-    },
-    {
-      "file": "frontend/src/pages/QaOverviewPage.tsx",
-      "start_line": 59,
-      "end_line": 63,
-      "message": "The severity badge mapping is duplicated across the new QA pages. Since these pages use the same severity labels and colors, keeping separate copies makes future severity changes easy to apply inconsistently; consider extracting a shared QA badge component/helper.",
-      "tp_fp": "fp",
-      "severity": "low",
-      "category": "maintainability",
-      "scope": "introduced-by-pr",
-      "difficulty": "easy",
-      "context_required": "diff-only",
-      "tp_fp_justification": "This is a duplicate of Finding 2, which already identified the same DRY violation across the QA pages. The finding is factually correct but restates the same issue already covered by Finding 2.",
-      "severity_justification": "Contained duplication in new files with no current behavioral impact.",
       "category_justification": "DRY violation across new QA page files.",
       "producer": "ccr:gpt-5.5[ReasoningEffort=medium]",
       "source": {

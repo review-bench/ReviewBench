@@ -448,26 +448,6 @@
       }
     },
     {
-      "file": "packages/software-factory/src/issue-loop.ts",
-      "start_line": 294,
-      "end_line": 295,
-      "message": "This classifies any run that completes exactly `maxOuterCycles` cycles as `max_outer_cycles`, even if the loop stopped because there are no unblocked issues left. For example, with `maxOuterCycles: 1` and one issue that completes successfully, the result is reported as hitting the guard instead of `all_issues_done`; the code needs to distinguish whether the guard actually prevented another cycle.",
-      "tp_fp": "tp",
-      "severity": "low",
-      "category": "correctness",
-      "scope": "introduced-by-pr",
-      "difficulty": "easy",
-      "context_required": "diff-only",
-      "tp_fp_justification": "Duplicate of Finding 1, verified against the same code. The `if (outerCycles >= maxOuterCycles)` check at outcome determination fires whenever outerCycles equals maxOuterCycles, regardless of whether the limit caused the exit or all work completed naturally on the last cycle. The maxOuterCycles:1 example makes the bug concrete and easy to reproduce.",
-      "severity_justification": "Same as Finding 1 — wrong outcome label in an edge case, no data corruption or behavioral failure. The maxOuterCycles:1 example is more illustrative but the practical impact remains a misleading result string.",
-      "category_justification": "Incorrect outcome classification due to a boundary condition in the post-loop guard check.",
-      "producer": "ccr:gpt-5.5[ReasoningEffort=medium]",
-      "source": {
-        "type": "ccr",
-        "alignment": "generated"
-      }
-    },
-    {
       "file": "packages/software-factory/src/issue-scheduler.ts",
       "start_line": 67,
       "end_line": 72,

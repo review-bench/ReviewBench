@@ -29,26 +29,6 @@
     },
     {
       "file": "crates/bashkit-python/src/lib.rs",
-      "start_line": 1974,
-      "end_line": 1976,
-      "message": "Same silent RwLock poison swallow as PyBash::clear_cancel. BashTool::clear_cancel silently does nothing on a poisoned lock, leaving subsequent execute() calls permanently failing with 'execution cancelled' and no error surfaced to the caller.",
-      "tp_fp": "tp",
-      "severity": "low",
-      "category": "reliability",
-      "scope": "introduced-by-pr",
-      "difficulty": "medium",
-      "context_required": "diff-only",
-      "tp_fp_justification": "Lines 1974-1976 contain identical code to the PyBash::clear_cancel — `if let Ok(token) = self.cancelled.read()` silently discards PoisonError. The finding is factually correct. This is a duplicate of Finding 1 applied to BashTool, but evaluated independently it is a valid TP.",
-      "severity_justification": "Same reasoning as Finding 1: RwLock poisoning requires a panic while holding the write lock, which is rare in this code path. Low practical impact.",
-      "category_justification": "Silent error swallowing in a recovery mechanism — callers cannot detect failure, leaving the instance permanently unusable with no observable signal.",
-      "producer": "llm_review:claude-sonnet-4.6",
-      "source": {
-        "type": "llm_review",
-        "alignment": "generated"
-      }
-    },
-    {
-      "file": "crates/bashkit-python/src/lib.rs",
       "start_line": 1460,
       "end_line": 1460,
       "message": "clear_cancel() stores false with Ordering::Relaxed, while the interpreter's check_cancelled() (interpreter/mod.rs:876) loads the same AtomicBool with Ordering::Relaxed. For cross-thread usage — where one Python thread calls clear_cancel() then releases the GIL, and another thread calls execute_sync() which also releases the GIL and runs on a different OS thread — there is no happens-before guarantee on weakly-ordered architectures (ARM). The store may not be visible before the load. The correct pairing is Ordering::Release on the store and Ordering::Acquire on the load. The same issue exists at line 1975 for BashTool.",
@@ -61,26 +41,6 @@
       "tp_fp_justification": "While technically accurate that Relaxed ordering lacks cross-thread guarantees, the same Ordering::Relaxed pattern is used throughout the pre-existing code including cancel() at line 1443. The intended usage pattern (clear_cancel() called after the cancelled execution finishes) means the task completion through the async Mutex (Acquire/Release) and Python GIL transitions provide implicit happens-before guarantees in practice. This isn't a new issue introduced by clear_cancel() that doesn't already apply to cancel().",
       "severity_justification": "Even if theoretically incorrect, the practical impact is negligible: Python GIL transitions provide OS-level fences, the async mutex provides Acquire/Release barriers, and the documented usage pattern requires task completion before calling clear_cancel().",
       "category_justification": "Memory ordering for atomic operations is a correctness concern about whether a write is guaranteed to be visible to another thread.",
-      "producer": "llm_review:claude-sonnet-4.6",
-      "source": {
-        "type": "llm_review",
-        "alignment": "generated"
-      }
-    },
-    {
-      "file": "crates/bashkit-python/src/lib.rs",
-      "start_line": 1975,
-      "end_line": 1975,
-      "message": "Same Ordering::Relaxed issue as PyBash::clear_cancel. BashTool::clear_cancel stores false with Relaxed, providing no cross-thread visibility guarantee for concurrent execute_sync() calls on weakly-ordered architectures.",
-      "tp_fp": "fp",
-      "severity": "low",
-      "category": "correctness",
-      "scope": "pre-existing",
-      "difficulty": "hard",
-      "context_required": "broader-project-context",
-      "tp_fp_justification": "Duplicate of Finding 3 applied to BashTool. The same Ordering::Relaxed pattern is pre-existing throughout the codebase including cancel() at line 1958, and the practical risk is negligible given Python GIL semantics and mutex-synchronized task completion in the intended usage pattern.",
-      "severity_justification": "Same reasoning as Finding 3 — theoretical concern on weakly-ordered architectures, but Python GIL and async Mutex transitions provide implicit barriers in practice.",
-      "category_justification": "Memory ordering for atomic operations is a correctness concern.",
       "producer": "llm_review:claude-sonnet-4.6",
       "source": {
         "type": "llm_review",
@@ -239,26 +199,6 @@
       "difficulty": "easy",
       "context_required": "diff-only",
       "tp_fp_justification": "This is a documentation preference about example completeness. The example correctly demonstrates the API contract (clear_cancel restores executability after cancel). Docstring examples are conventionally kept minimal and self-contained; the prose description above the example already explains the correct usage pattern and safety note. No concrete defect exists — the example isn't misleading about the API's behavior.",
-      "severity_justification": "Pure documentation preference with no impact on correctness or developer misuse.",
-      "category_justification": "Finding is about the quality of a docstring example.",
-      "producer": "llm_review:gemini-2.5-pro",
-      "source": {
-        "type": "llm_review",
-        "alignment": "generated"
-      }
-    },
-    {
-      "file": "crates/bashkit-python/bashkit/_bashkit.pyi",
-      "start_line": 727,
-      "end_line": 733,
-      "message": "The example code in the docstring for `BashTool.clear_cancel` does not demonstrate the intended use case. It calls `cancel()` and then immediately `clear_cancel()` before any command is executed, which doesn't correctly illustrate recovering from a cancelled in-flight execution. A better example would involve a long-running command, a `cancel()` call from another thread, awaiting the result, and then calling `clear_cancel()`.",
-      "tp_fp": "fp",
-      "severity": "low",
-      "category": "documentation",
-      "scope": "introduced-by-pr",
-      "difficulty": "easy",
-      "context_required": "diff-only",
-      "tp_fp_justification": "Identical to Finding 12 applied to BashTool.clear_cancel. The example correctly demonstrates the API contract; the prose description covers the intended use case and safety note. This is a documentation preference about example completeness, not a concrete defect.",
       "severity_justification": "Pure documentation preference with no impact on correctness or developer misuse.",
       "category_justification": "Finding is about the quality of a docstring example.",
       "producer": "llm_review:gemini-2.5-pro",

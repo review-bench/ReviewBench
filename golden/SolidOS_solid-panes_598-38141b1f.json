@@ -484,26 +484,6 @@
       }
     },
     {
-      "file": "src/social/editProfileDetails.ts",
-      "start_line": 260,
-      "end_line": 265,
-      "message": "`readProfileLinkValues` preserves multiple existing links separated by newlines, but the dialog only displays the first one in a single `url` input. Saving the form deletes all existing statements for the field and re-inserts only this first value, so users can unintentionally lose additional homepage/weblog/workplace/school links without editing them.",
-      "tp_fp": "tp",
-      "severity": "medium",
-      "category": "correctness",
-      "scope": "pre-existing",
-      "difficulty": "medium",
-      "context_required": "diff-plus-related-files",
-      "tp_fp_justification": "Duplicate of Finding 1, already verified. `readProfileLinkValues` joins multiple values with '\\n', the dialog displays only `.split('\\n')[0]`, and save captures only the single input value. `saveProfileLinkValues` then deletes ALL existing statements and inserts only the one — silently dropping any additional URLs.",
-      "severity_justification": "Users with multiple values for a link predicate will silently lose all but the first when they open and save the edit dialog, a real data integrity issue for an edge case.",
-      "category_justification": "The load/save cycle is not symmetric for multi-valued predicates — a logic error that causes silent data loss.",
-      "producer": "ccr:gpt-5.5[ReasoningEffort=medium]",
-      "source": {
-        "type": "ccr",
-        "alignment": "generated"
-      }
-    },
-    {
       "file": "README.md",
       "start_line": 87,
       "end_line": 87,

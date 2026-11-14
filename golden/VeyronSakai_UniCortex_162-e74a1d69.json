@@ -486,26 +486,6 @@
         "type": "ccr",
         "alignment": "generated"
       }
-    },
-    {
-      "file": "Tools~/UniCortex.Core.Test/UseCases/MovieRecordingUseCaseTest.cs",
-      "start_line": 96,
-      "end_line": 100,
-      "message": "The test records to `Path.GetTempPath()` but cleanup searches under `UNICORTEX_PROJECT_PATH`, so the generated `UniCortex_Test_*.mp4` files are never deleted from the temp directory. This can leave large video artifacts behind on every test run.",
-      "tp_fp": "tp",
-      "severity": "low",
-      "category": "testing",
-      "scope": "introduced-by-pr",
-      "difficulty": "medium",
-      "context_required": "diff-only",
-      "tp_fp_justification": "Duplicate of Finding 1, verified against the same code: line 63 writes to Path.GetTempPath() with pattern UniCortex_Test_*.mp4, but DeleteRecordingFiles (lines 94-104) scans UNICORTEX_PROJECT_PATH for that pattern. The paths never match so cleanup never runs.",
-      "severity_justification": "Recordings accumulate in the system temp directory across test runs causing disk space leakage, but tests still pass and no data is corrupted. Impact is bounded to CI/dev environments.",
-      "category_justification": "Test cleanup helper targets the wrong directory, leaving video artifacts behind after each test run.",
-      "producer": "ccr:gpt-5.5[ReasoningEffort=medium]",
-      "source": {
-        "type": "ccr",
-        "alignment": "generated"
-      }
     }
   ]
 }

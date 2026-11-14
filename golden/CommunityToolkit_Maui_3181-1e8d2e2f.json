@@ -388,26 +388,6 @@
       }
     },
     {
-      "file": "samples/CommunityToolkit.Maui.Sample/Pages/Views/MediaElement/MediaElementFromStreamPage.xaml.cs",
-      "start_line": 318,
-      "end_line": 320,
-      "message": "The `ChangeAspectClicked` method uses unchecked `Enum.TryParse`. This could cause unexpected operations if unanticipated or invalid inputs are made.",
-      "tp_fp": "fp",
-      "severity": "low",
-      "category": "correctness",
-      "scope": "introduced-by-pr",
-      "difficulty": "easy",
-      "context_required": "diff-only",
-      "tp_fp_justification": "The finding mischaracterizes Enum.TryParse as 'unchecked' — TryParse is precisely the safe, checked alternative to Enum.Parse. It returns false on failure, which the code handles by showing an error dialog and returning. The inputs come from a fixed DisplayActionSheet with only known-valid enum names. This is identical to Finding 19 and the same method in the pre-existing MediaElementPage.",
-      "severity_justification": "Enum.TryParse cannot produce unexpected behavior from invalid input — that is its entire purpose. No unhandled exception path exists.",
-      "category_justification": "The finding incorrectly characterizes Enum.TryParse as unsafe or unchecked.",
-      "producer": "llm_review:gpt-4o",
-      "source": {
-        "type": "llm_review",
-        "alignment": "generated"
-      }
-    },
-    {
       "file": "samples/CommunityToolkit.Maui.Sample/CommunityToolkit.Maui.Sample.csproj",
       "start_line": 90,
       "end_line": 90,

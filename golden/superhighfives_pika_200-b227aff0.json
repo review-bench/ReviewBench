@@ -406,26 +406,6 @@
         "type": "ccr",
         "alignment": "generated"
       }
-    },
-    {
-      "file": "Pika/Services/Exporter.swift",
-      "start_line": 1,
-      "end_line": 1,
-      "message": "`Defaults` is imported but not used anywhere in this file. Remove the unused import to keep dependencies clear and avoid lint/compiler warnings in stricter configurations.",
-      "tp_fp": "tp",
-      "severity": "low",
-      "category": "maintainability",
-      "scope": "introduced-by-pr",
-      "difficulty": "easy",
-      "context_required": "diff-plus-related-files",
-      "tp_fp_justification": "Identical to Finding 1 — already verified. The base commit (bdda75c) had only `import Foundation` in Exporter.swift. This PR added `import Defaults` but none of the methods in the file reference any Defaults APIs. The unused import is confirmed at this SHA.",
-      "severity_justification": "Unused imports are harmless but constitute dead code and unnecessary coupling. No runtime impact.",
-      "category_justification": "Unused import is a code cleanliness issue with no functional impact.",
-      "producer": "ccr:gpt-5.5[ReasoningEffort=medium]",
-      "source": {
-        "type": "ccr",
-        "alignment": "generated"
-      }
     }
   ]
 }
