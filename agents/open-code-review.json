@@ -1,0 +1,34 @@
+{
+  "name": "open-code-review",
+  "display_name": "Open Code Review",
+  "image": "ghcr.io/lizhengfeng101/open-code-review-reviewbench@sha256:9a3393d93a9036f1b0cfde16a36a170f3ec3f3e440cd6b0221e9c195e51b2630",
+  "image_visibility": "public",
+  "configuration": [
+    {
+      "key": "model",
+      "value": "qwen3.8-flash"
+    },
+    {
+      "key": "protocol",
+      "value": "openai"
+    },
+    {
+      "key": "concurrency",
+      "value": "8"
+    }
+  ],
+  "secrets": {
+    "env": [
+      "OCR_API_KEY"
+    ]
+  },
+  "model_api_url": "https://dashscope.aliyuncs.com/compatible-mode/v1",
+  "pr_timeout_seconds": 3600,
+  "contacts": [
+    "lizhengfeng101"
+  ],
+  "provider": "Open Code Review",
+  "egress": [
+    "dashscope.aliyuncs.com"
+  ]
+}
