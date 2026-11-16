@@ -328,26 +328,6 @@
       }
     },
     {
-      "file": "server/src/dialogue/executor.ts",
-      "start_line": 55,
-      "end_line": 57,
-      "message": "In `takeItem`, there is no validation if the agent's inventory does not exist, and failures return false. This could lead to unclear error handling logic depending on the caller's behavior.",
-      "tp_fp": "fp",
-      "severity": "low",
-      "category": "correctness",
-      "scope": "introduced-by-pr",
-      "difficulty": "easy",
-      "context_required": "diff-plus-related-files",
-      "tp_fp_justification": "Same as finding 16: Agent.inventory is always initialized via emptyResourceStore() in the constructor, so 'inventory does not exist' is impossible. In production, takeItem calls resolveAgentRef (throws for unknown refs) then Agent.removeFromInventory which checks inventory[resource] < amount and returns false for insufficient funds — this is intentional short-circuit behavior documented in the executor. The false return is a designed transaction-failure signal, not an error masking issue.",
-      "severity_justification": "The described failure mode does not exist in the production code path. Returning false on insufficient funds is intentional behavior.",
-      "category_justification": "The finding makes an incorrect claim about a validation gap that does not exist given the Agent class invariants.",
-      "producer": "llm_review:gpt-4o",
-      "source": {
-        "type": "llm_review",
-        "alignment": "generated"
-      }
-    },
-    {
       "file": "server/src/dialogue/dialogue-engine.ts",
       "start_line": 83,
       "end_line": 90,
@@ -504,26 +484,6 @@
       "severity_justification": "The practical risk of double-fired effects is near-zero due to how the other public methods are structured. The concern is primarily about API hygiene: a getter with documented side effects is an unusual contract but not a likely source of real bugs given current usage patterns.",
       "category_justification": "The core issue is API contract design — a method named `getState` that has side effects on first call for action-node roots, which violates reader expectations of a getter even though the behavior is documented in JSDoc.",
       "producer": "ccr:claude-opus-4.7[ReasoningEffort=medium]",
-      "source": {
-        "type": "ccr",
-        "alignment": "generated"
-      }
-    },
-    {
-      "file": "server/src/simulation/scenario-loader.ts",
-      "start_line": 15,
-      "end_line": 16,
-      "message": "`loadScenario` creates and returns a `TriggerRegistry` but never attaches it to `state.triggerRegistry`, while `processTick` only evaluates triggers from `state.triggerRegistry`. Since this function otherwise mutates the provided state when spawning NPCs, callers that simply load a scenario will get no Phase 8 trigger execution unless they remember an extra assignment.",
-      "tp_fp": "tp",
-      "severity": "medium",
-      "category": "correctness",
-      "scope": "introduced-by-pr",
-      "difficulty": "easy",
-      "context_required": "diff-plus-related-files",
-      "tp_fp_justification": "Identical issue to Finding 2, already verified: `loadScenario` never assigns the created `TriggerRegistry` to `state.triggerRegistry`, so phase 8 trigger evaluation is silently skipped unless the caller manually wires the result. The code in `scenario-loader.ts:15-51` and `tick.ts:161` confirms this.",
-      "severity_justification": "Same as Finding 2: the trigger system will be silently inert in any production context where the caller doesn't manually wire the result. No error, no warning, just no triggers firing.",
-      "category_justification": "Incomplete wiring causes the trigger evaluation system to be silently non-functional unless the caller performs an extra manual step.",
-      "producer": "ccr:gpt-5.5[ReasoningEffort=medium]",
       "source": {
         "type": "ccr",
         "alignment": "generated"

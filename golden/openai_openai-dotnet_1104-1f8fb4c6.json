@@ -49,26 +49,6 @@
     },
     {
       "file": "src/Custom/Responses/ResponsesClient.cs",
-      "start_line": 68,
-      "end_line": 68,
-      "message": "Breaking API change: same as above for ResponsesClient(AuthenticationPolicy authenticationPolicy, ResponsesClientOptions options) — previously took OpenAIClientOptions. No compat overload provided.",
-      "tp_fp": "fp",
-      "severity": "medium",
-      "category": "api-architecture",
-      "scope": "introduced-by-pr",
-      "difficulty": "medium",
-      "context_required": "diff-plus-related-files",
-      "tp_fp_justification": "Same as Finding 2: the entire ResponsesClient class is [Experimental(\"OPENAI001\")], which is the contractual signal in this codebase that the API is unstable and subject to breaking changes. No backward-compat overload is required for intentionally changed experimental APIs.",
-      "severity_justification": "If not for the [Experimental] attribute this would be a significant breaking change, but the attribute covers it contractually.",
-      "category_justification": "Concerns a public constructor signature change and backward compatibility.",
-      "producer": "llm_review:claude-sonnet-4.6",
-      "source": {
-        "type": "llm_review",
-        "alignment": "generated"
-      }
-    },
-    {
-      "file": "src/Custom/Responses/ResponsesClient.cs",
       "start_line": 86,
       "end_line": 86,
       "message": "Breaking API change: the protected internal ResponsesClient(ClientPipeline pipeline, ResponsesClientOptions options) constructor previously accepted OpenAIClientOptions. Subclasses that override or call this constructor chain will fail to compile without changes, with no migration path provided.",

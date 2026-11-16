@@ -512,26 +512,6 @@
       }
     },
     {
-      "file": "ldn/classify.py",
-      "start_line": 844,
-      "end_line": 849,
-      "message": "This existing-output check now raises `LdnError` instead of exiting successfully, so rerunning classification without `--overwrite` fails the whole batch rather than treating the existing STAC item as an idempotent skip.",
-      "tp_fp": "tp",
-      "severity": "medium",
-      "category": "correctness",
-      "scope": "introduced-by-pr",
-      "difficulty": "easy",
-      "context_required": "diff-only",
-      "tp_fp_justification": "Duplicate of Finding 2 — same code location (classify.py ~line 843-849), same behavioral change from `raise typer.Exit()` to `raise LdnError(...)` for the 'item already exists' path. Already verified: LdnError propagates as an unhandled exception causing non-zero exit, breaking idempotent batch runs.",
-      "severity_justification": "Same as Finding 2: breaks idempotent re-runs of ldn classify for already-processed tiles.",
-      "category_justification": "Semantics changed from success/skip to error for a valid no-op case.",
-      "producer": "ccr:gpt-5.5[ReasoningEffort=medium]",
-      "source": {
-        "type": "ccr",
-        "alignment": "generated"
-      }
-    },
-    {
       "file": "ldn/grids.py",
       "start_line": 112,
       "end_line": 118,
@@ -692,26 +672,6 @@
       }
     },
     {
-      "file": "ldn/typology_mapping.yaml",
-      "start_line": 20,
-      "end_line": 36,
-      "message": "These `rgb(...)` color values have the same compatibility issue as the earlier entries: they are loaded into `ldn.typology.colors` and passed to Matplotlib `ListedColormap`/`Patch` call sites, where CSS functional color strings are not valid. Use a Matplotlib-compatible representation consistently for all class colors.",
-      "tp_fp": "tp",
-      "severity": "medium",
-      "category": "correctness",
-      "scope": "introduced-by-pr",
-      "difficulty": "medium",
-      "context_required": "diff-plus-related-files",
-      "tp_fp_justification": "Duplicate of Finding 4 — same file, same rgb(...) CSS color format issue affecting all level1_classes entries. Already verified that matplotlib 3.10.x rejects rgb(...) strings. All color values in typology_mapping.yaml flow through typology.py into ListedColormap usage in Compare_LULC_func.py.",
-      "severity_justification": "Same as Finding 4: causes ValueError in matplotlib when visualizations are rendered using the standard colormap.",
-      "category_justification": "CSS rgb() color format is incompatible with matplotlib's color parsing, causing runtime errors in visualization code.",
-      "producer": "ccr:gpt-5.5[ReasoningEffort=medium]",
-      "source": {
-        "type": "ccr",
-        "alignment": "generated"
-      }
-    },
-    {
       "file": "visualisation/app.py",
       "start_line": 8,
       "end_line": 8,
@@ -725,26 +685,6 @@
       "tp_fp_justification": "While the typo 'visability' (should be 'visibility') is factually present and was introduced by this PR, it is a spelling error in a TODO comment with no functional impact. This is sub-threshold — a cosmetic suggestion on a developer-facing comment that has negligible impact.",
       "severity_justification": "Spelling error in a TODO comment only; no functional, API, or runtime impact.",
       "category_justification": "Typo in a comment/documentation string.",
-      "producer": "ccr:gpt-5.5[ReasoningEffort=medium]",
-      "source": {
-        "type": "ccr",
-        "alignment": "generated"
-      }
-    },
-    {
-      "file": "ldn/classify.py",
-      "start_line": 786,
-      "end_line": 789,
-      "message": "This log message is missing the `f` prefix, so it will emit the literal `{GEOMAD_VERSION}` and `{version_geomad}` placeholders instead of the actual values. That makes version override diagnostics misleading when troubleshooting runs.",
-      "tp_fp": "tp",
-      "severity": "low",
-      "category": "maintainability",
-      "scope": "introduced-by-pr",
-      "difficulty": "easy",
-      "context_required": "diff-only",
-      "tp_fp_justification": "Duplicate of Finding 1 — same code at classify.py lines 787-789. Already verified: logger.info('Overriding the latest GeoMAD version ({GEOMAD_VERSION}) with the specified version ({version_geomad}).') is missing the f prefix, causing literal placeholder output in logs.",
-      "severity_justification": "Logging-only issue; misleading debug output but no impact on processing logic.",
-      "category_justification": "Missing f-string prefix produces incorrect log output, violating the project's explicit coding convention.",
       "producer": "ccr:gpt-5.5[ReasoningEffort=medium]",
       "source": {
         "type": "ccr",

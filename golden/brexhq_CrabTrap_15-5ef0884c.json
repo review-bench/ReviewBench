@@ -412,30 +412,6 @@
       }
     },
     {
-      "file": "internal/admin/api.go",
-      "start_line": 340,
-      "end_line": 340,
-      "message": "rather than doing this, I'll just always query `limit+1`, removing one from the entries when returning to the UI and this will be len(entries) > limit, avoids slow total query and prevents one postgres",
-      "tp_fp": "tp",
-      "severity": "medium",
-      "category": "performance",
-      "scope": "introduced-by-pr",
-      "difficulty": "easy",
-      "context_required": "diff-only",
-      "tp_fp_justification": "The limit+1 approach was literally in the original PR diff before being replaced with Count. The suggestion is code-specific, actionable, and eliminates both the expensive COUNT(*) and the TOCTOU race between Count and QuerySummaries in a single change.",
-      "severity_justification": "Same as Finding 20: COUNT(*) on an unbounded audit log will degrade to a full-table scan at scale, making the audit UI non-functional. The limit+1 fix is a direct, low-cost remedy.",
-      "category_justification": "The finding is about replacing an expensive database query with a more efficient single-query pattern.",
-      "producer": "human_review",
-      "source": {
-        "type": "review_comment",
-        "author": "bjhaid",
-        "url": "https://github.com/brexhq/CrabTrap/pull/15#discussion_r3161419119",
-        "created_at": "2026-04-29T13:39:03Z",
-        "alignment": "on_chosen_head",
-        "original_commit": "5ef0884c59b3ee1d5a986dd02686a8232570c80f"
-      }
-    },
-    {
       "file": "web/src/components/AuditTrail.tsx",
       "start_line": 113,
       "end_line": 113,

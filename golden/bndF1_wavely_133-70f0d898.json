@@ -568,46 +568,6 @@
       }
     },
     {
-      "file": "src/app/features/search/search.page.html",
-      "start_line": 63,
-      "end_line": 67,
-      "message": "This projected \"Search all regions\" link is never rendered because `wavely-empty-state` does not include an `<ng-content>` slot in its template. As a result, users who get no regional results cannot access the intended global-search fallback from this empty state.",
-      "tp_fp": "tp",
-      "severity": "medium",
-      "category": "correctness",
-      "scope": "pre-existing",
-      "difficulty": "medium",
-      "context_required": "diff-plus-related-files",
-      "tp_fp_justification": "Duplicate of Finding 1 — already verified: EmptyStateComponent template has no <ng-content> slot, and search.page.html projects a <p class=\"global-search-hint\"> with the 'Search all regions' button into <wavely-empty-state>. The projected content is silently dropped by Angular.",
-      "severity_justification": "Users who search in their region and get zero results will not see the 'Search all regions' button that is the intended contextual fallback for this exact scenario, reducing discoverability of global search.",
-      "category_justification": "Missing <ng-content> causes projected DOM content to be silently discarded, breaking the intended UI feature.",
-      "producer": "ccr:gpt-5.5[ReasoningEffort=medium]",
-      "source": {
-        "type": "ccr",
-        "alignment": "generated"
-      }
-    },
-    {
-      "file": "src/app/core/services/search-history.service.ts",
-      "start_line": 5,
-      "end_line": 6,
-      "message": "The new search history store caps persisted entries at 8, but the linked issue's acceptance criteria require storing up to 10 items while showing the last 8 suggestions. This will evict two valid recent searches earlier than specified.",
-      "tp_fp": "fp",
-      "severity": "low",
-      "category": "documentation",
-      "scope": "pre-existing",
-      "difficulty": "hard",
-      "context_required": "broader-project-context",
-      "tp_fp_justification": "Duplicate of Finding 6. MAX_ITEMS = 8 is consistent with the SDD ('last 8 queries'). The claim that the linked issue requires storing 10 items while showing 8 cannot be verified from the repository — GitHub issue #38 is not accessible.",
-      "severity_justification": "Even if the issue criteria differ, the difference between 8 and 10 stored searches is trivial in user impact.",
-      "category_justification": "The finding is about a potential spec mismatch between implementation and issue acceptance criteria.",
-      "producer": "ccr:gpt-5.5[ReasoningEffort=medium]",
-      "source": {
-        "type": "ccr",
-        "alignment": "generated"
-      }
-    },
-    {
       "file": "src/app/features/library/library.page.ts",
       "start_line": 93,
       "end_line": 98,
@@ -621,26 +581,6 @@
       "tp_fp_justification": "Duplicate of Finding 7. The implementation facts are confirmed (no 'Downloaded' filter, no downloaded state in HistoryEntry), but the claim that the linked issue required a 'Downloaded' filter cannot be verified without accessing GitHub issue #39. Without the issue content being verifiable, this is an unverifiable claim.",
       "severity_justification": "No runtime bug — the filters that are implemented (All/Unplayed/In Progress/Completed) work correctly. The concern is about spec conformance with an unverifiable issue requirement.",
       "category_justification": "The finding is about a mismatch between implementation and alleged acceptance criteria in a GitHub issue.",
-      "producer": "ccr:gpt-5.5[ReasoningEffort=medium]",
-      "source": {
-        "type": "ccr",
-        "alignment": "generated"
-      }
-    },
-    {
-      "file": "src/app/features/browse/browse.page.ts",
-      "start_line": 114,
-      "end_line": 118,
-      "message": "Featured and New & Noteworthy are both populated from the same iTunes top-podcasts API as Top Podcasts. The linked browse requirement calls for Featured from Podcast Index `/recent/feeds` and a distinct New & Noteworthy source, so these sections will duplicate top-chart content rather than showing the intended data.",
-      "tp_fp": "tp",
-      "severity": "medium",
-      "category": "correctness",
-      "scope": "pre-existing",
-      "difficulty": "easy",
-      "context_required": "diff-plus-related-files",
-      "tp_fp_justification": "Duplicate of Finding 8. Already verified: browse.page.ts calls getTrendingPodcasts(25/5/10) in forkJoin, all hitting the same iTunes RSS top-chart URL. The three carousels show overlapping prefixes of the same list. The Podcast Index claim is unverifiable but the duplicate-content issue is independently confirmed.",
-      "severity_justification": "All three browse carousels display the same leading podcasts from the iTunes top chart, making Featured and New & Noteworthy sections redundant with Top Podcasts and providing no additional content discovery value.",
-      "category_justification": "The three sections are intended to surface distinct content but use identical queries producing overlapping results.",
       "producer": "ccr:gpt-5.5[ReasoningEffort=medium]",
       "source": {
         "type": "ccr",
@@ -781,26 +721,6 @@
       "tp_fp_justification": "Verified: README line 35 lists 'Google Sign-In + email/password' as a shipped (✅) feature. AuthService only has signInWithGoogle() using GoogleAuthProvider/signInWithPopup — no email/password methods exist. No EmailAuthProvider, signInWithEmailAndPassword, or createUserWithEmailAndPassword appears anywhere in the source code. The README overstates available authentication methods.",
       "severity_justification": "This is a documentation inaccuracy in the README. No functional code is broken; users just won't find the advertised email/password option. Low impact since the app is pre-MVP alpha.",
       "category_justification": "The finding is about README marketing copy incorrectly claiming a feature (email/password auth) that doesn't exist in the codebase.",
-      "producer": "ccr:gpt-5.5[ReasoningEffort=medium]",
-      "source": {
-        "type": "ccr",
-        "alignment": "generated"
-      }
-    },
-    {
-      "file": "SDD.md",
-      "start_line": 869,
-      "end_line": 872,
-      "message": "This limitation entry says push notifications are planned for v1.2.0, but the same document now marks v1.2.0 as shipped and lists push notifications under the v1.3.0 Native Platform milestone. The planned version should be updated for consistency.",
-      "tp_fp": "tp",
-      "severity": "low",
-      "category": "documentation",
-      "scope": "introduced-by-pr",
-      "difficulty": "easy",
-      "context_required": "diff-only",
-      "tp_fp_justification": "Duplicate of Finding 3. Already verified: SDD.md Known Limitations table says 'v1.2.0 milestone' for push notifications, but section 19 marks v1.2.0 as shipped and section 20 explicitly lists push notifications (#41) under v1.3.0 Native Platform. The inconsistency is confirmed.",
-      "severity_justification": "Documentation-only inconsistency within the SDD with no runtime impact.",
-      "category_justification": "Stale milestone reference in the Known Limitations table contradicts the same document's milestone sections.",
       "producer": "ccr:gpt-5.5[ReasoningEffort=medium]",
       "source": {
         "type": "ccr",

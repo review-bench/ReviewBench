@@ -386,26 +386,6 @@
         "type": "ccr",
         "alignment": "generated"
       }
-    },
-    {
-      "file": "actuator_control/robstride.py",
-      "start_line": 339,
-      "end_line": 343,
-      "message": "When `clear_fault=True`, the cached fault is removed before the disable/clear command is acknowledged. If `transmit()` or the following `receive_status_frame()` fails or times out, callers lose the last known fault status even though the actuator may not have cleared it; clear the local cache only after a successful response confirms the clear operation.",
-      "tp_fp": "tp",
-      "severity": "low",
-      "category": "correctness",
-      "scope": "introduced-by-pr",
-      "difficulty": "medium",
-      "context_required": "diff-only",
-      "tp_fp_justification": "Identical to Finding 2 — confirmed that `clear_fault_status(motor)` is called before `transmit` at lines 339–343. If `transmit` or `receive_status_frame` raises, the local cache has been cleared even though the actuator may not have processed the clear command. The finding is factually correct and non-trivial.",
-      "severity_justification": "Same as Finding 2: transmit failure is an uncommon path, and the motor's actual hardware fault state is unaffected. The diagnostic information loss is unfortunate but not safety-critical in most use cases.",
-      "category_justification": "A logic ordering bug where state mutation (cache clear) precedes the operation it's meant to accompany, leaving state inconsistent on failure.",
-      "producer": "ccr:gpt-5.5[ReasoningEffort=medium]",
-      "source": {
-        "type": "ccr",
-        "alignment": "generated"
-      }
     }
   ]
 }

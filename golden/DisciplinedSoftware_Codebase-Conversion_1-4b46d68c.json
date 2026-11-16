@@ -954,26 +954,6 @@
       }
     },
     {
-      "file": "fortran_to_rust/benchmarker.py",
-      "start_line": 183,
-      "end_line": 186,
-      "message": "The Rust benchmark never calls the converted function; it only black-boxes an input array. The reported Rust timing therefore measures loop/black_box overhead rather than conversion performance, so the speedup in the report is misleading.",
-      "tp_fp": "tp",
-      "severity": "medium",
-      "category": "correctness",
-      "scope": "introduced-by-pr",
-      "difficulty": "easy",
-      "context_required": "diff-only",
-      "tp_fp_justification": "Duplicate of Finding 1 — verified the same _RUST_BENCH_TEMPLATE code where the actual function call is commented out and only std::hint::black_box(&{first_array}) runs in the timed loop. The reported Rust timing and speedup are meaningless.",
-      "severity_justification": "Same as Finding 1: the benchmark produces and displays misleading speedup numbers that don't reflect actual converted function performance.",
-      "category_justification": "The benchmark reports incorrect timing data because the converted function is never called in the measurement loop.",
-      "producer": "ccr:gpt-5.5[ReasoningEffort=medium]",
-      "source": {
-        "type": "ccr",
-        "alignment": "generated"
-      }
-    },
-    {
       "file": "fortran_to_rust/fetcher.py",
       "start_line": 40,
       "end_line": 42,
@@ -1087,26 +1067,6 @@
       "tp_fp_justification": "Verified: _build_unsafe_rust and _direct_fortran_to_rust both map non-array DP scalars to by-value f64 parameters. DROTG modifies all 4 scalar args in-place (DA, DB, C, S), but the generated Rust signature has them as by-value f64, making correct implementation impossible without changing the signature.",
       "severity_justification": "The generated signatures for scalar-output routines like DROTG are semantically wrong and cannot be corrected by filling in the TODO body — the function signature itself must change, requiring manual intervention beyond just implementing the body.",
       "category_justification": "The hybrid strategy generates incorrect Rust function signatures for Fortran routines that return results through scalar arguments.",
-      "producer": "ccr:gpt-5.5[ReasoningEffort=medium]",
-      "source": {
-        "type": "ccr",
-        "alignment": "generated"
-      }
-    },
-    {
-      "file": "fortran_to_rust/strategies/hybrid.py",
-      "start_line": 302,
-      "end_line": 309,
-      "message": "The direct fallback has the same by-value scalar mapping, so routines that return values through scalar arguments cannot be represented correctly. This affects BLAS routines like `DROTG`/`DROTMG`, where real scalar arguments are outputs and need mutable reference semantics.",
-      "tp_fp": "tp",
-      "severity": "medium",
-      "category": "correctness",
-      "scope": "introduced-by-pr",
-      "difficulty": "easy",
-      "context_required": "diff-only",
-      "tp_fp_justification": "Verified: _direct_fortran_to_rust at lines 298-310 has the identical by-value scalar mapping (is_real and not is_array -> f64, is_integer and not is_array -> i32) as _build_unsafe_rust. The same DROTG/DROTMG scalar output problem applies. This is a duplicate of Finding 15 pointing to the parallel code path.",
-      "severity_justification": "Same impact as Finding 15: output scalar arguments cannot be represented, making the generated signatures wrong for DROTG/DROTMG regardless of how the body is filled in.",
-      "category_justification": "The direct fallback path generates incorrect Rust signatures for routines that return values through scalar arguments.",
       "producer": "ccr:gpt-5.5[ReasoningEffort=medium]",
       "source": {
         "type": "ccr",

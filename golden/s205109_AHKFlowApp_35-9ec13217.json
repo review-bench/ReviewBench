@@ -288,66 +288,6 @@
       }
     },
     {
-      "file": "docs/superpowers/plans/2026-04-07-database-foundation-ef-core.md",
-      "start_line": 106,
-      "end_line": 106,
-      "message": "This snippet calls the old synchronous helper. To stay consistent with the async implementation and the paragraph above, the example should await the async helper instead of showing `CreateMigratedContext(...)`.",
-      "tp_fp": "tp",
-      "severity": "low",
-      "category": "documentation",
-      "scope": "introduced-by-pr",
-      "difficulty": "easy",
-      "context_required": "diff-only",
-      "tp_fp_justification": "Verified at line 106: the plan doc's snippet calls `CreateMigratedContext(...)` (no await) for `readContext` in the Assert block, again with `await using`, within an async test — same inconsistency as findings 2 and 3. The actual implementation uses `await CreateMigratedContextAsync(...)` at the equivalent location.",
-      "severity_justification": "Same as findings 2 and 3 — stale example code in a historical plan document. Negligible functional risk, but the example is internally inconsistent (await using without awaiting the factory call).",
-      "category_justification": "Stale code example in a plan doc, yet another call site within the same snippet that should use the async helper.",
-      "producer": "ccr:gpt-5.5[ReasoningEffort=medium]",
-      "source": {
-        "type": "ccr",
-        "alignment": "generated"
-      }
-    },
-    {
-      "file": "docs/superpowers/plans/2026-04-07-database-foundation-ef-core.md",
-      "start_line": 116,
-      "end_line": 116,
-      "message": "This snippet calls the old synchronous helper. To stay consistent with the async implementation and the paragraph above, the example should await the async helper instead of showing `CreateMigratedContext(...)`.",
-      "tp_fp": "tp",
-      "severity": "low",
-      "category": "documentation",
-      "scope": "introduced-by-pr",
-      "difficulty": "easy",
-      "context_required": "diff-only",
-      "tp_fp_justification": "Verified at line 116: the plan doc's `Add_TestMessage_PersistsCreatedAt` snippet calls `CreateMigratedContext(...)` (no await) with `await using context`, same inconsistency as the prior findings. The actual TestMessageTests.cs uses `await CreateMigratedContextAsync(...)` at this equivalent location.",
-      "severity_justification": "Same as findings 2–4: stale example code in a historical plan document. The internally inconsistent `await using` + non-awaited factory is the same pattern repeated across all call sites in the snippet.",
-      "category_justification": "Another stale call site in the same plan doc code example — same root cause as findings 2, 3, and 4.",
-      "producer": "ccr:gpt-5.5[ReasoningEffort=medium]",
-      "source": {
-        "type": "ccr",
-        "alignment": "generated"
-      }
-    },
-    {
-      "file": "docs/superpowers/plans/2026-04-07-database-foundation-ef-core.md",
-      "start_line": 125,
-      "end_line": 125,
-      "message": "This snippet calls the old synchronous helper. To stay consistent with the async implementation and the paragraph above, the example should await the async helper instead of showing `CreateMigratedContext(...)`.",
-      "tp_fp": "tp",
-      "severity": "low",
-      "category": "documentation",
-      "scope": "introduced-by-pr",
-      "difficulty": "easy",
-      "context_required": "diff-only",
-      "tp_fp_justification": "Verified at line 125: the plan doc's `Add_TestMessage_PersistsCreatedAt` Assert block calls `CreateMigratedContext(...)` (no await) with `await using readContext`, same inconsistency as findings 2–5. The actual TestMessageTests.cs uses `await CreateMigratedContextAsync(...)` at this equivalent location.",
-      "severity_justification": "Same as findings 2–5: stale example code in a historical plan document with internally inconsistent `await using` + non-awaited factory call. No production impact.",
-      "category_justification": "Another stale call site in the same plan doc code example — same root cause as findings 2–5, completing all four call sites in the snippet.",
-      "producer": "ccr:gpt-5.5[ReasoningEffort=medium]",
-      "source": {
-        "type": "ccr",
-        "alignment": "generated"
-      }
-    },
-    {
       "file": "docs/superpowers/specs/2026-04-08-api-health-checks-problem-details-design.md",
       "start_line": 272,
       "end_line": 272,

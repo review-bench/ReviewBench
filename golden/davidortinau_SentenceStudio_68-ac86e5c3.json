@@ -448,26 +448,6 @@
       }
     },
     {
-      "file": ".squad/agents/jayne/history.md",
-      "start_line": 21,
-      "end_line": 23,
-      "message": "These three learnings duplicate lines 18-20 exactly, which makes the agent history noisier without adding information.",
-      "tp_fp": "tp",
-      "severity": "low",
-      "category": "documentation",
-      "scope": "pre-existing",
-      "difficulty": "easy",
-      "context_required": "diff-only",
-      "tp_fp_justification": "Verified in the file: the three entries ('It compiles is NOT sufficient', 'Must call CacheService.InvalidateVocabSummary()', 'Playwright must use pressSequentially') at lines 18-20 are exactly duplicated at lines 21-23. Same issue as Finding 1, evaluated independently on its own merit.",
-      "severity_justification": "Purely a documentation duplication in an internal agent history file with no impact on code behavior.",
-      "category_justification": "The finding is about duplicate entries in a markdown history/notes file used by an AI agent.",
-      "producer": "ccr:gpt-5.5[ReasoningEffort=medium]",
-      "source": {
-        "type": "ccr",
-        "alignment": "generated"
-      }
-    },
-    {
       "file": ".squad/agents/zoe/history.md",
       "start_line": 37,
       "end_line": 40,

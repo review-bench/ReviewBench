@@ -568,32 +568,6 @@
       }
     },
     {
-      "file": "aws_dynamo_db_authentication/README.md",
-      "start_line": 82,
-      "end_line": 82,
-      "message": "```suggestion\r\n- `aws_dynamodb_parallel_scan.get_paginator()`\r\n```",
-      "tp_fp": "fp",
-      "severity": "low",
-      "category": "documentation",
-      "scope": "pre-existing",
-      "difficulty": "easy",
-      "context_required": "diff-only",
-      "tp_fp_justification": "Identical to Finding 21: same file (aws_dynamo_db_authentication/README.md), same line (82), same suggestion. The content already matches the suggestion at the current SHA — the PR already applied this fix.",
-      "severity_justification": "No change needed; the suggested content is already present.",
-      "category_justification": "The concern is about a malformed code reference in README documentation.",
-      "producer": "human_review",
-      "source": {
-        "type": "review_comment",
-        "author": "fivetran-JenasVimal",
-        "url": "https://github.com/fivetran/fivetran_csdk_connectors/pull/6#discussion_r3050781828",
-        "created_at": "2026-04-08T10:40:24Z",
-        "alignment": "code_changed",
-        "original_commit": "d1872d5509dea12959129a2a15eeeadc22a70948",
-        "original_start_line": 82,
-        "original_end_line": 82
-      }
-    },
-    {
       "file": "couchbase_magma/README.md",
       "start_line": 42,
       "end_line": 47,
@@ -721,84 +695,6 @@
         "original_commit": "7fd03f9de8fa767d3130548597f649e0811c30b1",
         "original_start_line": 43,
         "original_end_line": 47
-      }
-    },
-    {
-      "file": "documentdb/README.md",
-      "start_line": 159,
-      "end_line": 161,
-      "message": "```suggestion\r\n  \"_id\": ObjectId(\"...\"),\r\n  \"created_at\": ISODate(\"2023-01-01T00:00:00Z\"),\r\n  \"updated_at\": ISODate(\"2023-01-01T00:00:00Z\"),\r\n```",
-      "tp_fp": "fp",
-      "severity": "low",
-      "category": "documentation",
-      "scope": "pre-existing",
-      "difficulty": "easy",
-      "context_required": "diff-only",
-      "tp_fp_justification": "Identical to Finding 22: same file (documentdb/README.md), same lines (159–161), same suggestion. Already verified that lines 159–161 match the suggestion exactly at the current SHA.",
-      "severity_justification": "No change needed; the suggested content is already present.",
-      "category_justification": "The finding references README code example content.",
-      "producer": "human_review",
-      "source": {
-        "type": "review_comment",
-        "author": "fivetran-JenasVimal",
-        "url": "https://github.com/fivetran/fivetran_csdk_connectors/pull/6#discussion_r3051403216",
-        "created_at": "2026-04-08T12:47:14Z",
-        "alignment": "code_changed",
-        "original_commit": "a601be9d14dd783a8efdf15b9e173ce6884f03db",
-        "original_start_line": 159,
-        "original_end_line": 161
-      }
-    },
-    {
-      "file": "gnews/README.md",
-      "start_line": 67,
-      "end_line": 67,
-      "message": "```suggestion\r\n- Upserts: Each record is written via `op.upsert(...)` to `news_stories`.\r\n```",
-      "tp_fp": "fp",
-      "severity": "low",
-      "category": "documentation",
-      "scope": "pre-existing",
-      "difficulty": "easy",
-      "context_required": "diff-only",
-      "tp_fp_justification": "Identical to Finding 24: same file (gnews/README.md), same line (67), same suggestion. Already verified that line 67 matches the suggestion exactly at the current SHA.",
-      "severity_justification": "No change needed; the suggested content is already present.",
-      "category_justification": "The finding references README prose content.",
-      "producer": "human_review",
-      "source": {
-        "type": "review_comment",
-        "author": "fivetran-JenasVimal",
-        "url": "https://github.com/fivetran/fivetran_csdk_connectors/pull/6#discussion_r3051450795",
-        "created_at": "2026-04-08T12:55:48Z",
-        "alignment": "code_changed",
-        "original_commit": "82d869aa9fdb82e29b9f424556ce1dfb60a14c37",
-        "original_start_line": 67,
-        "original_end_line": 67
-      }
-    },
-    {
-      "file": "gnews/README.md",
-      "start_line": 81,
-      "end_line": 81,
-      "message": "```suggestion\r\nThe connector creates the `news_stories` table.\r\n```",
-      "tp_fp": "fp",
-      "severity": "low",
-      "category": "documentation",
-      "scope": "pre-existing",
-      "difficulty": "easy",
-      "context_required": "diff-only",
-      "tp_fp_justification": "Identical to Finding 25: same file (gnews/README.md), same line (81), same suggestion. Already verified that line 81 matches the suggestion exactly at the current SHA.",
-      "severity_justification": "No change needed; the suggested content is already present.",
-      "category_justification": "The finding references README prose content.",
-      "producer": "human_review",
-      "source": {
-        "type": "review_comment",
-        "author": "fivetran-JenasVimal",
-        "url": "https://github.com/fivetran/fivetran_csdk_connectors/pull/6#discussion_r3051453821",
-        "created_at": "2026-04-08T12:56:22Z",
-        "alignment": "code_changed",
-        "original_commit": "82d869aa9fdb82e29b9f424556ce1dfb60a14c37",
-        "original_start_line": 81,
-        "original_end_line": 81
       }
     },
     {

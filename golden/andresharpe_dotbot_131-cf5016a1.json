@@ -248,26 +248,6 @@
       }
     },
     {
-      "file": "workflows/default/systems/ui/static/modules/product.js",
-      "start_line": 92,
-      "end_line": 123,
-      "message": "The 'showBinaryPlaceholder' function does not validate or sanitize filenames beyond escaping. Using filenames directly in JavaScript or HTML contexts presents a risk if filenames originate from untrusted sources.",
-      "tp_fp": "fp",
-      "severity": "low",
-      "category": "security",
-      "scope": "introduced-by-pr",
-      "difficulty": "easy",
-      "context_required": "diff-only",
-      "tp_fp_justification": "This is a near-duplicate of finding 12 and is equally incorrect. doc.filename is passed through escapeHtml() before HTML interpolation, which is the correct and sufficient mitigation for HTML injection. The finding vaguely asserts risk from 'untrusted sources' without demonstrating any concrete exploit path — escaping is exactly the right defence for embedding user-supplied strings in HTML. This is a generic boilerplate security warning that could be copy-pasted onto any code that handles filenames.",
-      "severity_justification": "No concrete vulnerability exists; escapeHtml() is applied correctly.",
-      "category_justification": "The finding alleges a security risk from unsanitized filenames in HTML/JS contexts.",
-      "producer": "llm_review:gpt-4o",
-      "source": {
-        "type": "llm_review",
-        "alignment": "generated"
-      }
-    },
-    {
       "file": "workflows/default/systems/ui/modules/ProductAPI.psm1",
       "start_line": 39,
       "end_line": 41,
