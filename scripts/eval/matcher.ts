@@ -23,6 +23,7 @@ import {
 
 import type { Finding } from "../lib/types.js";
 import type { RawCorrespondence } from "../lib/match-types.js";
+import { parseJsonAllowingInvalidEscapes } from "../lib/json.js";
 import {
   renderMatcherFinding,
   renderJudgeSystemPrompt,
@@ -102,12 +103,12 @@ interface MatcherResponse {
 
 function extractJson(text: string): unknown | null {
   try {
-    return JSON.parse(text);
+    return parseJsonAllowingInvalidEscapes(text);
   } catch {
     const match = text.match(/\{[\s\S]*\}/);
     if (match) {
       try {
-        return JSON.parse(match[0]);
+        return parseJsonAllowingInvalidEscapes(match[0]);
       } catch {
         return null;
       }

@@ -22,6 +22,7 @@ import {
   SessionManager,
   SettingsManager,
 } from "@earendil-works/pi-coding-agent";
+import { parseJsonAllowingInvalidEscapes } from "../lib/json.js";
 
 import type { ClassificationResult, ClassifierInput } from "./types.js";
 import { toClassifierFinding } from "./types.js";
@@ -328,11 +329,12 @@ export function resolveModel(
 // JSON detection helper
 // ---------------------------------------------------------------------------
 
-function containsJson(text: string): boolean {
+/** Whether `text` holds a JSON object with `tp_fp`, read as `parseClassifierResponse` reads it. */
+export function containsJson(text: string): boolean {
   const match = text.match(/\{[\s\S]*\}/);
   if (!match) return false;
   try {
-    const parsed = JSON.parse(match[0]);
+    const parsed = parseJsonAllowingInvalidEscapes(match[0]);
     return typeof parsed === "object" && parsed !== null && "tp_fp" in parsed;
   } catch {
     return false;
@@ -364,7 +366,7 @@ export function parseClassifierResponse(
 
   let parsed: Record<string, unknown>;
   try {
-    parsed = JSON.parse(cleaned);
+    parsed = parseJsonAllowingInvalidEscapes(cleaned) as Record<string, unknown>;
   } catch (e) {
     throw new Error(
       `Failed to parse classifier response as JSON for comment ${commentId}:\n${raw.slice(0, 1000)}`
