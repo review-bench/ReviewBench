@@ -297,50 +297,6 @@
     },
     {
       "file": "src/webapp/models.ts",
-      "start_line": 619,
-      "end_line": 621,
-      "message": "[javascript.lang.security.audit.detect-non-literal-regexp.detect-non-literal-regexp] RegExp() called with a `id` function argument, this might allow an attacker to cause a Regular Expression Denial-of-Service (ReDoS) within your application as RegExP blocks the main thread. For this reason, it is recommended to use hardcoded regexes instead. If your regex is run on user-controlled input, consider performing input validation or use a regex checking/sanitization library such as https://www.npmjs.com/package/recheck to verify that the regex does not appear vulnerable to ReDoS.",
-      "tp_fp": "fp",
-      "severity": "low",
-      "category": "security",
-      "scope": "pre-existing",
-      "difficulty": "easy",
-      "context_required": "diff-plus-related-files",
-      "tp_fp_justification": "Identical to findings 13 and 14. The id argument is passed through escRx() at line 618 before being embedded in the RegExp at lines 619-621, escaping all regex special characters. This is a generic Semgrep alert that does not account for the escaping already in place.",
-      "severity_justification": "No exploitable ReDoS path — id is always escaped before use.",
-      "category_justification": "The finding is framed as a ReDoS security vulnerability.",
-      "producer": "deterministic_tool:semgrep",
-      "source": {
-        "type": "tool",
-        "alignment": "generated",
-        "tool": "semgrep",
-        "rule_id": "javascript.lang.security.audit.detect-non-literal-regexp.detect-non-literal-regexp"
-      }
-    },
-    {
-      "file": "src/webapp/models.ts",
-      "start_line": 655,
-      "end_line": 657,
-      "message": "[javascript.lang.security.audit.detect-non-literal-regexp.detect-non-literal-regexp] RegExp() called with a `id` function argument, this might allow an attacker to cause a Regular Expression Denial-of-Service (ReDoS) within your application as RegExP blocks the main thread. For this reason, it is recommended to use hardcoded regexes instead. If your regex is run on user-controlled input, consider performing input validation or use a regex checking/sanitization library such as https://www.npmjs.com/package/recheck to verify that the regex does not appear vulnerable to ReDoS.",
-      "tp_fp": "fp",
-      "severity": "low",
-      "category": "security",
-      "scope": "pre-existing",
-      "difficulty": "easy",
-      "context_required": "diff-plus-related-files",
-      "tp_fp_justification": "Identical to findings 13-15. The id argument is passed through escRx() at line 654 before being embedded in the RegExp at lines 655-657, escaping all regex special characters. Generic Semgrep alert that does not account for the escaping already present.",
-      "severity_justification": "No exploitable ReDoS path — id is always escaped before use.",
-      "category_justification": "The finding is framed as a ReDoS security vulnerability.",
-      "producer": "deterministic_tool:semgrep",
-      "source": {
-        "type": "tool",
-        "alignment": "generated",
-        "tool": "semgrep",
-        "rule_id": "javascript.lang.security.audit.detect-non-literal-regexp.detect-non-literal-regexp"
-      }
-    },
-    {
-      "file": "src/webapp/models.ts",
       "start_line": 679,
       "end_line": 681,
       "message": "[javascript.lang.security.audit.detect-non-literal-regexp.detect-non-literal-regexp] RegExp() called with a `id` function argument, this might allow an attacker to cause a Regular Expression Denial-of-Service (ReDoS) within your application as RegExP blocks the main thread. For this reason, it is recommended to use hardcoded regexes instead. If your regex is run on user-controlled input, consider performing input validation or use a regex checking/sanitization library such as https://www.npmjs.com/package/recheck to verify that the regex does not appear vulnerable to ReDoS.",

@@ -1,12 +1,12 @@
 {
-  "name": "ocr",
-  "display_name": "OCR",
-  "image": "ghcr.io/airport233/ocr-reviewbench@sha256:0d45fd59fda191143ae18889809a4eb447a9cf1ed74a6459310c2abcc734d6a1",
+  "name": "open-code-review",
+  "display_name": "Open Code Review",
+  "image": "ghcr.io/lizhengfeng101/open-code-review-reviewbench@sha256:9a3393d93a9036f1b0cfde16a36a170f3ec3f3e440cd6b0221e9c195e51b2630",
   "image_visibility": "public",
   "configuration": [
     {
       "key": "model",
-      "value": "ocr-max"
+      "value": "qwen3.8-flash"
     },
     {
       "key": "protocol",
@@ -25,9 +25,9 @@
   "model_api_url": "https://dashscope.aliyuncs.com/compatible-mode/v1",
   "pr_timeout_seconds": 3600,
   "contacts": [
-    "airport233"
+    "lizhengfeng101"
   ],
-  "provider": "OCR",
+  "provider": "Open Code Review",
   "egress": [
     "dashscope.aliyuncs.com"
   ]

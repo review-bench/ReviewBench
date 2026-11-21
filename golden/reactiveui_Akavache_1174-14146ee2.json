@@ -468,26 +468,6 @@
       }
     },
     {
-      "file": "src/Akavache.Sqlite3/AkavacheBuilderExtensions.cs",
-      "start_line": 126,
-      "end_line": 129,
-      "message": "Exposing a method to reset the SQLite provider for tests without conditional compilation risks accidental invocation in production, which can cause undefined behavior.",
-      "tp_fp": "fp",
-      "severity": "low",
-      "category": "maintainability",
-      "scope": "introduced-by-pr",
-      "difficulty": "easy",
-      "context_required": "diff-plus-related-files",
-      "tp_fp_justification": "Identical to Finding 20. The method is `internal static` and InternalsVisibleTo only lists Akavache.Tests and Akavache.Settings.Tests. NuGet consumers cannot access internal members, so 'accidental invocation in production' is factually impossible. The internal+InternalsVisibleTo pattern is the standard .NET idiom for test-accessible hooks.",
-      "severity_justification": "The access is already properly restricted to named test assemblies only.",
-      "category_justification": "The finding raises an encapsulation concern about test hooks in production code.",
-      "producer": "llm_review:gpt-4o",
-      "source": {
-        "type": "llm_review",
-        "alignment": "generated"
-      }
-    },
-    {
       "file": "src/Akavache.Tests/Helpers/TestHttpServer.cs",
       "start_line": 73,
       "end_line": 77,

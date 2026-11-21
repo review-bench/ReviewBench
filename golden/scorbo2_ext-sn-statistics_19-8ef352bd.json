@@ -169,26 +169,6 @@
     },
     {
       "file": "src/main/java/ca/corbett/snotes/extensions/statistics/StatisticsExtension.java",
-      "start_line": 222,
-      "end_line": 223,
-      "message": "The `progressComplete` method calls `getMessageUtil().info()` inside a `SwingUtilities.invokeLater()`. If the main window is closed before this code runs, `MainWindow.getInstance()` will return null, causing a `NullPointerException` when `getMessageUtil()` is called. The check for `MainWindow.getInstance() != null` should be performed inside the `invokeLater` runnable to avoid this race condition.",
-      "tp_fp": "fp",
-      "severity": "low",
-      "category": "reliability",
-      "scope": "introduced-by-pr",
-      "difficulty": "hard",
-      "context_required": "broader-project-context",
-      "tp_fp_justification": "Substantively identical to the prior finding about getMessageUtil() in progressCanceled. The modal progress dialog prevents main window closure during loading, making the race window practically unreachable. The NPE claim depends on unverifiable MessageUtil constructor behavior. Same analysis and conclusion as Finding 8.",
-      "severity_justification": "Same as Finding 8: even if triggered, harm occurs only when the app is already shutting down. Negligible real-world impact.",
-      "category_justification": "Same category as Finding 8 — potential NPE from lazy initialization racing with window lifecycle in a cross-thread Swing pattern.",
-      "producer": "llm_review:gemini-2.5-pro",
-      "source": {
-        "type": "llm_review",
-        "alignment": "generated"
-      }
-    },
-    {
-      "file": "src/main/java/ca/corbett/snotes/extensions/statistics/StatisticsExtension.java",
       "start_line": 154,
       "end_line": 161,
       "message": "The `MessageUtil` instance is lazily initialized and stored in a non-volatile instance field `messageUtil`. Since inner classes like `StatsRefreshAction` and `ProgressListener` can be called from different threads, there is a risk of a race condition during the initialization of `messageUtil`, potentially leading to multiple instances being created or other threads seeing a partially constructed object. The `messageUtil` field should be declared `volatile`.",

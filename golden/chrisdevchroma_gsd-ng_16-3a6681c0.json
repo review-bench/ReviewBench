@@ -520,26 +520,6 @@
       }
     },
     {
-      "file": "tests/pick-flag.test.cjs",
-      "start_line": 75,
-      "end_line": 75,
-      "message": "The test name is missing the noun after \"with\", which makes the assertion description hard to read.",
-      "tp_fp": "tp",
-      "severity": "low",
-      "category": "maintainability",
-      "scope": "introduced-by-pr",
-      "difficulty": "easy",
-      "context_required": "diff-only",
-      "tp_fp_justification": "Same issue as Finding 1, verified at line 75: test title reads '--file with still writes raw value to stdout (not @file:)' — 'with' is orphaned making the title grammatically incomplete/unclear.",
-      "severity_justification": "Purely cosmetic test naming issue with no behavioral impact.",
-      "category_justification": "Readability issue in a test description string.",
-      "producer": "ccr:gpt-5.5[ReasoningEffort=medium]",
-      "source": {
-        "type": "ccr",
-        "alignment": "generated"
-      }
-    },
-    {
       "file": "gsd-ng/references/decimal-phase-calculation.md",
       "start_line": 40,
       "end_line": 40,

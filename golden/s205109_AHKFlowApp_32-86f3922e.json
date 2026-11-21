@@ -88,26 +88,6 @@
       }
     },
     {
-      "file": "tests/AHKFlowApp.API.Tests/Middleware/GlobalExceptionMiddlewareTests.cs",
-      "start_line": 70,
-      "end_line": 95,
-      "message": "Same WithWebHostBuilder resource leak as the first test: the factory returned by _factory.WithWebHostBuilder(...) is not stored or disposed, leaking a second TestServer per class instance. Because xUnit creates one class instance per [Fact], two concurrent or sequential tests in this class each leak a full TestServer.",
-      "tp_fp": "fp",
-      "severity": "low",
-      "category": "reliability",
-      "scope": "introduced-by-pr",
-      "difficulty": "easy",
-      "context_required": "diff-only",
-      "tp_fp_justification": "Same — parent factory cleanup handles it",
-      "severity_justification": "Same as Finding 1 — test resource leak with no production impact. Not merge-blocking but does cause unreleased resources per test run.",
-      "category_justification": "Resource leak in test infrastructure — WebApplicationFactory instances created by WithWebHostBuilder are heavyweight and must be disposed.",
-      "producer": "llm_review:claude-sonnet-4.6",
-      "source": {
-        "type": "llm_review",
-        "alignment": "generated"
-      }
-    },
-    {
       "file": "tests/AHKFlowApp.API.Tests/Health/HealthControllerTests.cs",
       "start_line": 12,
       "end_line": 16,

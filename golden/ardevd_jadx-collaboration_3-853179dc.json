@@ -266,26 +266,6 @@
         "type": "ccr",
         "alignment": "generated"
       }
-    },
-    {
-      "file": "src/main/kotlin/uk/oshawk/jadx/collaboration/Plugin.kt",
-      "start_line": 50,
-      "end_line": 54,
-      "message": "These shortcut handlers also create non-daemon threads via `kotlin.concurrent.thread`, so a blocked pull/push triggered from the keyboard can prevent JVM shutdown. Use a daemon executor thread or ensure the worker is shut down with the plugin lifecycle.",
-      "tp_fp": "tp",
-      "severity": "low",
-      "category": "reliability",
-      "scope": "introduced-by-pr",
-      "difficulty": "medium",
-      "context_required": "diff-only",
-      "tp_fp_justification": "Verified: lines 50–54 call `kotlin.concurrent.thread` for the key binding handlers with no `isDaemon=true`, same default non-daemon behaviour as finding 1. Factually correct, but this is substantively identical to finding 1 — same root cause, same fix, same four call sites. Evaluated independently it is still a valid TP.",
-      "severity_justification": "Same shutdown-stall risk as finding 1; annoying but not data-corrupting.",
-      "category_justification": "Thread lifecycle / JVM shutdown behaviour concern, same as finding 1.",
-      "producer": "ccr:gpt-5.5[ReasoningEffort=medium]",
-      "source": {
-        "type": "ccr",
-        "alignment": "generated"
-      }
     }
   ]
 }

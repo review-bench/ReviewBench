@@ -1,0 +1,30 @@
+{
+  "name": "ncoder-sonnet-5-5",
+  "display_name": "ncoder-sonnet-5-5",
+  "image": "ghcr.io/nclusion-reviewbench/ncoder-reviewbench@sha256:9b1b0a12424f7347ebd8fc7b68f0ec2c6af04a70cfcd1a0298ffe9bb46f0f693",
+  "image_visibility": "private",
+  "configuration": [
+    {
+      "key": "model",
+      "value": "claude-sonnet-5-5"
+    },
+    {
+      "key": "effort",
+      "value": "high"
+    }
+  ],
+  "secrets": {
+    "env": [
+      "ANTHROPIC_API_KEY",
+      "GHCR_PULL_TOKEN"
+    ]
+  },
+  "model_api_url": "https://api.anthropic.com",
+  "contacts": [
+    "nclusion-reviewbench"
+  ],
+  "provider": "ncoder-sonnet-5-5",
+  "egress": [
+    "api.anthropic.com"
+  ]
+}

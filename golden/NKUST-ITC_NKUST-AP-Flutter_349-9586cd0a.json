@@ -328,26 +328,6 @@
       }
     },
     {
-      "file": "lib/api/leave_helper.dart",
-      "start_line": 230,
-      "end_line": 230,
-      "message": "The method `getLeaveApplication` catches a generic 'NullThrownError' string. The underlying `loginToLeave` call can throw `GeneralResponse` objects on failure. Catching a specific string is brittle and will likely miss actual exceptions, preventing proper error handling for login failures.",
-      "tp_fp": "fp",
-      "severity": "low",
-      "category": "correctness",
-      "scope": "pre-existing",
-      "difficulty": "easy",
-      "context_required": "diff-plus-related-files",
-      "tp_fp_justification": "Same issue as Finding 16: there is no method called `getLeaveApplication` in `leave_helper.dart`. The method at line 225 is `getLeavesSubmitInfo`. The `'NullThrownError'` string is THROWN (not caught) as a null credentials guard. The finding reverses the direction and uses a non-existent method name.",
-      "severity_justification": "Throwing a bare string is pre-existing bad practice, but the finding's factual claim about catching is incorrect and no new behavior was introduced by this PR.",
-      "category_justification": "The finding makes an incorrect claim about control flow direction (catch vs throw) and names a non-existent method.",
-      "producer": "llm_review:gemini-2.5-pro",
-      "source": {
-        "type": "llm_review",
-        "alignment": "generated"
-      }
-    },
-    {
       "file": "lib/api/ap_helper.dart",
       "start_line": 159,
       "end_line": 243,
