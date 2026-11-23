@@ -101,7 +101,7 @@ If the first pull request fails because a host was refused, the run stops there 
 
 ## 5. Change something
 
-- New image: add a configuration in the portal with the new digest and labels, or use **new build** on a published configuration. No approval needed; each run records which configuration it used.
+- New image: **edit** a configuration that is not published yet, use **new build** on a published one, or add a configuration with different labels for a new row. No approval needed; each run records which configuration it used.
 - New secret value: the credentials form.
 - New authorized GitHub user: edit the `contacts` list in a pull request.
 
