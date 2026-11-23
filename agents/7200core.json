@@ -1,0 +1,20 @@
+{
+  "name": "7200core",
+  "display_name": "7200core",
+  "image": "ghcr.io/7200core/7200core-client@sha256:dcd01d56ea7416e746ad2cfeabeba47e78c2ab3b38cd4542e26e56946a840202",
+  "image_visibility": "private",
+  "secrets": {
+    "env": [
+      "AUDIT_TOKEN",
+      "GHCR_PULL_TOKEN"
+    ]
+  },
+  "model_api_url": "https://rb.7200core.com",
+  "contacts": [
+    "7200core"
+  ],
+  "provider": "7200core",
+  "egress": [
+    "rb.7200core.com"
+  ]
+}
