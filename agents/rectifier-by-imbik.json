@@ -1,0 +1,21 @@
+{
+  "name": "rectifier-by-imbik",
+  "display_name": "Rectifier by Imbik",
+  "image": "ghcr.io/imbik-ai/rectifier-reviewbench@sha256:50aa30435f852fa0261d737a3ce89729d3db41f9153df8ff7b44e85f673f8749",
+  "image_visibility": "private",
+  "secrets": {
+    "env": [
+      "RECTIFIER_REVIEWBENCH_CLIENT_TOKEN",
+      "GHCR_PULL_TOKEN"
+    ]
+  },
+  "model_api_url": "https://rectifier-api.imbik.ai",
+  "pr_timeout_seconds": 3600,
+  "contacts": [
+    "cpchen"
+  ],
+  "provider": "Rectifier by Imbik",
+  "egress": [
+    "rectifier-api.imbik.ai"
+  ]
+}
