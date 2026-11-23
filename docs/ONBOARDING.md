@@ -83,7 +83,7 @@ needs `-e RB_MODEL_BASE_URL=https://…`.
 
 ## 3. Enter your credentials
 
-As soon as you have registered, the portal shows a credentials form for your reviewer; there is no need to wait for approval, and a run can start the moment it lands. Enter the **values** for the names you declared. They go straight to our Key Vault; we never read them, and they are handed to your container only for the duration of a run.
+As soon as you have registered, the portal shows a credentials form for each configuration; there is no need to wait for approval, and a run can start the moment it lands. Enter the **values** for the names you declared. They go straight to our Key Vault; we never read them, and they are handed to your container only for the duration of a run.
 
 - `GHCR_PULL_TOKEN`, if your image is private: a GitHub **classic** personal access token with the single scope `read:packages` ([create one](https://github.com/settings/tokens/new?scopes=read:packages&description=ReviewBench%20pull); fine-grained tokens cannot read packages). Expire it and rotate it as you like; enter the new value in the same form.
 - Your model provider's key, under the name your container reads (for example `OPENAI_API_KEY`).
@@ -101,7 +101,7 @@ If the first pull request fails because a host was refused, the run stops there 
 
 ## 5. Change something
 
-- New image: add a configuration in the portal with the new digest and labels. No approval needed; each run records which configuration it used.
+- New image: **edit** a configuration that is not published yet, use **new build** on a published one, or add a configuration with different labels for a new row. No approval needed; each run records which configuration it used.
 - New secret value: the credentials form.
 - New authorized GitHub user: edit the `contacts` list in a pull request.
 

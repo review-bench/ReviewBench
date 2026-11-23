@@ -261,9 +261,9 @@ tuning happens on your side:
    your leaderboard row is published.
 
 There is no monthly cap on runs. You choose which configuration goes to the
-final; you do not choose which run, because the final is measured fresh. Your
-row shows how many configurations you tested. **Only a final run started
-through this self-service flow can be published on the leaderboard.**
+final; you do not choose which run, because the final is measured fresh.
+**Only a final run started through this self-service flow can be published
+on the leaderboard.**
 
 ### Optional: Judge your own findings locally for tuning
 
