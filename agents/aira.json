@@ -1,0 +1,30 @@
+{
+  "name": "aira",
+  "display_name": "Aira",
+  "image": "ghcr.io/eightgenai/aira-reviewbench@sha256:509b77fac5984df4184ae55a12416c4d63b070bb2bda0f9ad7d63766bdc4e6fb",
+  "image_visibility": "public",
+  "configuration": [
+    {
+      "key": "model",
+      "value": "deepseek-v4.1-flash-1017"
+    },
+    {
+      "key": "effort",
+      "value": "medium"
+    }
+  ],
+  "secrets": {
+    "env": [
+      "RB_API_TOKEN"
+    ]
+  },
+  "model_api_url": "https://reviewbench.eightgen.ai",
+  "pr_timeout_seconds": 3600,
+  "contacts": [
+    "namitpatel3006"
+  ],
+  "provider": "Aira",
+  "egress": [
+    "reviewbench.eightgen.ai"
+  ]
+}
