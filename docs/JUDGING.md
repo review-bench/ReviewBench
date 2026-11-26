@@ -143,9 +143,23 @@ your agent inference remains yours.
 ## Resume and inspect results
 
 During a run, `results.checkpoint.json` is updated after each PR. Running the
-same command again resumes compatible completed work. A checkpoint created by a
-different model or prompt fingerprint is ignored. The checkpoint is removed
+same command again resumes compatible completed work, however long ago the run
+stopped: the checkpoint does not expire. A checkpoint created by a different
+model, prompt or input fingerprint, or one that can't be read, is not used; it
+is renamed to `results.checkpoint.<timestamp>.json` rather than overwritten, so
+a rerun with the original inputs can still resume it. The checkpoint is removed
 after a fully successful run.
+
+A PR that fails on a rate limit, an overloaded or unavailable provider, or a
+dropped connection is judged again after 30s, 60s and 120s. Change the number
+of retries with `--max-retries <n>` (`0` disables them) and the first delay with
+`REVIEW_BENCH_JUDGE_RETRY_DELAY_MS`. Judge timeouts are not retried.
+
+When the provider rejects the API key, the key has expired, the quota is
+used up, or the model is unavailable, every remaining PR would fail the same
+way. The run stops after the first such failure and exits with code 2, keeping
+the checkpoint. Fix the key or quota and run the same command again to judge
+only the PRs that are left.
 
 The command prints the final summary and writes:
 
