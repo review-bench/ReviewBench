@@ -1,0 +1,25 @@
+{
+  "name": "amp-review",
+  "display_name": "Amp Review",
+  "image": "ghcr.io/lox/amp-mcp-gateway-reviewbench@sha256:873bf54e18eaf4a1ba9c50ac1fb147696d481ebc7a62a82d5328ae846910234c",
+  "image_visibility": "public",
+  "configuration": [
+    {
+      "key": "mode",
+      "value": "reviewbot-v1"
+    }
+  ],
+  "secrets": {
+    "env": [
+      "AMP_API_KEY"
+    ]
+  },
+  "model_api_url": "https://ampcode.com",
+  "contacts": [
+    "lox"
+  ],
+  "provider": "Amp Review",
+  "egress": [
+    "ampcode.com"
+  ]
+}
